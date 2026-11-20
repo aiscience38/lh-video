@@ -1,8 +1,8 @@
 {
-  "name": "open-higgsfield",
+  "name": "lh-video",
   "version": "0.1.0",
   "private": true,
-  "description": "Open-source Higgsfield alternative for multi-provider AI image and video generation.",
+  "description": "LH Video: a self-hosted Flow/Higgsfield-style generation studio with a local ComfyUI backend.",
   "license": "MIT",
   "author": "TechBe",
   "homepage": "https://openhiggs.techbe.me",

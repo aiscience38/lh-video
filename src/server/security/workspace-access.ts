@@ -24,8 +24,11 @@ export function workspaceConfiguration(): WorkspaceConfiguration {
     if (rawOrigin) {
         let url: URL;
         try { url = new URL(rawOrigin); } catch { throw new Error("ERR_ACCESS_CONFIG"); }
+        // LH_VIDEO_LOCAL marks the packaged desktop build: it serves the app on
+        // http loopback while Next still runs in production mode.
+        const desktopLoopback = process.env.LH_VIDEO_LOCAL === "true" && url.protocol === "http:" && loopback(url);
         if (url.origin !== rawOrigin || url.username || url.password ||
-            (url.protocol !== "https:" && !(url.protocol === "http:" && !production && loopback(url)))) {
+            (url.protocol !== "https:" && !desktopLoopback && !(url.protocol === "http:" && !production && loopback(url)))) {
             throw new Error("ERR_ACCESS_CONFIG");
         }
         origin = url.origin;

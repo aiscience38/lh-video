@@ -170,7 +170,7 @@ See [Architecture](docs/architecture.md) for the complete request lifecycle and 
 
 ### Prerequisites
 
-- Node.js 22.23.4 or newer within the Node 22 release line
+- Node.js 22.23.4 or newer within the Node 22 release line (the repo pins `.node-version`; the Windows desktop build bundles its own Node 22 runtime)
 - npm 10+
 - At least one supported provider credential
 - For distributed deployments: Vercel Blob or S3 credentials for durable media/reference uploads; legacy Cloudinary is optional
