@@ -13,10 +13,15 @@ test.describe.configure({ mode: "serial" });
 test("overview shows live counts for all three kinds and the on-disk layout", async ({ page }) => {
     await page.goto("/en/library");
     await expect(page.getByRole("heading", { name: en.library.overview.title })).toBeVisible();
+    const counts: number[] = [];
     for (const kind of ["characters", "scenes", "storyboards"]) {
         await expect(page.getByTestId(`library-card-${kind}`)).toBeVisible();
-        await expect(page.getByTestId(`library-count-${kind}`)).toHaveText("0");
+        const count = page.getByTestId(`library-count-${kind}`);
+        await expect(count).toHaveText(/^\d+$/);
+        counts.push(Number(await count.textContent()));
     }
+    // Projects share one e2e server, so earlier projects may already have created characters.
+    if (counts.every(value => value === 0)) await expect(page.getByTestId("library-overview-empty")).toBeVisible();
     await expect(page.getByTestId("library-layout")).toContainText("characters/");
     await expect(page.getByTestId("library-layout")).toContainText("character.json");
     await expect(page.getByTestId("library-layout")).toContainText(".trash");
@@ -50,7 +55,7 @@ test("creates a character with one uploaded reference and persists after reload"
 
     const card = page.getByTestId("character-card").filter({ hasText: name });
     await expect(card).toBeVisible();
-    await expect(card.getByTestId("character-reference-count")).toHaveText("1");
+    await expect(card.getByTestId("character-reference-count")).toHaveAttribute("data-count", "1");
     const image = card.locator("img");
     await expect(image).toHaveAttribute("src", /\/api\/uploaded\/[a-f0-9]{64}\.jpg$/);
     await expect.poll(() => image.evaluate(node => (node as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);

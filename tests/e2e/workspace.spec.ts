@@ -35,14 +35,14 @@ for (const [locale, m] of Object.entries(messages)) {
 
         await page.getByRole("link", { name: m.workspace.providers, exact: true }).click();
         await expect(page.getByRole("heading", { name: m.providers.title })).toBeVisible();
-        await expect(page.locator(".provider-card")).toHaveCount(6);
+        await expect(page.locator(".provider-card")).toHaveCount(7);
         for (const mark of await page.locator('.provider-card img').all()) {
             await mark.scrollIntoViewIfNeeded();
             await mark.evaluate(image => (image as HTMLImageElement).decode());
             await expect(mark).toHaveCSS("object-fit", "contain");
         }
         await page.reload();
-        await expect(page.locator(".provider-card")).toHaveCount(6);
+        await expect(page.locator(".provider-card")).toHaveCount(7);
         await expectWithinViewport(page);
         expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
         await page.screenshot({ path: testInfo.outputPath("providers.png"), fullPage: true });
