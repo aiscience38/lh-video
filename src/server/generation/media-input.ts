@@ -18,6 +18,21 @@ export function readModelMedia(form: FormData, model: ModelCapabilities, mode: "
     if (mode === "image" && "has_edit_variant" in model && model.has_edit_variant && !slots.some(s => s.id === "reference_images")) {
         slots.push({ id: "reference_images", label: "Reference images", kind: "image", multiple: true, max_count: 14 });
     }
+    // A model only accepts the slots its catalog capability declares. Silently
+    // dropping an undeclared image/video input would report success for a
+    // generation that ignored the attachment.
+    const declared = new Set(slots.map(slot => slot.id));
+    for (const [key, value] of form) {
+        const match = /^(slot_|file_|url_)(.+)$/.exec(key);
+        if (!match || match[2].startsWith("elem_")) continue;
+        const provided = value instanceof File ? value.size > 0 : typeof value === "string" && value.trim().length > 0;
+        const acceptedPrefix = mode === "image" ? match[1] !== "file_" : match[1] !== "slot_";
+        if (provided && (!acceptedPrefix || !declared.has(match[2]))) {
+            // Mirror the adapter's catalog-validation code so the API returns
+            // the same ERR_* value the provider would report.
+            throw new Error(model.provider === "comfyui" ? "ERR_COMFYUI_UNSUPPORTED_MEDIA" : "ERR_UNSUPPORTED_MEDIA");
+        }
+    }
     return slots.map(slot => {
         const files = form.getAll(`${mode === "image" ? "slot" : "file"}_${slot.id}`).filter((v): v is File => v instanceof File && v.size > 0);
         const urls = form.getAll(`url_${slot.id}`).filter((v): v is string => typeof v === "string" && !!v.trim()).map(v => v.trim());
