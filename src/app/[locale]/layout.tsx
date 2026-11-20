@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope, Space_Grotesk } from "next/font/google";
+import { Manrope, Playfair_Display } from "next/font/google";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
@@ -17,10 +17,10 @@ const manrope = Manrope({
     weight: ["400", "500", "600", "700", "800"],
 });
 
-const spaceGrotesk = Space_Grotesk({
+const playfair = Playfair_Display({
     subsets: ["latin"],
-    variable: "--font-space-grotesk",
-    weight: ["500", "700"],
+    variable: "--font-playfair",
+    weight: ["500", "600", "700"],
 });
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -61,7 +61,7 @@ export default async function LocaleLayout({
                 {/* The workspace is already dark; prevent extension rewrites before hydration. */}
                 <meta name="darkreader-lock" />
             </head>
-            <body className={`${manrope.variable} ${spaceGrotesk.variable}`}>
+            <body className={`${manrope.variable} ${playfair.variable}`}>
                 <NextIntlClientProvider messages={messages}>
                     <TooltipProvider><WorkspaceShell>{children}</WorkspaceShell></TooltipProvider>
                 </NextIntlClientProvider>

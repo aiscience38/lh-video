@@ -1,9 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="LH Video logo">
-  <rect width="64" height="64" rx="18" fill="#0a0a0a"/>
-  <rect x="14" y="18" width="8" height="28" rx="1.5" fill="#d5ff47"/>
-  <rect x="14" y="38" width="17" height="8" rx="1.5" fill="#d5ff47"/>
-  <rect x="35" y="18" width="8" height="28" rx="1.5" fill="#d5ff47"/>
-  <rect x="51" y="18" width="8" height="28" rx="1.5" fill="#d5ff47"/>
-  <rect x="35" y="28" width="24" height="8" rx="1.5" fill="#d5ff47"/>
-  <circle cx="51" cy="52" r="3.5" fill="#f4f7fb"/>
+  <defs>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7f7f9"/>
+      <stop offset=".45" stop-color="#cfcfd6"/>
+      <stop offset=".7" stop-color="#9d9da6"/>
+      <stop offset="1" stop-color="#e6e6ea"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#0b0b0c"/>
+  <polygon points="13,13 21,13 21,43 41,43 41,51 13,51" fill="url(#steel)"/>
+  <polygon points="33,13 41,13 41,26 47,26 47,13 55,13 55,51 47,51 47,34 41,34 41,51 33,51" fill="url(#steel)"/>
+  <rect x="13" y="55" width="38" height="1.6" rx=".8" fill="#8f8f99" opacity=".55"/>
 </svg>

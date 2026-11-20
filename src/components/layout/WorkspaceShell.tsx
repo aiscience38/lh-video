@@ -35,7 +35,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                 <div className="flex h-12 items-center gap-1.5 px-2 sm:gap-3 sm:px-4">
                     <Link href={`/${locale}`} aria-label={t("home")} className="flex shrink-0 items-center gap-2 rounded-lg">
                         <Image src="/icon.svg" width={28} height={28} alt="" className="size-7" priority />
-                        <span className="hidden text-sm font-semibold tracking-tight text-white xl:block">Open<span className="text-primary">Higgsfield</span></span>
+                        <span className="hidden text-[15px] tracking-[0.3em] text-white xl:block" style={{ fontFamily: "var(--font-display)" }}>LH <span className="text-primary">VIDEO</span></span>
                     </Link>
                     <nav aria-label={t("navigation")} className="flex shrink-0 gap-0.5 rounded-xl bg-white/[.04] p-0.5">
                         {destinations.map(({ label, href, icon: Icon, active }) => <Link key={href} href={href} aria-current={active ? "page" : undefined} title={label} className={`flex h-8 min-w-9 items-center justify-center gap-1.5 rounded-[10px] px-2 text-xs font-semibold transition-colors sm:px-3 ${active ? "bg-white/[.1] text-white" : "text-muted-foreground hover:bg-white/[.05] hover:text-white"}`}>

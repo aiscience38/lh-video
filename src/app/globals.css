@@ -8,7 +8,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-manrope), sans-serif;
-  --font-display: var(--font-space-grotesk), sans-serif;
+  --font-display: var(--font-playfair), Georgia, serif;
   --font-mono: ui-monospace, monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -39,8 +39,8 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --color-lime: #d5ff47;
-  --color-lime-2: #bcf122;
+  --color-lime: #d9d9e2;
+  --color-lime-2: #bfbfc8;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -52,39 +52,39 @@
 
 :root {
   color-scheme: dark;
-  /* Shared studio palette. */
-  --background: #060606;
-  --foreground: #f4f7fb;
-  --card: rgba(16, 16, 16, .86);
-  --card-foreground: #f4f7fb;
-  --popover: rgba(18, 18, 18, .97);
-  --popover-foreground: #f4f7fb;
-  --primary: #d5ff47;
-  --primary-foreground: #0b1118;
-  --secondary: rgba(255, 255, 255, .05);
-  --secondary-foreground: rgba(244, 247, 251, .72);
-  --muted: rgba(255, 255, 255, .05);
-  --muted-foreground: #a4abb4;
-  --accent: rgba(255, 255, 255, .07);
-  --accent-foreground: #f4f7fb;
-  --destructive: #ff8080;
-  --border: rgba(255, 255, 255, .08);
-  --input: rgba(255, 255, 255, .08);
-  --ring: rgba(213, 255, 71, .4);
-  --chart-1: #d5ff47;
-  --chart-2: #8ef4c5;
-  --chart-3: #ffd56a;
-  --chart-4: #ff8080;
-  --chart-5: rgba(244, 247, 251, .44);
+  /* Lamboy Holdings metal palette: charcoal ground, brushed-silver accent. */
+  --background: #0a0a0b;
+  --foreground: #ececef;
+  --card: rgba(21, 21, 23, .88);
+  --card-foreground: #ececef;
+  --popover: rgba(23, 23, 25, .97);
+  --popover-foreground: #ececef;
+  --primary: #d9d9e2;
+  --primary-foreground: #121214;
+  --secondary: rgba(255, 255, 255, .06);
+  --secondary-foreground: rgba(236, 236, 239, .74);
+  --muted: rgba(255, 255, 255, .06);
+  --muted-foreground: #9d9da6;
+  --accent: rgba(255, 255, 255, .08);
+  --accent-foreground: #ececef;
+  --destructive: #e08585;
+  --border: rgba(255, 255, 255, .09);
+  --input: rgba(255, 255, 255, .09);
+  --ring: rgba(217, 217, 226, .45);
+  --chart-1: #e8e8ee;
+  --chart-2: #b9b9c2;
+  --chart-3: #8f8f99;
+  --chart-4: #d0b98f;
+  --chart-5: rgba(236, 236, 239, .44);
   --radius: 0.875rem;
-  --sidebar: #111111;
-  --sidebar-foreground: #f4f7fb;
-  --sidebar-primary: #d5ff47;
-  --sidebar-primary-foreground: #0b1118;
-  --sidebar-accent: rgba(255, 255, 255, .07);
-  --sidebar-accent-foreground: #f4f7fb;
-  --sidebar-border: rgba(255, 255, 255, .08);
-  --sidebar-ring: rgba(213, 255, 71, .4);
+  --sidebar: #111113;
+  --sidebar-foreground: #ececef;
+  --sidebar-primary: #d9d9e2;
+  --sidebar-primary-foreground: #121214;
+  --sidebar-accent: rgba(255, 255, 255, .08);
+  --sidebar-accent-foreground: #ececef;
+  --sidebar-border: rgba(255, 255, 255, .09);
+  --sidebar-ring: rgba(217, 217, 226, .45);
 }
 
 @layer base {
@@ -96,10 +96,10 @@
     @apply bg-background text-foreground;
     font-family: var(--font-manrope), sans-serif;
     background:
-      radial-gradient(circle at top left, rgba(255, 255, 255, .06), transparent 24%),
-      radial-gradient(circle at 88% 78%, rgba(213, 255, 71, .08), transparent 18%),
-      radial-gradient(circle at 82% 22%, rgba(255, 255, 255, .04), transparent 16%),
-      linear-gradient(180deg, #040404 0%, #090909 34%, #060606 100%);
+      radial-gradient(ellipse 60% 38% at 50% -6%, rgba(255, 255, 255, .10), transparent 60%),
+      radial-gradient(circle at 88% 78%, rgba(217, 217, 226, .05), transparent 20%),
+      radial-gradient(circle at 12% 22%, rgba(255, 255, 255, .035), transparent 18%),
+      linear-gradient(180deg, #08080a 0%, #0b0b0d 36%, #09090b 100%);
     overflow: hidden;
   }
 
