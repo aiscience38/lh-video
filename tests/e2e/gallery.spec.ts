@@ -167,7 +167,17 @@ test("failed deletion preserves selection and retry removes only the chosen imag
 test("dragging an image onto another reorders and saves at once without attaching it to the prompt", async ({ page }, info) => {
     test.skip(info.project.name === "mobile-chromium", "Touchscreens reorder from each tile's menu, covered by the next test.");
     const { mutations } = await gallery(page); await page.goto("/en");
-    await card(page, "gallery-b:0").dragTo(card(page, "gallery-a:0"), { steps: 12 });
+    const source = card(page, "gallery-b:0");
+    const target = card(page, "gallery-a:0");
+    if (test.info().project.name === "webkit") {
+        // WebKit does not deliver HTML5 dataTransfer through Playwright's native drag path.
+        const dataTransfer = await page.evaluateHandle(() => new DataTransfer());
+        await source.dispatchEvent("dragstart", { dataTransfer });
+        await target.dispatchEvent("dragover", { dataTransfer });
+        await target.dispatchEvent("drop", { dataTransfer });
+    } else {
+        await source.dragTo(target, { steps: 12 });
+    }
     await expect.poll(async () => (await keys(page))[0]).toBe("gallery-b:0");
     await expect.poll(() => mutations.filter(item => item.action === "reorder").length).toBe(1);
     await expect(page.locator("[data-studio-composer]").getByRole("textbox")).toBeVisible();
