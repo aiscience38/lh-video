@@ -1,4 +1,5 @@
 import { spawn, execFileSync } from "node:child_process";
+import { existsSync } from "node:fs";
 import { access, cp, mkdtemp, readFile, rm } from "node:fs/promises";
 import { Agent, request as httpRequest } from "node:http";
 import { createServer as createHttpsServer } from "node:https";
@@ -15,6 +16,16 @@ const sockets = new Set();
 let server, child, childEnded, shuttingDown = false;
 const upstreamAgent = new Agent({ keepAlive: true, maxSockets: 16, maxFreeSockets: 4 });
 const expectedDisconnect = error => ["ECONNRESET", "EPIPE", "ERR_STREAM_PREMATURE_CLOSE"].includes(error?.code);
+
+function resolveOpenssl() {
+    if (process.env.OPENSSL_PATH) return process.env.OPENSSL_PATH;
+    if (process.platform !== "win32") return "openssl";
+    // Windows: bare "openssl" resolves through MSYS shims and fails with EPERM in Node's spawn.
+    for (const candidate of ["C:/Program Files/Git/usr/bin/openssl.exe", "C:/Program Files/Git/mingw64/bin/openssl.exe"]) {
+        if (existsSync(candidate)) return candidate;
+    }
+    return "openssl";
+}
 
 function track(socket) {
     if (sockets.has(socket)) return socket;
@@ -87,7 +98,8 @@ try {
     await assertBackendPortFree();
     const argumentsForNext = await nextArguments();
     const keyPath = path.join(temporary, "key.pem"), certPath = path.join(temporary, "cert.pem");
-    execFileSync("openssl", ["req", "-x509", "-newkey", "rsa:2048", "-nodes", "-sha256", "-days", "1",
+    const opensslBinary = resolveOpenssl();
+    execFileSync(opensslBinary, ["req", "-x509", "-newkey", "rsa:2048", "-nodes", "-sha256", "-days", "1",
         "-keyout", keyPath, "-out", certPath, "-subj", "/CN=127.0.0.1", "-addext", "subjectAltName=IP:127.0.0.1"], { stdio: "ignore" });
     server = createHttpsServer({ key: await readFile(keyPath), cert: await readFile(certPath) }, (request, response) => {
         let upstreamResponse;
