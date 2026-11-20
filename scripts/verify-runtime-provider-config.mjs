@@ -82,7 +82,7 @@ test("removed Freepik connections and custom models cannot reenter the runtime c
         const definitions = loader.load("src/providers/definitions.ts");
         const catalog = loader.load("src/server/catalog/runtime.ts");
         assert.equal(definitions.isProviderId("freepik"), false);
-        assert.equal(definitions.PROVIDER_DEFINITIONS.length, 6);
+        assert.equal(definitions.PROVIDER_DEFINITIONS.length, 7);
         assert.deepEqual(Array.from(await store.listProviderConnections()), []);
         assert.equal(await store.getProviderConnection("retired_connection"), undefined);
         assert.equal(await store.selectProviderConnection("freepik"), undefined);
@@ -122,11 +122,12 @@ test("Studio lists only models from providers with enabled credentials", async (
             assert.equal((await catalog.getRuntimeCapabilityList(media)).length, 0);
             assert.ok((await catalog.getAllRuntimeCapabilities(media)).length > 0, "settings still expose disconnected models");
         }
-        for (const { id: providerId } of definitions.PROVIDER_DEFINITIONS) {
+        for (const { id: providerId, mediaTypes } of definitions.PROVIDER_DEFINITIONS) {
             const first = await store.saveProviderConnection({ providerId, label: "Disabled", secret: "synthetic-hidden-key", enabled: false });
             assert.equal((await store.getConnectedProviderIds()).has(providerId), false);
             const second = await store.saveProviderConnection({ providerId, label: "Active", secret: "synthetic-active-key", enabled: true });
-            for (const media of ["image", "video"]) {
+            // A provider only ships models for the media types it advertises.
+            for (const media of mediaTypes) {
                 const models = await catalog.getRuntimeCapabilityList(media);
                 assert.ok(models.length > 0, `${providerId} has ${media} models`);
                 assert.ok(models.every(model => model.provider === providerId));

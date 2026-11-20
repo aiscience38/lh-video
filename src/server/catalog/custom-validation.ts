@@ -9,6 +9,7 @@ import { VIDEO_CAPABILITIES } from "./video";
 import { getMagnificContract } from "./magnific";
 import { getToapisContract } from "./toapis";
 import { getRunwareContract } from "./runware";
+import { getComfyuiTemplate } from "./comfyui";
 
 const unsafeKeys = new Set(["__proto__", "prototype", "constructor"]);
 const identifier = z.string().regex(/^[A-Za-z0-9_.:-]{1,180}$/).refine(value => value.split(/[.:]/).every(part => !unsafeKeys.has(part)));
@@ -105,7 +106,8 @@ export function assertCustomModelCapabilities(value: unknown, mediaType: "image"
     if (mediaType === "video" && model.provider_mode !== "video" || mediaType === "image" && model.provider_mode === "video") throw new Error("ERR_CUSTOM_MODEL_MEDIA_TYPE");
     if (model.provider === "magnific" && !getMagnificContract(model.provider_model_id, mediaType)
         || model.provider === "toapis" && !getToapisContract(model.provider_model_id, mediaType, model.provider_action)
-        || model.provider === "runware" && !getRunwareContract(model.provider_model_id, mediaType)) throw new Error("ERR_CUSTOM_MODEL_ADAPTER_REQUIRED");
+        || model.provider === "runware" && !getRunwareContract(model.provider_model_id, mediaType)
+        || model.provider === "comfyui" && !getComfyuiTemplate(model.provider_model_id, mediaType)) throw new Error("ERR_CUSTOM_MODEL_ADAPTER_REQUIRED");
     if (model.provider !== "runware" && model.provider_model_id.includes("@")) throw new Error("ERR_CUSTOM_MODEL_INVALID");
     for (const fields of [model.custom_fields, model.media_slots]) {
         if (new Set(fields.map(field => field.id)).size !== fields.length) throw new Error("ERR_CUSTOM_MODEL_INVALID");

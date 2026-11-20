@@ -81,6 +81,17 @@ export const PROVIDER_DEFINITIONS: readonly ProviderDefinition[] = [
         discovery: "provider-api",
         envKeys: ["RUNWARE_API_KEY"],
     },
+    {
+        id: "comfyui",
+        docsUrl: "https://github.com/comfyanonymous/ComfyUI",
+        label: "ComfyUI",
+        description: "Reviewed ComfyUI graphs on the local GX10 host.",
+        secretKind: "api-key",
+        mediaTypes: ["image"],
+        supportsMultipleConnections: true,
+        discovery: "manual",
+        envKeys: ["COMFYUI_BASE_URL", "COMFYUI_API_KEY"],
+    },
 ];
 
 export function getProviderDefinition(id: ProviderId): ProviderDefinition {

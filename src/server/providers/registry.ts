@@ -7,6 +7,7 @@ import { VercelAiGatewayProvider } from "@/server/providers/vercel-ai-gateway";
 import { ToapisProvider } from "@/server/providers/toapis";
 import { MagnificProvider } from "@/server/providers/magnific-provider";
 import { RunwareProvider } from "@/server/providers/runware";
+import { ComfyuiProvider } from "@/server/providers/comfyui";
 
 const providers = new Map<ProviderId, GenerationProvider>([
     ["google-ai-studio", new GoogleProvider("google-ai-studio")],
@@ -15,6 +16,7 @@ const providers = new Map<ProviderId, GenerationProvider>([
     ["toapis", new ToapisProvider()],
     ["magnific", new MagnificProvider()],
     ["runware", new RunwareProvider()],
+    ["comfyui", new ComfyuiProvider()],
 ]);
 
 export function resolveProvider(caps: ModelCapabilities): {
