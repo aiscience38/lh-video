@@ -332,6 +332,7 @@
     "mode": "Creation type",
     "fields": {
       "seed": "Seed",
+      "cfg": "CFG scale",
       "negative_prompt": "Negative prompt",
       "resolution": "Resolution",
       "aspect_ratio": "Aspect ratio",
@@ -1025,7 +1026,8 @@
       "vercel-ai-gateway": "Access models from multiple providers with one gateway key.",
       "toapis": "Connect your ToAPIs account for image and video models.",
       "magnific": "Generate, edit and upscale with Magnific's creative tools.",
-      "runware": "Generate images and videos with FLUX, Gemini, GPT Image and other models on Runware."
+      "runware": "Generate images and videos with FLUX, Gemini, GPT Image and other models on Runware.",
+      "comfyui": "Run reviewed ComfyUI graphs on the GX10 host with an optional bearer token."
     },
     "keyHint": "Use a key from your provider account.",
     "modelIdPlaceholder": "provider/model-id"
@@ -1073,6 +1075,12 @@
   },
   "catalog": {
     "descriptions": {
+      "text_3acbbaaa_59": "Text encoded into the negative prompt of the sampler graph.",
+      "text_8990dd2b_65": "Output width in pixels. ComfyUI decodes widths in multiples of 8.",
+      "text_ec4134bd_67": "Output height in pixels. ComfyUI decodes heights in multiples of 8.",
+      "text_153fb3e_43": "Sampler steps applied by the KSampler node.",
+      "text_ea33b082_59": "Classifier-free guidance scale passed to the KSampler node.",
+      "text_85ac0ff0_63": "Sampler seed. The same seed and graph reproduce the same image.",
       "text_a5c83b1c_444": "### Structure Reference\nBase64 image to use as structure reference. Using images as structure references allows you to influence the shape of your final image. This feature enables various creative applications such as coloring sketches, transforming cartoons into realistic images, texturing basic 3D models, or converting real images into cartoons. The outcome is entirely controlled by your prompt, offering limitless creative possibilities.\n",
       "text_41823537_253": "### Style Reference\nBase64 image to use as style reference. Using images as style references allows you to influence the aesthetic of your creation. This is possibly the most powerful tool of Mystic, as it truly lets you create incredibly unique images.\n",
       "text_5d9b5cfe_1631": "* `zen` - for smoother, basic, and cleaner results. Fewer objects in the scene and less intricate details. The softer looking one.\n\n* `flexible` - good prompt adherence. However, it has results that are a bit more HDR and saturated than Realism or Fluid. It's especially good with illustrations, fantastical prompts, and for diving into the latent space in search of very specific visual styles.\n\n* `fluid` - the model that adheres best to prompts with great average quality for all kind of images. It can generate really creative images! It will always follow your input no matter what.\n\n* `realism` - with a more realistic color palette. It tries to give an extra boost of reality to your images, a kind of \"less AI look\". Works especially well with photographs but also magically works with illustrations too. IMPORTANT: you should use Zen, Flexible or Fluid if you are trying to generate something that is really fantastic or a known character, Realism may not follow your prompt well.\n\n* `super_real` - if reality is your priority, this is your model. Nearly as versatile as Flexible, it excels in realism outperforming Editorial Portraits in medium shots, though not as strong for close-ups.\n\n* `editorial_portraits` - the most amazing state-of-the-art generator for editorial portraits. You have never seen a level of realism like this before. Perfect for hyperrealistic close-up or medium shots. Unfortunately, in wide or distant shots, it generates anatomical problems and artifacts... but for close-ups, it is simply the best on the market. Tip: use the longest and most explanatory prompts possible, they really suit it well!\n",
@@ -3229,6 +3237,7 @@
       "text_137990a3_9": "1238x1674"
     },
     "models": {
+      "text_bb6a36d3_18": "FLUX Text to Image",
       "text_4ff4cff1_20": "Arrow 2 - AI Gateway",
       "text_a5f61c0c_26": "Arrow 2 Telos - AI Gateway",
       "text_d7e84aa8_43": "Change Camera - Transform image perspective",

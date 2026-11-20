@@ -27,6 +27,11 @@ export function createModuleLoader({ mocks = {}, env = {}, globals = {}, platfor
         if (cache.has(filename)) return cache.get(filename).exports;
         const loaded = { exports: {} };
         cache.set(filename, loaded);
+        // JSON templates are bundled as data, exactly as Next imports them.
+        if (path.extname(filename) === ".json") {
+            loaded.exports = JSON.parse(fs.readFileSync(filename, "utf8"));
+            return loaded.exports;
+        }
         const code = ts.transpileModule(fs.readFileSync(filename, "utf8"), {
             compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true },
             fileName: filename,

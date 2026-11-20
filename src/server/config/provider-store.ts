@@ -327,6 +327,13 @@ export async function deleteCustomModel(modelId: string, mediaType: "image" | "v
 
 export function connectionFromEnv(providerId: ProviderId): ProviderConnectionContext | undefined {
     if (!isProviderId(providerId)) return undefined;
+    // ComfyUI needs only a base URL; the bearer token stays optional on the LAN.
+    if (providerId === "comfyui") {
+        const baseUrl = process.env.COMFYUI_BASE_URL?.trim();
+        if (!baseUrl) return undefined;
+        const apiKey = process.env.COMFYUI_API_KEY?.trim();
+        return { id: `env:${providerId}`, providerId, ...(apiKey ? { secret: apiKey } : {}), metadata: { baseUrl } };
+    }
     const key = providerId === "google-ai-studio" ? process.env.GEMINI_API_KEY ?? process.env.GOOGLE_AI_API_KEY
         : providerId === "google-vertex" ? process.env.GOOGLE_SERVICE_ACCOUNT_JSON ?? process.env.GOOGLE_CLOUD_CREDENTIALS
             : providerId === "vercel-ai-gateway" ? process.env.AI_GATEWAY_API_KEY

@@ -329,6 +329,7 @@
     "referenceOnlyHint": "Tu descripción se conserva mientras usas un modelo que no admite texto.",
     "fields": {
       "seed": "Semilla",
+      "cfg": "Escala CFG",
       "negative_prompt": "Qué evitar",
       "resolution": "Resolución",
       "aspect_ratio": "Relación de aspecto",
@@ -1013,7 +1014,8 @@
       "vercel-ai-gateway": "Accede a modelos de varios proveedores con una sola clave del gateway.",
       "toapis": "Conecta tu cuenta de ToAPIs para usar modelos de imagen y vídeo.",
       "magnific": "Genera, edita y amplía imágenes con las herramientas creativas de Magnific.",
-      "runware": "Genera imágenes y vídeos con FLUX, Gemini, GPT Image y otros modelos en Runware."
+      "runware": "Genera imágenes y vídeos con FLUX, Gemini, GPT Image y otros modelos en Runware.",
+      "comfyui": "Ejecuta gráficos de ComfyUI revisados en el host GX10 con un token bearer opcional."
     },
     "keyHint": "Usa una clave de tu cuenta del proveedor.",
     "firstTitle": "Empieza con un proveedor que ya uses",
@@ -1068,6 +1070,12 @@
   },
   "catalog": {
     "descriptions": {
+      "text_3acbbaaa_59": "Texto codificado en el prompt negativo del gráfico del muestreador.",
+      "text_8990dd2b_65": "Ancho de salida en píxeles. ComfyUI decodifica anchos en múltiplos de 8.",
+      "text_ec4134bd_67": "Alto de salida en píxeles. ComfyUI decodifica altos en múltiplos de 8.",
+      "text_153fb3e_43": "Pasos del muestreador aplicados por el nodo KSampler.",
+      "text_ea33b082_59": "Escala de guía sin clasificador aplicada al nodo KSampler.",
+      "text_85ac0ff0_63": "Semilla del muestreador. La misma semilla y el mismo gráfico reproducen la misma imagen.",
       "text_a5c83b1c_444": "Imagen en Base64 como referencia de estructura. Orienta las formas de la imagen final y permite colorear bocetos, convertir dibujos en fotos, texturizar modelos 3D o convertir fotos en dibujos. La descripción controla el resultado.",
       "text_41823537_253": "Imagen en Base64 como referencia de estilo. Orienta la estética de la creación en Mystic.",
       "text_5d9b5cfe_1631": "zen: resultados suaves y sencillos, con menos objetos y detalles. flexible: buena fidelidad a la descripción, colores más saturados y efecto HDR; adecuado para ilustraciones y fantasía. fluid: gran fidelidad a la descripción y buena calidad general. realism: paleta natural y aspecto fotográfico; puede ignorar elementos fantásticos o personajes conocidos. super_real: prioriza el realismo, sobre todo en planos medios. editorial_portraits: retratos realistas en primer plano o plano medio; los planos abiertos pueden presentar errores anatómicos. Usa descripciones detalladas.",
@@ -3224,6 +3232,7 @@
       "text_137990a3_9": "1238x1674"
     },
     "models": {
+      "text_bb6a36d3_18": "FLUX texto a imagen",
       "text_4ff4cff1_20": "Arrow 2 - AI Gateway",
       "text_a5f61c0c_26": "Arrow 2 Telos - AI Gateway",
       "text_d7e84aa8_43": "Change Camera - Transformar perspectiva de la imagen",
