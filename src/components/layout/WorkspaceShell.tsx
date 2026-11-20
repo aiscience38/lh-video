@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Cloud, Image as ImageIcon, Languages } from "lucide-react";
+import { Check, Cloud, Image as ImageIcon, Languages, Library } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -22,8 +22,10 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     const t = useTranslations("workspace");
     const languages = useTranslations("languages");
     const inSettings = pathname.includes("/settings");
+    const inLibrary = pathname.includes("/library");
     const destinations = [
-        { label: t("studio"), href: `/${locale}`, icon: ImageIcon, active: !inSettings },
+        { label: t("studio"), href: `/${locale}`, icon: ImageIcon, active: !inSettings && !inLibrary },
+        { label: t("library"), href: `/${locale}/library`, icon: Library, active: inLibrary },
         { label: t("providers"), href: `/${locale}/settings`, icon: Cloud, active: inSettings },
     ];
     const languageUrl = `${localePathname}${params.size ? `?${params}` : ""}`;

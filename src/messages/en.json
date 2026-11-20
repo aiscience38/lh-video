@@ -883,11 +883,126 @@
   },
   "workspace": {
     "studio": "Studio",
+    "library": "Library",
     "providers": "Providers",
     "navigation": "Workspace navigation",
     "home": "OpenHiggsfield home",
     "language": "Change language",
     "skip": "Skip to content"
+  },
+  "library": {
+    "eyebrow": "CREATIVE LIBRARY",
+    "title": "Your creative library",
+    "subtitle": "Characters, scenes and storyboards saved as plain documents in your workspace.",
+    "tabs": {
+      "label": "Library sections",
+      "overview": "Overview",
+      "characters": "Characters",
+      "scenes": "Scenes",
+      "storyboards": "Storyboards"
+    },
+    "overview": {
+      "title": "Your creative library",
+      "subtitle": "Everything you keep for reuse, stored as folders you can read and back up.",
+      "savedEntries": "saved",
+      "characters": {
+        "title": "Characters",
+        "description": "Cast members with notes and reference images."
+      },
+      "scenes": {
+        "title": "Scenes",
+        "description": "Ordered shots that describe a sequence."
+      },
+      "storyboards": {
+        "title": "Storyboards",
+        "description": "Panels that sketch a production before generation."
+      },
+      "open": "Open {section}",
+      "layoutTitle": "How it is stored on disk",
+      "layoutHint": "Every entry is one folder with a single JSON document inside the workspace data folder:",
+      "layoutEmptyTitle": "Nothing saved yet",
+      "layoutEmptyHint": "Create a character and its folder appears here immediately.",
+      "emptyTitle": "Start your library",
+      "emptyHint": "Create a character to see counts, thumbnails and the on-disk layout come to life.",
+      "loading": "Loading library...",
+      "retry": "Retry"
+    },
+    "characters": {
+      "title": "Characters",
+      "subtitle": "Reusable cast members for your generations.",
+      "new": "New character",
+      "emptyTitle": "No characters yet",
+      "emptyHint": "Create the first character with a name, notes and reference images.",
+      "emptyAction": "Create a character",
+      "references": "{count, plural, =0 {No references} one {# reference} other {# references}}",
+      "createTitle": "New character",
+      "createHint": "The character is saved as library/characters/SLUG/character.json.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Ana",
+      "notesLabel": "Notes",
+      "notesPlaceholder": "Role, look, wardrobe...",
+      "referencesLabel": "Reference images",
+      "referencesHint": "Each image is uploaded first and linked by asset id. Up to {max}.",
+      "filesSelected": "{count, plural, one {# file selected} other {# files selected}}",
+      "create": "Create character",
+      "creating": "Creating...",
+      "uploading": "Uploading {index} of {total}...",
+      "rename": "Rename",
+      "renameTitle": "Rename character",
+      "renameHint": "The folder slug stays the same; only the display name changes.",
+      "save": "Save name",
+      "saving": "Saving...",
+      "delete": "Delete",
+      "deleteTitle": "Move character to trash?",
+      "deleteDescription": "The folder library/characters/{slug} moves to library/.trash. Referenced media is not deleted.",
+      "deleteConfirm": "Move to trash",
+      "detail": {
+        "back": "Back to characters",
+        "notFound": "Character not found",
+        "notFoundHint": "It may have been deleted, or the link may be wrong.",
+        "notes": "Notes",
+        "noNotes": "No notes yet.",
+        "references": "References",
+        "slug": "Folder: {slug}",
+        "loading": "Loading character..."
+      }
+    },
+    "scenes": {
+      "title": "Scenes",
+      "subtitle": "Shot lists stored as scene documents.",
+      "emptyTitle": "No scenes yet",
+      "emptyHint": "Scene folders live in library/scenes/SLUG/scene.json.",
+      "listLabel": "Saved scenes"
+    },
+    "storyboards": {
+      "title": "Storyboards",
+      "subtitle": "Panel sequences stored as storyboard documents.",
+      "emptyTitle": "No storyboards yet",
+      "emptyHint": "Storyboard folders live in library/storyboards/SLUG/storyboard.json.",
+      "listLabel": "Saved storyboards"
+    },
+    "collection": {
+      "loading": "Loading entries...",
+      "retry": "Retry",
+      "updated": "Updated {date}",
+      "count": "{count, plural, one {# entry} other {# entries}}"
+    },
+    "errors": {
+      "load": "Could not load the library. Check that the workspace storage is available.",
+      "generic": "Something went wrong. Try again.",
+      "ERR_LIBRARY_INVALID": "The name or data is not valid. Use at least two letters or digits.",
+      "ERR_LIBRARY_CONFLICT": "That name is already in use. Choose another one.",
+      "ERR_LIBRARY_NOT_FOUND": "That entry no longer exists. Reload the library.",
+      "ERR_LIBRARY_UNAVAILABLE": "The library storage is unavailable. Try again.",
+      "ERR_UNSUPPORTED_MEDIA_TYPE": "Only image files can be used as references.",
+      "ERR_MEDIA_TOO_LARGE": "That image is too large.",
+      "ERR_IMAGE_PIXEL_LIMIT": "That image has too many pixels.",
+      "ERR_EMPTY_MEDIA": "That file is empty.",
+      "ERR_REQUEST_TOO_LARGE": "The upload is too large.",
+      "ERR_CONTENT_TYPE": "The upload format was not accepted.",
+      "ERR_INVALID_FORM_DATA": "The upload could not be read.",
+      "ERR_REQUEST_INVALID": "The request was not valid."
+    }
   },
   "providers": {
     "title": "Your creative connections",

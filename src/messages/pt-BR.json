@@ -883,11 +883,126 @@
   },
   "workspace": {
     "studio": "Estúdio",
+    "library": "Biblioteca",
     "providers": "Provedores",
     "navigation": "Navegação principal",
     "home": "Início do OpenHiggsfield",
     "language": "Mudar idioma",
     "skip": "Ir para o conteúdo"
+  },
+  "library": {
+    "eyebrow": "BIBLIOTECA CRIATIVA",
+    "title": "Sua biblioteca criativa",
+    "subtitle": "Personagens, cenas e storyboards salvos como documentos simples no seu espaço de trabalho.",
+    "tabs": {
+      "label": "Seções da biblioteca",
+      "overview": "Visão geral",
+      "characters": "Personagens",
+      "scenes": "Cenas",
+      "storyboards": "Storyboards"
+    },
+    "overview": {
+      "title": "Sua biblioteca criativa",
+      "subtitle": "Tudo o que você guarda para reutilizar, em pastas que pode ler e copiar.",
+      "savedEntries": "salvos",
+      "characters": {
+        "title": "Personagens",
+        "description": "Membros do elenco com notas e imagens de referência."
+      },
+      "scenes": {
+        "title": "Cenas",
+        "description": "Planos ordenados que descrevem uma sequência."
+      },
+      "storyboards": {
+        "title": "Storyboards",
+        "description": "Painéis que esboçam uma produção antes da geração."
+      },
+      "open": "Abrir {section}",
+      "layoutTitle": "Como fica no disco",
+      "layoutHint": "Cada entrada é uma pasta com um único documento JSON dentro da pasta de dados do espaço de trabalho:",
+      "layoutEmptyTitle": "Ainda não há nada salvo",
+      "layoutEmptyHint": "Crie um personagem e a pasta dele aparece aqui imediatamente.",
+      "emptyTitle": "Comece sua biblioteca",
+      "emptyHint": "Crie um personagem para ver as contagens, as miniaturas e a estrutura no disco.",
+      "loading": "Carregando biblioteca...",
+      "retry": "Tentar de novo"
+    },
+    "characters": {
+      "title": "Personagens",
+      "subtitle": "Membros do elenco reutilizáveis para suas gerações.",
+      "new": "Novo personagem",
+      "emptyTitle": "Ainda não há personagens",
+      "emptyHint": "Crie o primeiro personagem com nome, notas e imagens de referência.",
+      "emptyAction": "Criar um personagem",
+      "references": "{count, plural, =0 {Sem referências} one {# referência} other {# referências}}",
+      "createTitle": "Novo personagem",
+      "createHint": "O personagem é salvo como library/characters/SLUG/character.json.",
+      "nameLabel": "Nome",
+      "namePlaceholder": "Ana",
+      "notesLabel": "Notas",
+      "notesPlaceholder": "Função, aparência, figurino...",
+      "referencesLabel": "Imagens de referência",
+      "referencesHint": "Cada imagem é enviada primeiro e vinculada pelo id do recurso. Até {max}.",
+      "filesSelected": "{count, plural, one {# arquivo selecionado} other {# arquivos selecionados}}",
+      "create": "Criar personagem",
+      "creating": "Criando...",
+      "uploading": "Enviando {index} de {total}...",
+      "rename": "Renomear",
+      "renameTitle": "Renomear personagem",
+      "renameHint": "O slug da pasta não muda; apenas o nome exibido.",
+      "save": "Salvar nome",
+      "saving": "Salvando...",
+      "delete": "Excluir",
+      "deleteTitle": "Mover personagem para a lixeira?",
+      "deleteDescription": "A pasta library/characters/{slug} vai para library/.trash. As mídias referenciadas não são excluídas.",
+      "deleteConfirm": "Mover para a lixeira",
+      "detail": {
+        "back": "Voltar para personagens",
+        "notFound": "Personagem não encontrado",
+        "notFoundHint": "Ele pode ter sido excluído ou o link pode estar errado.",
+        "notes": "Notas",
+        "noNotes": "Ainda não há notas.",
+        "references": "Referências",
+        "slug": "Pasta: {slug}",
+        "loading": "Carregando personagem..."
+      }
+    },
+    "scenes": {
+      "title": "Cenas",
+      "subtitle": "Listas de planos salvas como documentos de cena.",
+      "emptyTitle": "Ainda não há cenas",
+      "emptyHint": "As pastas de cenas ficam em library/scenes/SLUG/scene.json.",
+      "listLabel": "Cenas salvas"
+    },
+    "storyboards": {
+      "title": "Storyboards",
+      "subtitle": "Sequências de painéis salvas como documentos de storyboard.",
+      "emptyTitle": "Ainda não há storyboards",
+      "emptyHint": "As pastas de storyboards ficam em library/storyboards/SLUG/storyboard.json.",
+      "listLabel": "Storyboards salvos"
+    },
+    "collection": {
+      "loading": "Carregando entradas...",
+      "retry": "Tentar de novo",
+      "updated": "Atualizado {date}",
+      "count": "{count, plural, one {# entrada} other {# entradas}}"
+    },
+    "errors": {
+      "load": "Não foi possível carregar a biblioteca. Verifique se o armazenamento do espaço de trabalho está disponível.",
+      "generic": "Algo deu errado. Tente de novo.",
+      "ERR_LIBRARY_INVALID": "O nome ou os dados não são válidos. Use pelo menos duas letras ou dígitos.",
+      "ERR_LIBRARY_CONFLICT": "Esse nome já está em uso. Escolha outro.",
+      "ERR_LIBRARY_NOT_FOUND": "Essa entrada não existe mais. Recarregue a biblioteca.",
+      "ERR_LIBRARY_UNAVAILABLE": "O armazenamento da biblioteca está indisponível. Tente de novo.",
+      "ERR_UNSUPPORTED_MEDIA_TYPE": "Somente imagens podem ser usadas como referências.",
+      "ERR_MEDIA_TOO_LARGE": "Essa imagem é grande demais.",
+      "ERR_IMAGE_PIXEL_LIMIT": "Essa imagem tem pixels demais.",
+      "ERR_EMPTY_MEDIA": "Esse arquivo está vazio.",
+      "ERR_REQUEST_TOO_LARGE": "O envio é grande demais.",
+      "ERR_CONTENT_TYPE": "O formato do envio não foi aceito.",
+      "ERR_INVALID_FORM_DATA": "Não foi possível ler o envio.",
+      "ERR_REQUEST_INVALID": "A solicitação não era válida."
+    }
   },
   "providers": {
     "title": "Suas conexões criativas",
