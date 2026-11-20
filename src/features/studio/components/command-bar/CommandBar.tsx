@@ -812,7 +812,7 @@ export function CommandBar({ mode, onModeChange, suggestion, incoming, onPromptS
                         disabled={modelUnavailable}
                         className="flex w-full min-h-11 shrink-0 items-center justify-center gap-[.3em] self-center border-none rounded-[18px] font-bold cursor-pointer active:scale-95 transition-transform disabled:opacity-60 disabled:cursor-not-allowed sm:w-[146px] sm:min-h-[88px] sm:flex-col sm:gap-0 sm:rounded-[22px]"
                         style={{
-                            background: "linear-gradient(180deg, #d5ff47, #bcf122)",
+                            background: "linear-gradient(180deg, #e6e6ea, #bfbfc8)",
                             color: "#0b1118",
                             fontFamily: "var(--font-space-grotesk), sans-serif",
                             fontSize: 18,

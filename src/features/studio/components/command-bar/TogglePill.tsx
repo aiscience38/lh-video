@@ -32,7 +32,7 @@ export function TogglePill({ label, icon, value, onChange }: TogglePillProps) {
                     width: 30,
                     height: 18,
                     padding: "0 3px",
-                    background: value ? "#d5ff47" : "rgba(255,255,255,.14)",
+                    background: value ? "#e6e6ea" : "rgba(255,255,255,.14)",
                 }}
             >
                 <span

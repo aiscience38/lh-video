@@ -23,13 +23,13 @@ export function StudioEmpty({ mode, onIdea, supportsPrompt }: { supportsPrompt: 
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(213,255,71,0.045),transparent_65%)]" />
         <div className="relative w-full max-w-xl text-center">
             <svg aria-hidden="true" viewBox="0 0 220 140" fill="none" className="mx-auto mb-6 hidden h-28 w-44 sm:block">
-                <defs><linearGradient id="creative-frame" x1="45" y1="12" x2="186" y2="132" gradientUnits="userSpaceOnUse"><stop stopColor="#d5ff47" stopOpacity=".8" /><stop offset="1" stopColor="#d5ff47" stopOpacity=".05" /></linearGradient></defs>
-                <rect x="23" y="28" width="100" height="90" rx="16" transform="rotate(-12 23 28)" fill="#11150e" stroke="#d5ff47" strokeOpacity=".15" />
-                <rect x="106" y="12" width="96" height="104" rx="16" transform="rotate(12 106 12)" fill="#151914" stroke="#d5ff47" strokeOpacity=".2" />
-                <rect x="63" y="19" width="100" height="106" rx="17" fill="#151914" stroke="url(#creative-frame)" />
-                <path d="m77 105 23-28a7 7 0 0 1 11 0l12 15 12-14a7 7 0 0 1 11 0l5 6" stroke="#d5ff47" strokeOpacity=".65" strokeWidth="2" strokeLinecap="round" />
-                <circle cx="132" cy="49" r="9" fill="#d5ff47" fillOpacity=".8" />
-                <path d="m185 111 3-8 3 8 8 3-8 3-3 8-3-8-8-3 8-3Z" fill="#d5ff47" />
+                <defs><linearGradient id="creative-frame" x1="45" y1="12" x2="186" y2="132" gradientUnits="userSpaceOnUse"><stop stopColor="#e6e6ea" stopOpacity=".8" /><stop offset="1" stopColor="#e6e6ea" stopOpacity=".05" /></linearGradient></defs>
+                <rect x="23" y="28" width="100" height="90" rx="16" transform="rotate(-12 23 28)" fill="#131315" stroke="#e6e6ea" strokeOpacity=".15" />
+                <rect x="106" y="12" width="96" height="104" rx="16" transform="rotate(12 106 12)" fill="#17171a" stroke="#e6e6ea" strokeOpacity=".2" />
+                <rect x="63" y="19" width="100" height="106" rx="17" fill="#17171a" stroke="url(#creative-frame)" />
+                <path d="m77 105 23-28a7 7 0 0 1 11 0l12 15 12-14a7 7 0 0 1 11 0l5 6" stroke="#e6e6ea" strokeOpacity=".65" strokeWidth="2" strokeLinecap="round" />
+                <circle cx="132" cy="49" r="9" fill="#e6e6ea" fillOpacity=".8" />
+                <path d="m185 111 3-8 3 8 8 3-8 3-3 8-3-8-8-3 8-3Z" fill="#e6e6ea" />
             </svg>
             <p className="mb-3 text-[10px] font-semibold tracking-[.2em] text-primary/85">{t("eyebrow")}</p>
             <h1 className="font-display text-2xl leading-tight tracking-tight sm:text-4xl">{t(ready ? !supportsPrompt ? "referenceTitle" : mode === "image" ? "imageTitle" : "videoTitle" : hasConnection ? "noModelsTitle" : "connectTitle")}</h1>
