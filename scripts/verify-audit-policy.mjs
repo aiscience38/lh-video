@@ -6,6 +6,7 @@ import { resolve } from "node:path";
 import { copyFileSync, mkdtempSync, rmSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
+import { symlinkUnavailableReason } from "./windows-symlinks.mjs";
 
 const paths = {
   "node_modules/@typescript-eslint/typescript-estree/node_modules/minimatch": { version: "10.2.4", dev: true },
@@ -67,21 +68,28 @@ test("schema, edge, exact-copy and expiry changes fail", () => {
   assert.equal(isCliEntrypoint(import.meta.url, undefined), false);
 });
 
-test("CLI entrypoints with spaces and symlinks fail visibly when their lockfile is absent", () => {
+test("CLI entrypoints with spaces and symlinks fail visibly when their lockfile is absent", async (t) => {
   const directory = mkdtempSync(resolve(tmpdir(), "qa audit gate "));
   const entry = resolve(directory, "audit-dependencies.mjs");
+  const assertCliFails = (cliPath) => {
+    const result = spawnSync(process.execPath, [cliPath], { cwd: directory, encoding: "utf8", timeout: 10_000 });
+    assert.ifError(result.error);
+    assert.equal(result.signal, null);
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /Dependency audit gate failed/);
+    assert.match(result.stderr, /package-lock\.json/);
+  };
   try {
     copyFileSync(fileURLToPath(new URL("./audit-dependencies.mjs", import.meta.url)), entry);
-    const alias = resolve(directory, "alias.mjs");
-    symlinkSync(entry, alias);
-    for (const cliPath of [entry, alias]) {
-      const result = spawnSync(process.execPath, [cliPath], { cwd: directory, encoding: "utf8", timeout: 10_000 });
-      assert.ifError(result.error);
-      assert.equal(result.signal, null);
-      assert.equal(result.status, 1);
-      assert.match(result.stderr, /Dependency audit gate failed/);
-      assert.match(result.stderr, /package-lock\.json/);
-    }
+    // A path with spaces never needs symlink support, so this assertion always runs.
+    assertCliFails(entry);
+    // Only the alias assertion depends on the Windows symlink privilege.
+    const symlinkReason = await symlinkUnavailableReason(directory);
+    await t.test("symlinked entrypoint", { skip: symlinkReason ?? false }, () => {
+      const alias = resolve(directory, "alias.mjs");
+      symlinkSync(entry, alias);
+      assertCliFails(alias);
+    });
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }

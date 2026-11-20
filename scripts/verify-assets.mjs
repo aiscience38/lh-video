@@ -7,6 +7,7 @@ import { PassThrough } from "node:stream";
 import { EventEmitter } from "node:events";
 import { createHash } from "node:crypto";
 import { createModuleLoader, windowsDirectoryFs } from "./test-module-loader.mjs";
+import { symlinkUnavailableReason } from "./windows-symlinks.mjs";
 
 const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jmO0AAAAASUVORK5CYII=", "base64");
 const mp4 = Buffer.concat([Buffer.from([0, 0, 0, 24]), Buffer.from("ftypmp42"), Buffer.alloc(24)]);
@@ -400,10 +401,16 @@ test("uploaded route rejects traversal, symlinks and legacy active content while
         const response = await route.GET(routeRequest("/api/uploaded/x"), { params: Promise.resolve({ filename: name }) });
         assert.equal(response.status, 400);
     }
-    const outside = path.join(h.dir, "outside.png"); await fs.writeFile(outside, png);
-    await fs.symlink(outside, path.join(h.dir, "uploads/link.png"));
-    const symlink = await route.GET(routeRequest("/api/uploaded/link.png"), { params: Promise.resolve({ filename: "link.png" }) });
-    assert.equal(symlink.status, 400);
+    const outside = path.join(h.dir, "outside.png");
+    // Windows accounts without SeCreateSymbolicLinkPrivilege cannot create the escape fixture; only
+    // that assertion is skipped, while traversal and legacy-content rejection above/below still run.
+    const symlinkReason = await symlinkUnavailableReason(h.dir);
+    await t.test("symlink escape is rejected", { skip: symlinkReason ?? false }, async () => {
+        await fs.writeFile(outside, png);
+        await fs.symlink(outside, path.join(h.dir, "uploads", "link.png"));
+        const symlink = await route.GET(routeRequest("/api/uploaded/link.png"), { params: Promise.resolve({ filename: "link.png" }) });
+        assert.equal(symlink.status, 400);
+    });
 });
 
 test("Vercel legacy full responses fail before emission above 4 MiB, while local full and small ranges work", async (t) => {
