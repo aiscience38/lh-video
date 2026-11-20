@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Open-Higgsfield",
+    "appName": "LH Video",
     "generate": "Generate",
     "video": "Video",
     "image": "Image",
@@ -1056,12 +1056,12 @@
     "es": "Español"
   },
   "metadata": {
-    "title": "Open-Higgsfield - Open-source AI image and video studio",
+    "title": "LH Video - Open-source AI image and video studio",
     "description": "Create AI images and videos with Magnific, Gemini, Vertex AI, Vercel AI Gateway and your own provider accounts.",
     "socialDescription": "Generate, edit and upscale images and videos in one free, self-hostable studio.",
-    "appName": "Open-Higgsfield - AI Image & Video Studio",
-    "imageAlt": "Open-Higgsfield image and video creation studio",
-    "keywords": "AI image generator,AI video generator,open-source AI studio,Higgsfield alternative,Open-Higgsfield,Gemini,Veo,Vertex AI,Vercel AI Gateway,Magnific"
+    "appName": "LH Video - AI Image & Video Studio",
+    "imageAlt": "LH Video image and video creation studio",
+    "keywords": "AI image generator,AI video generator,open-source AI studio,Higgsfield alternative,LH Video,Gemini,Veo,Vertex AI,Vercel AI Gateway,Magnific"
   },
   "errorPages": {
     "notFoundTitle": "Page not found",

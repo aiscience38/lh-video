@@ -29,13 +29,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     const t = await getTranslations({ locale, namespace: "metadata" });
     return {
         metadataBase: new URL("https://openhiggs.techbe.me"),
-        title: { default: t("title"), template: "%s | Open-Higgsfield" },
+        title: { default: t("title"), template: "%s | LH Video" },
         description: t("description"), keywords: t("keywords").split(","),
-        authors: [{ name: "TechBe", url: "https://techbe.me" }], creator: "TechBe", applicationName: "Open-Higgsfield",
+        authors: [{ name: "TechBe", url: "https://techbe.me" }], creator: "TechBe", applicationName: "LH Video",
         alternates: { canonical: `/${locale}`, languages: Object.fromEntries(locales.map(code => [code, `/${code}`])) },
         manifest: `/${locale}/manifest.webmanifest`,
         openGraph: {
-            type: "website", url: `/${locale}`, siteName: "Open-Higgsfield", title: t("title"), description: t("socialDescription"),
+            type: "website", url: `/${locale}`, siteName: "LH Video", title: t("title"), description: t("socialDescription"),
             locale: openGraphLocales[locale], alternateLocale: locales.filter(code => code !== locale).map(code => openGraphLocales[code]),
             images: [{ url: "/og-image.png", width: 1200, height: 630, alt: t("imageAlt") }],
         },

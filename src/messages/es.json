@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Open-Higgsfield",
+    "appName": "LH Video",
     "generate": "Generar",
     "video": "Vídeo",
     "image": "Imagen",
@@ -1051,12 +1051,12 @@
     "es": "Español"
   },
   "metadata": {
-    "title": "Open-Higgsfield - Estudio de imagen y vídeo con IA de código abierto",
+    "title": "LH Video - Estudio de imagen y vídeo con IA de código abierto",
     "description": "Crea imágenes y vídeos con IA usando Magnific, Gemini, Vertex AI, Vercel AI Gateway y tus propias cuentas de proveedores.",
     "socialDescription": "Genera, edita y amplía imágenes y vídeos en un estudio gratuito que puedes alojar tú mismo.",
-    "appName": "Open-Higgsfield - Estudio de Imagen y Vídeo con IA",
-    "imageAlt": "Estudio de creación de imágenes y vídeos Open-Higgsfield",
-    "keywords": "generador de imágenes con IA,generador de vídeos con IA,estudio de IA de código abierto,alternativa a Higgsfield,Open-Higgsfield,Gemini,Veo,Vertex AI,Vercel AI Gateway,Magnific"
+    "appName": "LH Video - Estudio de Imagen y Vídeo con IA",
+    "imageAlt": "Estudio de creación de imágenes y vídeos LH Video",
+    "keywords": "generador de imágenes con IA,generador de vídeos con IA,estudio de IA de código abierto,alternativa a Higgsfield,LH Video,Gemini,Veo,Vertex AI,Vercel AI Gateway,Magnific"
   },
   "errorPages": {
     "notFoundTitle": "Página no encontrada",
