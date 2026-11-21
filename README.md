@@ -182,7 +182,7 @@ docker compose up --build -d
 ```
 
 Compose builds the standalone image, publishes `127.0.0.1:3000`, and keeps
-history and media in the `open-higgsfield-data` volume mounted at `/app/data`
+history and media in the `lh-video-data` volume mounted at `/app/data`
 (`OPEN_HIGGSFIELD_STORAGE_DIR`). Put an HTTPS reverse proxy in front of it and
 review the [single-process profile](docs/production.md#persistent-single-process)
 before enabling real work. Windows-specific steps, container networking to

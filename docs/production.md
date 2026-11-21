@@ -74,7 +74,7 @@ reverse proxy publicly. Configure production settings before starting Docker.
 The repository ships a multi-stage `Dockerfile` (Node 22 Alpine, standalone
 output, non-root uid 1001) and a `docker-compose.yml` that reads `.env.local`,
 publishes `127.0.0.1:3000`, and mounts the named volume
-`open-higgsfield-data` at `/app/data`. The image already sets
+`lh-video-data` at `/app/data`. The image already sets
 `OPEN_HIGGSFIELD_STORAGE_DIR=/app/data`, so the volume and the storage root are
 the same directory.
 
@@ -118,7 +118,7 @@ docker compose down -v       # DESTROYS the data volume - never on a live worksp
 Notes:
 
 - Compose prefixes named volumes with the project name, which defaults to the
-  checkout directory (`lh-docs_open-higgsfield-data` here). Confirm the actual
+  checkout directory (`lh-docs_lh-video-data` here). Confirm the actual
   name with `docker volume ls` before backing it up.
 - The application runs as uid 1001 inside the image. Files in the volume are
   owned by that user; mount or copy them with the same ownership.
@@ -154,7 +154,7 @@ the volume from a throwaway container. Replace the volume name with the one from
 
 ```powershell
 docker compose stop
-docker run --rm --user 1001:1001 -v lh-docs_open-higgsfield-data:/data -v C:/backups:/backup alpine tar czf /backup/lh-video-data.tar.gz -C /data .
+docker run --rm --user 1001:1001 -v lh-docs_lh-video-data:/data -v C:/backups:/backup alpine tar czf /backup/lh-video-data.tar.gz -C /data .
 docker compose start
 ```
 
@@ -162,7 +162,7 @@ Restore into the same volume:
 
 ```powershell
 docker compose down
-docker run --rm --user 1001:1001 -v lh-docs_open-higgsfield-data:/data -v C:/backups:/backup alpine sh -c "find /data -mindepth 1 -delete && tar xzf /backup/lh-video-data.tar.gz -C /data"
+docker run --rm --user 1001:1001 -v lh-docs_lh-video-data:/data -v C:/backups:/backup alpine sh -c "find /data -mindepth 1 -delete && tar xzf /backup/lh-video-data.tar.gz -C /data"
 docker compose up -d
 ```
 

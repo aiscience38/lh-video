@@ -6,8 +6,8 @@ services:
     env_file:
       - .env.local
     volumes:
-      - open-higgsfield-data:/app/data
+      - lh-video-data:/app/data
     restart: unless-stopped
 
 volumes:
-  open-higgsfield-data:
+  lh-video-data:
