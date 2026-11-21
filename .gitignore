@@ -81,3 +81,4 @@ dist/
 lh-video-data/
 .hermes-e2e.log
 .hermes/
+.hermes-*.log
