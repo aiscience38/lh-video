@@ -4422,6 +4422,50 @@
       "ERR_GATE_NOT_FOUND": "Esa puerta ya no existe.",
       "ERR_GATE_DECIDED": "Esta puerta ya fue decidida. Abre una nueva.",
       "ERR_PRODUCTIONS_UNAVAILABLE": "Las producciones no están disponibles ahora."
+    },
+    "ledger": {
+      "title": "Libro de gastos",
+      "subtitle": "Cada recurso por el que se ha cobrado esta producción.",
+      "loading": "Cargando el libro de gastos...",
+      "error": "No se pudo cargar el libro de gastos.",
+      "empty": "Todavía no se ha cobrado ningún recurso a esta producción.",
+      "spentOf": "Gastado {spent} de {budget}",
+      "remaining": "Quedan {amount}",
+      "overBudget": "Presupuesto excedido en {amount}",
+      "total": "Total {amount}",
+      "count": "{count, plural, =0 {Sin recursos} one {# recurso} other {# recursos}}",
+      "exact": "Liquidado {amount}",
+      "estimated": "Retenido {amount}",
+      "estimatedBadge": "Estimado",
+      "settledBadge": "Liquidado",
+      "providerModel": "{provider} · {model}",
+      "recordedAt": "Registrado {date}",
+      "license": "Licencia {license}",
+      "budgetBarLabel": "Presupuesto usado",
+      "rowsLabel": "Entradas del libro"
+    },
+    "qa": {
+      "title": "Informe de calidad",
+      "subtitle": "Comprobaciones automáticas del montaje entregado.",
+      "loading": "Cargando el informe de calidad...",
+      "error": "No se pudo cargar el informe de calidad.",
+      "empty": "Aún no hay informe de calidad. Ejecuta las comprobaciones del montaje para ver los hallazgos aquí.",
+      "noFindings": "Sin hallazgos. Todas las comprobaciones automáticas pasaron.",
+      "duration": "Duración {duration}",
+      "findingsCount": "{count, plural, =0 {Sin hallazgos} one {# hallazgo} other {# hallazgos}}",
+      "savedAt": "Comprobado {date}",
+      "contactSheetAlt": "Hoja de contactos de la ejecución de calidad",
+      "contactSheetCaption": "Hoja de contactos · un fotograma por recuadro",
+      "findingsLabel": "Hallazgos de calidad",
+      "timecode": "{start} – {end}",
+      "types": {
+        "black": "Fotogramas negros",
+        "frozen": "Fotogramas congelados",
+        "silence": "Silencio",
+        "flash": "Destellos",
+        "loudness": "Sonoridad",
+        "duration": "Duración"
+      }
     }
   }
 }

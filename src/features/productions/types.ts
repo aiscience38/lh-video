@@ -92,3 +92,72 @@ export function sortedForBoard(productions: Production[]): Production[] {
 export function isComplete(production: Production): boolean {
     return activeStop(production.stopStates) === null;
 }
+
+/* ---------- Ledger ---------- */
+
+export interface LedgerRecord {
+    assetId: string;
+    source: "upload" | "provider";
+    provider: string;
+    model: string;
+    promptHash: string;
+    costUsd: number;
+    license: string;
+    createdAt: string;
+    estimated: boolean;
+}
+
+export interface LedgerProviderTotal {
+    count: number;
+    totalUsd: number;
+}
+
+export interface LedgerTotals {
+    count: number;
+    totalUsd: number;
+    exactUsd: number;
+    estimatedUsd: number;
+    byProvider: Record<string, LedgerProviderTotal>;
+}
+
+export interface ProductionBudget {
+    effort: ProductionEffort;
+    budgetUsd: number;
+    spentUsd: number;
+    remainingUsd: number;
+    percentUsed: number;
+    overBudget: boolean;
+}
+
+export interface ProductionLedger {
+    records: LedgerRecord[];
+    totals: LedgerTotals;
+    budget: ProductionBudget;
+}
+
+/* ---------- QA ---------- */
+
+export const QA_FINDING_TYPES = ["black", "frozen", "silence", "flash", "loudness", "duration"] as const;
+export type QaFindingType = (typeof QA_FINDING_TYPES)[number];
+export type QaSeverity = "error" | "warning" | "info";
+
+export interface QaFinding {
+    type: QaFindingType;
+    severity: QaSeverity;
+    tStart: number;
+    tEnd: number;
+    detail: string;
+}
+
+export interface ProductionQaReport {
+    durationSeconds: number;
+    hasVideo: boolean;
+    hasAudio: boolean;
+    findings: QaFinding[];
+    updatedAt: string;
+    contactSheetUrl: string | null;
+}
+
+export interface ProductionQa {
+    report: ProductionQaReport | null;
+}
