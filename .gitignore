@@ -80,3 +80,4 @@ next-env.d.ts
 dist/
 lh-video-data/
 .hermes-e2e.log
+.hermes/
