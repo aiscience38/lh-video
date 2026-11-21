@@ -76,7 +76,7 @@ test("multi-selected characters attach their saved images and over-capacity asse
     const second = page.getByTestId("reference-picker");
     await expect(second).toBeVisible();
     await second.getByTestId("picker-card").filter({ hasText: "Ben Reference" }).click();
-    await expect(second.getByTestId("picker-capacity-note")).toContainText("3 of 4 references fit");
+    await expect(second.getByTestId("picker-capacity-note")).toContainText("1 of 2 references fit");
     await expect(second.getByTestId("picker-refusals")).toContainText(en.picker.refusalsTitle);
     await expect(second.getByTestId("picker-refusals")).toContainText("Ben Reference: qwen-image-3.0-pro - ToAPIs has no free image reference slots left.");
     await second.getByRole("button", { name: en.picker.attach }).click();
