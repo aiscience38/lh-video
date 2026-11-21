@@ -4,11 +4,12 @@ import { useModelCopy } from "@/i18n/use-model-copy";
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { AlertCircle, CheckCircle2, Image as ImageIcon, Loader2, Plus, RefreshCw, Search, Video, X } from "lucide-react";
+import { AlertCircle, CheckCircle2, FileJson, Image as ImageIcon, Loader2, Plus, RefreshCw, Search, Video, X } from "lucide-react";
 import type { ProviderConnectionRecord } from "@/providers/config-types";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { CustomModelDialog } from "./CustomModelDialog";
+import { ComfyWorkflowDialog } from "./ComfyWorkflowDialog";
 import { configRequest, providerErrorMessage } from "../lib/api";
 import { fieldClass, panelClass } from "./styles";
 import { type CatalogModel, type CatalogResponse, type MediaType, type ProviderDefinition } from "../types";
@@ -20,10 +21,12 @@ export function ProviderModels({ provider, catalog, connections, connected, relo
     const t = useTranslations("providers");
     const { modelLabel } = useModelCopy();
     const addButton = useRef<HTMLButtonElement>(null);
+    const workflowButton = useRef<HTMLButtonElement>(null);
     const [mediaType, setMediaType] = useState<MediaType>("image");
     const [search, setSearch] = useState("");
     const [visibility, setVisibility] = useState("all");
     const [adding, setAdding] = useState(false);
+    const [importingWorkflow, setImportingWorkflow] = useState(false);
     const [busy, setBusy] = useState(false);
     const [notice, setNotice] = useState<{ error: boolean; text: string } | null>(null);
     const models: CatalogModel[] = [
@@ -69,7 +72,7 @@ export function ProviderModels({ provider, catalog, connections, connected, relo
     }
 
     return <section className={panelClass} aria-labelledby="provider-models-title">
-        <div className="flex flex-wrap items-start justify-between gap-4"><div><h2 id="provider-models-title" className="text-base font-semibold">{t("modelsTitle")}</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t("modelsHint")}</p></div><div className="flex flex-wrap gap-2">{supportsDiscovery && <Button variant="secondary" disabled={busy || !connected} title={t("syncHint")} onClick={() => void discover()}>{busy ? <Loader2 className="animate-spin" /> : <RefreshCw />}{t("sync")}</Button>}<Button ref={addButton} variant="outline" onClick={() => setAdding(true)}><Plus />{t("addModel")}</Button></div></div>
+        <div className="flex flex-wrap items-start justify-between gap-4"><div><h2 id="provider-models-title" className="text-base font-semibold">{t("modelsTitle")}</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t("modelsHint")}</p></div><div className="flex flex-wrap gap-2">{provider.id === "comfyui" && <Button ref={workflowButton} variant="outline" title={t("workflowEntryHint")} onClick={() => setImportingWorkflow(true)}><FileJson />{t("importWorkflow")}</Button>}{supportsDiscovery && <Button variant="secondary" disabled={busy || !connected} title={t("syncHint")} onClick={() => void discover()}>{busy ? <Loader2 className="animate-spin" /> : <RefreshCw />}{t("sync")}</Button>}<Button ref={addButton} variant="outline" onClick={() => setAdding(true)}><Plus />{t("addModel")}</Button></div></div>
         {!connected && <p className="mt-4 flex items-center gap-2 rounded-xl border border-amber-200/15 bg-amber-200/5 p-3 text-xs leading-relaxed text-amber-100"><AlertCircle className="size-4 shrink-0" />{t("needsConnection")}</p>}
         {notice && <div role={notice.error ? "alert" : "status"} className={`mt-4 flex items-start gap-2 rounded-xl p-3 text-sm ${notice.error ? "bg-destructive/10 text-destructive" : "bg-primary/5 text-primary"}`}>{notice.error ? <AlertCircle className="size-4 shrink-0" /> : <CheckCircle2 className="size-4 shrink-0" />}{notice.text}</div>}
         <div className="mt-5 flex flex-wrap items-center gap-3 border-b border-white/10 pb-4">
@@ -81,5 +84,6 @@ export function ProviderModels({ provider, catalog, connections, connected, relo
         {visible.length ? <div className="space-y-5 pt-3">{enabled.length > 0 && <div><p className="mb-3 text-xs font-medium text-muted-foreground">{t("visible")} ({enabled.length})</p><div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">{enabled.map(entry => tile(entry, true))}</div></div>}{disabled.length > 0 && <div><p className="mb-3 text-xs font-medium text-muted-foreground">{t("hidden")} ({disabled.length})</p><div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">{disabled.map(entry => tile(entry, false))}</div></div>}</div> : <p className="py-10 text-center text-sm text-muted-foreground">{t("emptyModels")}</p>}
         {candidates.length > 0 && <details className="mt-5 border-t border-white/10 pt-4"><summary className="cursor-pointer rounded-md py-2 text-sm font-medium">{t("discovered")} ({candidates.length})</summary><p className="my-3 text-sm leading-relaxed text-muted-foreground">{t("discoveredHint")}</p><div className="grid gap-2 sm:grid-cols-2">{candidates.map(model => <div key={model.id} className="min-w-0 rounded-lg bg-black/20 p-3 text-sm"><p className="truncate">{model.displayName ?? model.providerModelId}</p><p className="mt-1 truncate font-mono text-xs text-muted-foreground">{model.providerModelId}</p></div>)}</div></details>}
         {adding && <CustomModelDialog returnFocus={addButton} provider={provider} templates={models} onClose={() => setAdding(false)} onSaved={reload} />}
+        {importingWorkflow && <ComfyWorkflowDialog returnFocus={workflowButton} provider={provider} onClose={() => setImportingWorkflow(false)} onImported={reload} />}
     </section>;
 }

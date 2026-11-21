@@ -9,11 +9,13 @@ import type { ModelCapabilities } from "@/models/capabilities/types";
 import { isProviderId, PROVIDER_DEFINITIONS } from "@/providers/definitions";
 import type { ProviderConnectionContext, ProviderId } from "@/providers/types";
 import { assertCustomModelCapabilities, hasBuiltInCapability } from "@/server/catalog/custom-validation";
+import { COMFYUI_TEMPLATES, parseComfyuiTemplate, registerComfyuiTemplates, unregisterComfyuiTemplate, type ComfyuiTemplate } from "@/server/catalog/comfyui";
 
 const CONFIG_FILE = path.join(STORAGE_ROOT, "provider-runtime-config.json");
 const MAX_SECRET_LENGTH = 32_768;
 const MAX_METADATA_BYTES = 16_384;
 const MAX_CAPABILITY_BYTES = 128_000;
+const MAX_TEMPLATE_BYTES = 512_000;
 
 import type { ProviderConnectionRecord, ModelOverride, DiscoveredModelRecord } from "@/providers/config-types";
 
@@ -26,9 +28,10 @@ interface StoredConfig {
     connections: StoredConnection[];
     modelOverrides: ModelOverride[];
     discoveredModels: DiscoveredModelRecord[];
+    comfyuiTemplates: ComfyuiTemplate[];
 }
 
-const emptyConfig = (): StoredConfig => ({ version: 1, connections: [], modelOverrides: [], discoveredModels: [] });
+const emptyConfig = (): StoredConfig => ({ version: 1, connections: [], modelOverrides: [], discoveredModels: [], comfyuiTemplates: [] });
 let sqlClient: NeonQueryFunction<false, false> | undefined;
 let dbSchemaVerified = false;
 const shared = globalThis as typeof globalThis & { __providerConfigReady?: Promise<void>; __providerConfigQueue?: Promise<unknown> };
@@ -71,7 +74,14 @@ function normalizeConfig(value: unknown): StoredConfig {
         connections: input.connections.filter((entry): entry is StoredConnection => Boolean(entry && typeof entry === "object" && typeof (entry as StoredConnection).id === "string")),
         modelOverrides: input.modelOverrides.filter((entry): entry is ModelOverride => Boolean(entry && typeof entry === "object" && typeof (entry as ModelOverride).modelId === "string")),
         discoveredModels: Array.isArray(input.discoveredModels) ? input.discoveredModels.filter((entry): entry is DiscoveredModelRecord => Boolean(entry && typeof entry === "object" && typeof (entry as DiscoveredModelRecord).providerModelId === "string")) : [],
+        comfyuiTemplates: Array.isArray(input.comfyuiTemplates) ? input.comfyuiTemplates.filter((entry): entry is ComfyuiTemplate => Boolean(entry && typeof entry === "object" && typeof (entry as ComfyuiTemplate).id === "string")) : [],
     };
+}
+
+/** Imported ComfyUI graphs must be in the adapter registry before a capability can be validated. */
+function hydrateComfyuiTemplates(config: StoredConfig): void {
+    try { registerComfyuiTemplates(config.comfyuiTemplates); }
+    catch { throw new Error("ERR_PROVIDER_CONFIG_CORRUPT"); }
 }
 
 async function query(statement: string, values: unknown[] = []): Promise<Record<string, unknown>[]> {
@@ -265,6 +275,7 @@ export async function listModelOverrides(): Promise<ModelOverride[]> {
     let config: StoredConfig;
     try { config = await readConfig(); } catch (error) { if (error instanceof Error && error.message === "ERR_PROVIDER_CONFIG_SCHEMA_REQUIRED") return []; throw error; }
     const overrides = config.modelOverrides.filter((entry) => entry.source !== "custom" || (entry.capabilities as { provider?: unknown } | undefined)?.provider !== "freepik");
+    hydrateComfyuiTemplates(config);
     for (const entry of overrides) {
         if (entry.source !== "custom") continue;
         try {
@@ -306,6 +317,9 @@ export async function setBuiltInModelEnabled(modelId: string, mediaType: "image"
 export async function saveCustomModel(input: { modelId?: string; mediaType: "image" | "video"; capabilities: ModelCapabilities; enabled?: boolean }): Promise<ModelOverride> {
     const capabilities = structuredClone(input.capabilities);
     if (!capabilities || Buffer.byteLength(JSON.stringify(capabilities)) > MAX_CAPABILITY_BYTES) throw new Error("ERR_CUSTOM_MODEL_INVALID");
+    // A saved ComfyUI model references an imported graph: hydrate it before the
+    // adapter check, or a restart would reject its own catalog entry.
+    hydrateComfyuiTemplates(await readConfig());
     assertCustomModelCapabilities(capabilities, input.mediaType, input.modelId);
     return mutate((config) => {
         const now = new Date().toISOString();
@@ -323,6 +337,37 @@ export async function deleteCustomModel(modelId: string, mediaType: "image" | "v
         config.modelOverrides = config.modelOverrides.filter((entry) => !(entry.modelId === modelId && entry.mediaType === mediaType && entry.source === "custom"));
         return before !== config.modelOverrides.length;
     });
+}
+
+/** Imported templates persist beside the provider config, disabled until the operator enables the derived model. */
+export async function listComfyuiTemplates(): Promise<ComfyuiTemplate[]> {
+    let config: StoredConfig;
+    try { config = await readConfig(); } catch (error) { if (error instanceof Error && error.message === "ERR_PROVIDER_CONFIG_SCHEMA_REQUIRED") return []; throw error; }
+    hydrateComfyuiTemplates(config);
+    return structuredClone(config.comfyuiTemplates);
+}
+
+export async function saveComfyuiTemplate(value: ComfyuiTemplate): Promise<ComfyuiTemplate> {
+    const template = parseComfyuiTemplate(structuredClone(value));
+    if (Buffer.byteLength(JSON.stringify(template)) > MAX_TEMPLATE_BYTES) throw new Error("ERR_COMFYUI_WORKFLOW_INVALID");
+    if (Object.hasOwn(COMFYUI_TEMPLATES, template.id)) throw new Error("ERR_COMFYUI_WORKFLOW_DUPLICATE");
+    const saved = await mutate((config) => {
+        if (config.comfyuiTemplates.some(entry => entry.id === template.id)) throw new Error("ERR_COMFYUI_WORKFLOW_DUPLICATE");
+        config.comfyuiTemplates.push(template);
+        return structuredClone(template);
+    });
+    registerComfyuiTemplates([saved]);
+    return saved;
+}
+
+export async function deleteComfyuiTemplate(id: string): Promise<boolean> {
+    const deleted = await mutate((config) => {
+        const before = config.comfyuiTemplates.length;
+        config.comfyuiTemplates = config.comfyuiTemplates.filter(entry => entry.id !== id);
+        return before !== config.comfyuiTemplates.length;
+    });
+    if (deleted) unregisterComfyuiTemplate(id);
+    return deleted;
 }
 
 export function connectionFromEnv(providerId: ProviderId): ProviderConnectionContext | undefined {
