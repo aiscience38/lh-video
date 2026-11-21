@@ -1,4 +1,5 @@
 import { test, expect } from "./fixtures";
+import AxeBuilder from "@axe-core/playwright";
 import type { APIRequestContext, Page } from "@playwright/test";
 import fs from "node:fs/promises";
 import os from "node:os";
@@ -119,6 +120,7 @@ test("imports each first-level subfolder as a character, in filename order, skip
 
     const dialog = await openImport(page);
     await expect(dialog.getByRole("heading", { name: en.library.import.title })).toBeVisible();
+    expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
     await dialog.getByTestId("folder-import-input").setInputFiles(folder);
 
     const summary = dialog.getByTestId("folder-import-summary");

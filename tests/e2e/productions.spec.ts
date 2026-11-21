@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 import { test, expect } from "./fixtures";
 import en from "../../src/messages/en.json";
 
@@ -63,6 +64,7 @@ test("the board renders cards with stop-tone data attributes", async ({ page }) 
     await expect(waitingCard).toBeVisible();
     await expect(waitingCard.locator('li[data-stop="concept"]')).toHaveAttribute("data-tone", "amber");
     await expect(waitingCard.getByTestId("production-status")).toHaveText(en.productions.board.pendingGate);
+    expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
 });
 
 test("a pending gate blocks advance and approving it advances the rail", async ({ page }) => {
