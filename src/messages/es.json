@@ -4020,6 +4020,64 @@
       "text_80568cd7_12": "Wan3.0 Prime"
     }
   },
+  "picker": {
+    "trigger": "Añadir desde la biblioteca",
+    "title": "Añadir referencias desde tu biblioteca",
+    "hint": "Elige personajes, escenas o guiones gráficos. Sus imágenes guardadas ocupan los espacios de referencia de imagen de {capability}.",
+    "searchLabel": "Buscar en tu biblioteca",
+    "searchPlaceholder": "Buscar por nombre…",
+    "filterLabel": "Filtrar por tipo",
+    "kinds": {
+      "all": "Todos",
+      "character": "Personajes",
+      "scene": "Escenas",
+      "storyboard": "Guiones gráficos"
+    },
+    "loading": "Cargando tu biblioteca…",
+    "loadError": "No se pudo cargar tu biblioteca.",
+    "retry": "Reintentar",
+    "emptySearch": "Ninguna entrada de la biblioteca coincide con esta búsqueda.",
+    "emptyLibrary": "Tu biblioteca está vacía. Crea primero un personaje o una escena.",
+    "noAssets": "Aún no hay imágenes guardadas",
+    "imageCount": "Imágenes: {count}",
+    "selectedCount": "Seleccionados: {count}",
+    "readyCount": "Referencias listas: {count}",
+    "attach": "Adjuntar referencias",
+    "cancel": "Cancelar",
+    "refusalsTitle": "Algunas referencias no se pudieron adjuntar",
+    "refusalUnsupported": "{capability} no acepta referencias de imagen.",
+    "refusalCapacity": "{name}: {capability} no tiene espacios libres de referencia de imagen.",
+    "refusalInvalid": "{name} tiene una referencia de imagen que este espacio de trabajo no puede usar: {asset}.",
+    "refusalDuplicate": "{name} repite una imagen ya seleccionada.",
+    "capacityNote": "Caben {ready} de {total} referencias en {capability}."
+  },
+  "motion": {
+    "pillLabel": "Movimiento de cámara",
+    "title": "Movimiento de cámara",
+    "hint": "Añade un movimiento de cámara a tu prompt y aplica los ajustes recomendados del preajuste cuando el modelo los admite.",
+    "none": "Sin movimiento de cámara",
+    "previewLabel": "Vista previa del prompt",
+    "presets": {
+      "bullet-time": {
+        "label": "Tiempo bala"
+      },
+      "crash-zoom": {
+        "label": "Zoom brusco"
+      },
+      "dolly-in": {
+        "label": "Dolly de acercamiento"
+      },
+      "handheld": {
+        "label": "Cámara en mano"
+      },
+      "orbit": {
+        "label": "Órbita"
+      },
+      "whip-pan": {
+        "label": "Barrido rápido"
+      }
+    }
+  },
   "validation": {
     "promptRequired": "Escribe una descripción",
     "promptTooLong": "La descripción debe tener como máximo {max} caracteres",

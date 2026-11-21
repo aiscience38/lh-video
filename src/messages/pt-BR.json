@@ -4025,6 +4025,7 @@
       "text_80568cd7_12": "Wan3.0 Prime"
     }
   },
+<<<<<<< HEAD
   "productions": {
     "eyebrow": "PRODUÇÕES",
     "title": "Quadro de produções",
@@ -4131,6 +4132,64 @@
       "ERR_GATE_NOT_FOUND": "Essa decisão não existe mais.",
       "ERR_GATE_DECIDED": "Esta decisão já foi tomada. Abra uma nova.",
       "ERR_PRODUCTIONS_UNAVAILABLE": "As produções estão indisponíveis agora."
+=======
+  "picker": {
+    "trigger": "Adicionar da biblioteca",
+    "title": "Adicionar referências da sua biblioteca",
+    "hint": "Escolha personagens, cenas ou storyboards. As imagens salvas preenchem os espaços de referência de imagem de {capability}.",
+    "searchLabel": "Pesquisar na sua biblioteca",
+    "searchPlaceholder": "Pesquisar por nome…",
+    "filterLabel": "Filtrar por tipo",
+    "kinds": {
+      "all": "Todos",
+      "character": "Personagens",
+      "scene": "Cenas",
+      "storyboard": "Storyboards"
+    },
+    "loading": "Carregando sua biblioteca…",
+    "loadError": "Não foi possível carregar sua biblioteca.",
+    "retry": "Tentar de novo",
+    "emptySearch": "Nenhum item da biblioteca corresponde a esta pesquisa.",
+    "emptyLibrary": "Sua biblioteca está vazia. Crie um personagem ou uma cena primeiro.",
+    "noAssets": "Ainda não há imagens salvas",
+    "imageCount": "Imagens: {count}",
+    "selectedCount": "Selecionados: {count}",
+    "readyCount": "Referências prontas: {count}",
+    "attach": "Anexar referências",
+    "cancel": "Cancelar",
+    "refusalsTitle": "Algumas referências não puderam ser anexadas",
+    "refusalUnsupported": "{capability} não aceita referências de imagem.",
+    "refusalCapacity": "{name}: {capability} não tem espaços livres de referência de imagem.",
+    "refusalInvalid": "{name} tem uma referência de imagem que este workspace não pode usar: {asset}.",
+    "refusalDuplicate": "{name} repete uma imagem já selecionada.",
+    "capacityNote": "{ready} de {total} referências cabem em {capability}."
+  },
+  "motion": {
+    "pillLabel": "Movimento de câmera",
+    "title": "Movimento de câmera",
+    "hint": "Adiciona um movimento de câmera ao seu prompt e aplica os ajustes recomendados do preset quando o modelo os aceita.",
+    "none": "Sem movimento de câmera",
+    "previewLabel": "Prévia do prompt",
+    "presets": {
+      "bullet-time": {
+        "label": "Tempo bala"
+      },
+      "crash-zoom": {
+        "label": "Zoom brusco"
+      },
+      "dolly-in": {
+        "label": "Dolly in"
+      },
+      "handheld": {
+        "label": "Câmera na mão"
+      },
+      "orbit": {
+        "label": "Órbita"
+      },
+      "whip-pan": {
+        "label": "Whip pan"
+      }
+>>>>>>> m2/picker-presets
     }
   }
 }
