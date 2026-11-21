@@ -16,5 +16,9 @@ Modifications in this fork include (non-exhaustive):
   deployments still require an https origin.
 - Packaging under `packaging/` (WinForms launcher, NSIS installer, icon assets)
   and the bundled portable Node runtime used by the Windows desktop build.
+- Runtime dependency pins: Next.js **16.4.6** (upgraded from 16.4.3 for a
+  security advisory) and `workflow` **5.7.1** (upgraded from 5.3.0 because the
+  published 5.3.0 tarball was missing `runtime/start.js`). Both are unmodified
+  upstream packages; the upgrade is recorded in `CHANGELOG.md`.
 
 "LH Video" and its icon are original to this fork.
