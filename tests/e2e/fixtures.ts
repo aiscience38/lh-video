@@ -2,6 +2,8 @@ import { test as base, expect, type Page } from "@playwright/test";
 import type { ProviderConnectionRecord } from "../../src/providers/config-types";
 import type { ProviderDefinition } from "../../src/providers/definitions";
 import type { CatalogResponse } from "../../src/features/providers/types";
+import type { LibraryEntity } from "../../src/features/library/types";
+import type { MotionPreset } from "../../src/models/motion-params";
 import type { AnyTask } from "../../src/types";
 
 export const test = base.extend<{ browserErrors: string[] }>({
@@ -30,22 +32,26 @@ export interface MockWorkspace {
     historyError: boolean;
     history: AnyTask[];
     nextCursor: string | null;
+    library: LibraryEntity[];
+    motionPresets: MotionPreset[];
     requests: Array<{ method: string; path: string; body: string | null }>;
 }
 
 export async function mockWorkspace(page: Page, { connected = true }: { connected?: boolean } = {}): Promise<MockWorkspace> {
-    const [providersResponse, catalogResponse] = await Promise.all([
-        page.request.get("/api/providers"), page.request.get("/api/catalog"),
+    const [providersResponse, catalogResponse, motionResponse] = await Promise.all([
+        page.request.get("/api/providers"), page.request.get("/api/catalog"), page.request.get("/api/motion-presets"),
     ]);
     expect(providersResponse.ok()).toBeTruthy();
     expect(catalogResponse.ok()).toBeTruthy();
+    expect(motionResponse.ok()).toBeTruthy();
     const providers = (await providersResponse.json()).providers as ProviderDefinition[];
     const catalog = await catalogResponse.json() as CatalogResponse;
+    const motionPresets = (await motionResponse.json()).presets as MotionPreset[];
     const state: MockWorkspace = {
         providers, catalog: { ...catalog, overrides: [], discovered: [] },
         connectedProviderIds: connected ? providers.map(provider => provider.id) : [],
         connections: [], modelsError: false, providersError: false, catalogError: false,
-        historyError: false, history: [], nextCursor: null, requests: [],
+        historyError: false, history: [], nextCursor: null, library: [], motionPresets, requests: [],
     };
     await page.route("**/api/**", async route => {
         const request = route.request();
@@ -66,6 +72,15 @@ export async function mockWorkspace(page: Page, { connected = true }: { connecte
             case "/api/tasks":
             case "/api/image-tasks":
                 return state.historyError ? unavailable() : route.fulfill({ json: { tasks: state.history, nextCursor: state.nextCursor } });
+            case "/api/library": {
+                const kind = url.searchParams.get("kind");
+                const query = (url.searchParams.get("q") ?? "").trim().toLowerCase();
+                const entities = state.library.filter(entity => (!kind || entity.kind === kind)
+                    && (!query || entity.name.toLowerCase().includes(query) || entity.slug.includes(query)));
+                return route.fulfill({ json: { entities, count: entities.length } });
+            }
+            case "/api/motion-presets":
+                return route.fulfill({ json: { presets: state.motionPresets } });
             default:
                 return route.fulfill({ status: 400, json: { error: "ERR_SYNTHETIC_UNEXPECTED_REQUEST" } });
         }

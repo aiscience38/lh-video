@@ -2,9 +2,10 @@
 
 import { useState, useCallback, useRef, useMemo, useEffect, useEffectEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertCircle, X } from "lucide-react";
+import { AlertCircle, Images, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useForm, useWatch } from "react-hook-form";
+import useSWR from "swr";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
@@ -18,8 +19,15 @@ import { revalidateImageTasks } from "@/features/tasks/hooks/useImageTasks";
 import { defaultSettings, type SettingsValues } from "@/features/studio/model-settings";
 import type { AttachmentItem } from "@/features/studio/types";
 import type { SizeUiResolution } from "@/types";
+import type { MotionPreset } from "@/models/motion-params";
+import { composeMotionPrompt, familySupportsMotion, motionPresetsForFamily } from "@/models/motion-params";
+import type { ReferenceRefusal, ReferenceSlot, ReferenceSource } from "@/models/reference-selection";
+import { referenceRefusalCopy, resolveReferenceAssets } from "@/models/reference-selection";
+import { libraryAssetUrl } from "@/features/library/lib/asset-url";
+import { ReferencePickerDialog } from "@/features/library/components/ReferencePickerDialog";
 import { buildGroupedDropTargets, filesForDropTarget, slotsToDropDescriptors, type GroupedDropTarget } from "@/features/studio/lib/attachment-drop-targets";
 import { remapSlotFilesOnModelSwitch, remapVideoAttachmentsOnModelSwitch } from "@/features/studio/lib/attachment-remap";
+import { settingsWithMotionPreset } from "@/features/studio/lib/motion-settings";
 import { submitInBackground } from "@/features/studio/lib/background-submissions";
 import { hasMediaTransfer, isUrlReference, readMediaTransfer } from "@/features/studio/lib/media-transfer";
 
@@ -33,11 +41,18 @@ import { ControlsPill } from "@/features/studio/components/command-bar/ControlsP
 import { VideoControlsPill } from "@/features/studio/components/command-bar/VideoControlsPill";
 import { AttachmentButton } from "@/features/studio/components/command-bar/AttachmentButton";
 import { ImageAttachmentButton } from "@/features/studio/components/command-bar/ImageAttachmentButton";
+import { MotionPresetsPill } from "@/features/studio/components/command-bar/MotionPresetsPill";
 import { ReferencePreview } from "@/features/studio/components/ReferencePreview";
 import { useModelCopy } from "@/i18n/use-model-copy";
 
 const schema = z.object({ prompt: z.string().max(65536) });
 type FormData = z.infer<typeof schema>;
+
+const motionFetcher = async (url: string) => {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) throw new Error("ERR_MOTION_PRESETS_UNAVAILABLE");
+    return response.json() as Promise<{ presets: MotionPreset[] }>;
+};
 
 export interface IncomingImage { url: string; target: "reference" | "start" | "end"; mode: "image" | "video"; revision: number }
 
@@ -55,6 +70,8 @@ export function CommandBar({ mode, onModeChange, suggestion, incoming, onPromptS
     const tErrors = useTranslations("errors");
     const tCommon = useTranslations("common");
     const tCommand = useTranslations("commandBar");
+    const tPicker = useTranslations("picker");
+    const tMotion = useTranslations("motion");
     const { slotLabel } = useModelCopy();
     const videoCatalog = useRuntimeModels("video");
     const imageCatalog = useRuntimeModels("image");
@@ -95,6 +112,11 @@ export function CommandBar({ mode, onModeChange, suggestion, incoming, onPromptS
     const [apiError, setApiError] = useState<string | null>(null);
     const [isDragOverlayVisible, setIsDragOverlayVisible] = useState(false);
     const [activeDropTargetId, setActiveDropTargetId] = useState<string | null>(null);
+    const [pickerOpen, setPickerOpen] = useState(false);
+    const [pickerSession, setPickerSession] = useState(0);
+    const [referenceRefusals, setReferenceRefusals] = useState<ReferenceRefusal[]>([]);
+    const [motionPresetId, setMotionPresetId] = useState<string | null>(null);
+    const { data: motionData } = useSWR<{ presets: MotionPreset[] }>("/api/motion-presets", motionFetcher);
 
     const { control, setValue, handleSubmit } = useForm<FormData>({
         resolver: zodResolver(schema),
@@ -157,6 +179,63 @@ export function CommandBar({ mode, onModeChange, suggestion, incoming, onPromptS
     }, [mode, imageUploadSlots, videoRoleDescriptors]);
 
     const hasDropTargets = dropTargets.length > 0;
+
+    // ── Motion presets: only families whose models accept camera direction ──
+    const motionPresets = useMemo(() => motionData?.presets ?? [], [motionData]);
+    const motionSupported = mode === "video" && Boolean(videoModel) && videoModel?.prompt_supported !== false
+        && familySupportsMotion(motionPresets, videoModel?.family ?? "");
+    const availableMotionPresets = useMemo(
+        () => motionSupported && videoModel ? motionPresetsForFamily(motionPresets, videoModel.family) : [],
+        [motionSupported, motionPresets, videoModel],
+    );
+    const activeMotionPreset = availableMotionPresets.find((preset) => preset.id === motionPresetId) ?? null;
+    const motionPrompt = composeMotionPrompt(activeMotionPreset, prompt);
+
+    // ── Library references: capability slots the picker may fill ──
+    const referenceSlots = useMemo<ReferenceSlot[]>(() => {
+        if (mode === "image") return imageUploadSlots;
+        const overrideRoles = videoOverrides.attachment_roles;
+        if (overrideRoles && overrideRoles.length > 0) {
+            return overrideRoles.map((role) => ({ id: role.id, label: role.label, kind: role.kind, max_count: 1 }));
+        }
+        return (videoModel?.media_slots ?? []).map((slot) => ({
+            id: slot.id, label: slot.label, kind: slot.kind, multiple: slot.multiple, max_count: slot.max_count,
+        }));
+    }, [mode, imageUploadSlots, videoModel, videoOverrides]);
+    const referenceOccupied = useMemo(() => {
+        if (mode === "image") return Object.fromEntries(Object.entries(slotFiles).map(([slotId, files]) => [slotId, files.length]));
+        return attachments.reduce<Record<string, number>>((counts, attachment) => {
+            counts[attachment.roleId] = (counts[attachment.roleId] ?? 0) + 1;
+            return counts;
+        }, {});
+    }, [mode, slotFiles, attachments]);
+
+    const attachLibraryReferences = useCallback((sources: ReferenceSource[]) => {
+        const { assignments, refused } = resolveReferenceAssets(sources, referenceSlots, referenceOccupied);
+        const accepted: Array<{ slotId: string; url: string }> = [];
+        for (const assignment of assignments) {
+            const url = libraryAssetUrl(assignment.assetId);
+            if (!url) {
+                // The resolver already rejects malformed ids; this keeps the contract explicit.
+                refused.push({ assetId: assignment.assetId, entityId: assignment.entityId, entityName: assignment.entityName, reason: "invalid" });
+                continue;
+            }
+            accepted.push({ slotId: assignment.slotId, url });
+        }
+        if (mode === "image") {
+            setSlotFiles((previous) => {
+                const next = { ...previous };
+                for (const item of accepted) next[item.slotId] = [...(next[item.slotId] ?? []), new File([], item.url, { type: "image/png" })];
+                return next;
+            });
+        } else {
+            setAttachments((previous) => [...previous, ...accepted.map((item) => ({
+                id: crypto.randomUUID(), roleId: item.slotId, type: "url" as const, url: item.url, kind: "image" as const,
+            }))]);
+        }
+        setReferenceRefusals(refused);
+        setPickerOpen(false);
+    }, [mode, referenceSlots, referenceOccupied]);
 
     useEffect(() => {
         const hasFiles = (event: DragEvent) => hasMediaTransfer(event.dataTransfer);
@@ -371,6 +450,8 @@ export function CommandBar({ mode, onModeChange, suggestion, incoming, onPromptS
             }));
 
         setAttachments((current) => remapVideoAttachmentsOnModelSwitch(current, previousRoles, nextRoles));
+        setMotionPresetId(null);
+        setReferenceRefusals([]);
         setVideoModelId(nextModel?.id ?? "");
         setVideoVariantId(nextModel ? varId : "");
         setVideoSettings(defaultSettings(videoCatalog.byId[id], varId));
@@ -392,6 +473,7 @@ export function CommandBar({ mode, onModeChange, suggestion, incoming, onPromptS
         ];
 
         setSlotFiles((current) => remapSlotFilesOnModelSwitch(current, previousSlots, nextSlots));
+        setReferenceRefusals([]);
 
         setImageModelId(nextModel?.id ?? "");
         const m = asImageModel(imageCatalog.byId[id]);
@@ -431,15 +513,19 @@ export function CommandBar({ mode, onModeChange, suggestion, incoming, onPromptS
         if (supportsPrompt && activeModel.prompt_required && !data.prompt.trim()) { setApiError("ERR_PROMPT_REQUIRED"); textareaRef.current?.focus(); return; }
         const requiredSlots = mode === "image" ? imageUploadSlots : videoRoleDescriptors;
         if (requiredSlots.some(slot => slot.required && !(mode === "image" ? slotFiles[slot.id]?.length : attachments.some(item => item.roleId === slot.id)))) { setApiError("ERR_MISSING_ATTACHMENT"); return; }
-        if (supportsPrompt && data.prompt.length > (activeModel.prompt_max ?? 65536)) { setApiError("ERR_PROMPT_TOO_LONG"); return; }
+        // The camera fragment is part of the submitted prompt, so the prompt limit applies to the composed text.
+        const submittedPrompt = supportsPrompt ? composeMotionPrompt(activeMotionPreset, data.prompt) : "";
+        if (supportsPrompt && submittedPrompt.length > (activeModel.prompt_max ?? 65536)) { setApiError("ERR_PROMPT_TOO_LONG"); return; }
         setApiError(null);
         const submittedMode = mode;
         const body = new FormData();
-        body.append("prompt", supportsPrompt ? data.prompt : "");
+        body.append("prompt", submittedPrompt);
         if (submittedMode === "video") {
             body.append("model_id", videoModelId);
             body.append("variant_id", videoVariantId);
-            body.append("settings", JSON.stringify(videoSettings));
+            body.append("settings", JSON.stringify(activeMotionPreset && videoModel
+                ? settingsWithMotionPreset(activeMotionPreset, videoSettings, videoModel, videoVariantId)
+                : videoSettings));
             for (const att of attachments) {
                 if (att.file) body.append(`file_${att.roleId}`, att.file);
                 else if (att.url) body.append(`url_${att.roleId}`, att.url);
@@ -489,6 +575,35 @@ export function CommandBar({ mode, onModeChange, suggestion, incoming, onPromptS
                 )}
             </AnimatePresence>
 
+            {/* Library reference refusals — the capability cannot take these assets */}
+            <AnimatePresence>
+                {referenceRefusals.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        data-testid="picker-refusals"
+                        role="alert"
+                        className="relative mx-auto z-40 mb-3 w-full max-w-[70rem] rounded-[18px] border border-white/[.08] text-[13px] leading-[1.5]"
+                        style={{ padding: "14px 16px", background: "rgba(12,16,24,.96)", boxShadow: "0 28px 80px rgba(0,0,0,.42)" }}
+                    >
+                        <div className="flex items-start gap-2 text-[#ffc4c4]">
+                            <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                            <div className="min-w-0 flex-1">
+                                <p className="text-[11px] font-bold tracking-[.08em] uppercase">{tPicker("refusalsTitle")}</p>
+                                <ul className="mt-1 list-disc space-y-0.5 pl-4">
+                                    {referenceRefusals.map((refusal) => {
+                                        const copy = referenceRefusalCopy(refusal, activeModel?.label ?? "");
+                                        return <li key={`${refusal.entityId}:${refusal.assetId}:${refusal.reason}`}>{tPicker(copy.key, copy.values)}</li>;
+                                    })}
+                                </ul>
+                            </div>
+                            <button type="button" aria-label={tCommand("dismissError")} onClick={() => setReferenceRefusals([])} className="grid size-9 shrink-0 place-items-center rounded-lg hover:bg-white/10"><X className="size-4" /></button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* Composer */}
             <form
                 data-studio-composer
@@ -516,7 +631,7 @@ export function CommandBar({ mode, onModeChange, suggestion, incoming, onPromptS
                             key={m}
                             aria-pressed={mode === m}
                             type="button"
-                            onClick={() => onModeChange(m)}
+                            onClick={() => { setReferenceRefusals([]); onModeChange(m); }}
                             className={`min-h-10 flex-1 px-4 py-1.5 flex sm:flex-col sm:px-1.5 items-center justify-center gap-[5px] rounded-[14px] text-[10px] font-extrabold tracking-[0.02em] cursor-pointer border transition-colors ${mode === m
                                 ? "text-foreground border-white/[.1]"
                                 : "text-muted-foreground border-transparent hover:text-foreground"
@@ -570,6 +685,20 @@ export function CommandBar({ mode, onModeChange, suggestion, incoming, onPromptS
                                     onSlotFilesChange={setSlotFiles}
                                 />
                             ) : null}
+
+                            {/* Library reference picker trigger */}
+                            <button
+                                type="button"
+                                data-testid="picker-open"
+                                aria-label={tPicker("trigger")}
+                                title={tPicker("trigger")}
+                                onClick={() => { setPickerSession((session) => session + 1); setPickerOpen(true); }}
+                                disabled={modelUnavailable}
+                                className="flex min-h-10 max-w-full items-center gap-2 whitespace-nowrap rounded-xl border border-white/15 bg-white/[.04] px-3 text-xs font-semibold transition-colors hover:bg-white/[.08] disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                <Images aria-hidden="true" className="size-4" />
+                                <span className="truncate">{tPicker("trigger")}</span>
+                            </button>
 
                             {/* Image slot thumbnails */}
                             {mode === "image" && Object.values(slotFiles).some((f) => f.length > 0) && (
@@ -699,6 +828,14 @@ export function CommandBar({ mode, onModeChange, suggestion, incoming, onPromptS
                             </div>
                         </div>
 
+                        {/* Camera motion prompt preview: base prompt plus the preset fragment */}
+                        {activeMotionPreset && supportsPrompt && (
+                            <div data-testid="motion-prompt-preview" className="mt-1.5 rounded-[14px] border border-white/10 bg-white/[.03] px-2.5 py-1.5">
+                                <p className="text-[10px] font-bold tracking-[.08em] uppercase text-primary">{tMotion("previewLabel")}</p>
+                                <p className="mt-0.5 text-[12px] leading-snug break-words whitespace-pre-wrap text-muted-foreground">{motionPrompt}</p>
+                            </div>
+                        )}
+
                         {/* Control row (pills) */}
                         <div className="flex flex-wrap items-center gap-2 mt-[2px]">
                             {mode === "video" ? (
@@ -709,6 +846,13 @@ export function CommandBar({ mode, onModeChange, suggestion, incoming, onPromptS
                                         onModelChange={handleVideoModelChange}
                                         attachments={attachments}
                                     />
+                                    {motionSupported && availableMotionPresets.length > 0 && (
+                                        <MotionPresetsPill
+                                            presets={availableMotionPresets}
+                                            value={activeMotionPreset?.id ?? null}
+                                            onChange={setMotionPresetId}
+                                        />
+                                    )}
                                     {videoModel && <>
                                     {videoModel.resolution_variant && (videoModel.resolution_variant.options?.length ?? 0) > 0 && <ResolutionPill
                                         resolutions={videoModel.resolution_variant.options!.map(id => ({ id, base: 0 }))}
@@ -829,6 +973,15 @@ export function CommandBar({ mode, onModeChange, suggestion, incoming, onPromptS
                 </div>
             </form>
             {!supportsPrompt && <p className="mx-auto mt-2 hidden max-w-[70rem] text-right text-[11px] text-muted-foreground sm:block">{tCommand("referenceOnlyHint")}</p>}
+            <ReferencePickerDialog
+                key={pickerSession}
+                open={pickerOpen}
+                onClose={() => setPickerOpen(false)}
+                onConfirm={attachLibraryReferences}
+                slots={referenceSlots}
+                occupied={referenceOccupied}
+                capabilityLabel={activeModel?.label ?? ""}
+            />
         </div>
     );
 }

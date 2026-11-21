@@ -4000,5 +4000,63 @@
       "text_4dc4c7f6_6": "Wan2.7",
       "text_80568cd7_12": "Wan3.0 Prime"
     }
+  },
+  "picker": {
+    "trigger": "Add from library",
+    "title": "Add references from your library",
+    "hint": "Pick characters, scenes or storyboards. Their saved images fill the image reference slots of {capability}.",
+    "searchLabel": "Search your library",
+    "searchPlaceholder": "Search by name…",
+    "filterLabel": "Filter by kind",
+    "kinds": {
+      "all": "All",
+      "character": "Characters",
+      "scene": "Scenes",
+      "storyboard": "Storyboards"
+    },
+    "loading": "Loading your library…",
+    "loadError": "Could not load your library.",
+    "retry": "Try again",
+    "emptySearch": "No library entries match this search.",
+    "emptyLibrary": "Your library is empty. Create a character or scene first.",
+    "noAssets": "No saved images yet",
+    "imageCount": "Images: {count}",
+    "selectedCount": "Selected: {count}",
+    "readyCount": "References ready: {count}",
+    "attach": "Attach references",
+    "cancel": "Cancel",
+    "refusalsTitle": "Some references could not be attached",
+    "refusalUnsupported": "{capability} does not accept image references.",
+    "refusalCapacity": "{name}: {capability} has no free image reference slots left.",
+    "refusalInvalid": "{name} has an image reference this workspace cannot use: {asset}.",
+    "refusalDuplicate": "{name} repeats an image that is already selected.",
+    "capacityNote": "{ready} of {total} references fit in {capability}."
+  },
+  "motion": {
+    "pillLabel": "Camera motion",
+    "title": "Camera motion",
+    "hint": "Appends a camera move to your prompt and applies the preset's recommended settings when the model supports them.",
+    "none": "No camera motion",
+    "previewLabel": "Prompt preview",
+    "presets": {
+      "bullet-time": {
+        "label": "Bullet time"
+      },
+      "crash-zoom": {
+        "label": "Crash zoom"
+      },
+      "dolly-in": {
+        "label": "Dolly in"
+      },
+      "handheld": {
+        "label": "Handheld"
+      },
+      "orbit": {
+        "label": "Orbit"
+      },
+      "whip-pan": {
+        "label": "Whip pan"
+      }
+    }
   }
 }
