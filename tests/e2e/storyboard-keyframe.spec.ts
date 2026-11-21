@@ -60,7 +60,7 @@ test("sets a keyframe on shot 2 from the picker and it survives a reload", async
     await expect(dialog).toBeVisible();
     await expect(dialog.getByRole("heading", { name: en.library.storyboardEditor.keyframePickerTitle })).toBeVisible();
 
-    const option = dialog.locator(`[data-testid="storyboard-keyframe-option"][data-asset-id="${asset.assetId}"]`);
+    const option = dialog.locator(`[data-testid="storyboard-keyframe-option"][data-asset-id="${asset.assetId}"]`).filter({ hasText: characterName });
     await expect(option).toBeVisible();
     await expect(option).toHaveAccessibleName(en.library.storyboardEditor.keyframeOption
         .replace("{name}", characterName).replace("{id}", asset.assetId).replace("{index}", "2"));
