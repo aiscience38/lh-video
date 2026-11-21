@@ -1,16 +1,17 @@
 import { randomUUID } from "node:crypto";
+import sharp from "sharp";
 import { test, expect } from "./fixtures";
 import en from "../../src/messages/en.json";
 
-// Minimal 8x8 PNG used as the keyframe source.
-const png = Buffer.from(
-    "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAEUlEQVQImWO4+t8dK2IYWhIAylSGwYMD4fAAAAAASUVORK5CYII=",
-    "base64",
-);
 const origin = "https://127.0.0.1:3110";
 
 test("sets a keyframe on shot 2 from the picker and it survives a reload", async ({ page, browserErrors }) => {
     const stamp = Date.now();
+    // Asset ids are content-addressed, so each run needs distinct bytes or the
+    // picker dedupes against a previous project's identical upload.
+    const png = await sharp({ create: { width: 8, height: 8, channels: 4,
+        background: { r: stamp % 256, g: (stamp >> 8) % 256, b: (stamp >> 16) % 256, alpha: 1 } } })
+        .png().toBuffer();
 
     const upload = await page.request.post("/api/library/assets", {
         headers: { Origin: origin },
