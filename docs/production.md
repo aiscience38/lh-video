@@ -69,6 +69,136 @@ and never resubmits generation. Docker Compose uses `restart: unless-stopped`,
 mounts `/app/data`, and publishes the HTTP port on loopback. Expose only the TLS
 reverse proxy publicly. Configure production settings before starting Docker.
 
+## Docker on Windows
+
+The repository ships a multi-stage `Dockerfile` (Node 22 Alpine, standalone
+output, non-root uid 1001) and a `docker-compose.yml` that reads `.env.local`,
+publishes `127.0.0.1:3000`, and mounts the named volume
+`open-higgsfield-data` at `/app/data`. The image already sets
+`OPEN_HIGGSFIELD_STORAGE_DIR=/app/data`, so the volume and the storage root are
+the same directory.
+
+Prerequisites: Docker Desktop with the WSL 2 backend, the repository checked out
+on a shared drive (Docker Desktop shares `C:` by default), and a completed
+`.env.local` with `APP_ORIGIN` set to the HTTPS origin of your reverse proxy —
+not `http://localhost:3000`. Run the commands from the repository root in
+PowerShell.
+
+```powershell
+docker compose up --build -d
+docker compose ps
+docker compose logs -f open-higgsfield
+```
+
+Verify liveness and that the container can reach ComfyUI before enabling real
+work:
+
+```powershell
+curl.exe -s http://127.0.0.1:3000/api/health
+docker compose exec open-higgsfield wget -qO- http://100.92.10.72:8188/system_stats
+```
+
+The second command is the important one on Windows: the container reaches the
+GX10 through Docker Desktop's NAT and the host's Tailscale routes. If it fails,
+the container has no route to `100.92.10.72` even though the host can reach it;
+check `tailscale status` on the host, the Windows firewall profile for the
+Docker network, and whether the endpoint is reachable from a container at all.
+Do not change the saved ComfyUI base URL to a public address to work around a
+routing problem.
+
+Stop and start without deleting data:
+
+```powershell
+docker compose stop
+docker compose start
+docker compose down          # removes the container, keeps the volume
+docker compose down -v       # DESTROYS the data volume - never on a live workspace
+```
+
+Notes:
+
+- Compose prefixes named volumes with the project name, which defaults to the
+  checkout directory (`lh-docs_open-higgsfield-data` here). Confirm the actual
+  name with `docker volume ls` before backing it up.
+- The application runs as uid 1001 inside the image. Files in the volume are
+  owned by that user; mount or copy them with the same ownership.
+- The container does not need a GPU and does not run ComfyUI. Generation stays on
+  the GX10.
+
+These commands were **not executed on the documentation host**: Docker Desktop
+is not installed there. They are derived from this repository's `Dockerfile` and
+`docker-compose.yml` and from standard Docker behaviour, not from an observed
+run.
+
+## Backup and restore
+
+Back up three things, and keep the secrets out of the data archive:
+
+1. **The data root** — task history, `uploads/`, `downloads/`, `library/`.
+   In the single-process and Docker profiles this is the whole workspace state.
+2. **`PROVIDER_CONFIG_ENCRYPTION_KEY`** — without it, provider connections saved
+   through the interface cannot be decrypted. Store it in a password manager,
+   not in the same archive as the data.
+3. **The environment file** (`.env.local` or platform secrets) — contains
+   provider credentials and `APP_ORIGIN`.
+
+Losing the key is not data loss for media or history, but every saved connection
+must be deleted and re-added, and any provider-side state you cannot recreate is
+gone. Replacing the key has the same effect.
+
+### Docker volume
+
+Stop the container first so files are not changing during the copy, then archive
+the volume from a throwaway container. Replace the volume name with the one from
+`docker volume ls`.
+
+```powershell
+docker compose stop
+docker run --rm --user 1001:1001 -v lh-docs_open-higgsfield-data:/data -v C:/backups:/backup alpine tar czf /backup/lh-video-data.tar.gz -C /data .
+docker compose start
+```
+
+Restore into the same volume:
+
+```powershell
+docker compose down
+docker run --rm --user 1001:1001 -v lh-docs_open-higgsfield-data:/data -v C:/backups:/backup alpine sh -c "find /data -mindepth 1 -delete && tar xzf /backup/lh-video-data.tar.gz -C /data"
+docker compose up -d
+```
+
+If the archive was written by another user, restore as root and then fix
+ownership: `docker run --rm -v <volume>:/data alpine chown -R 1001:1001 /data`.
+
+After restoring, start with `GENERATION_ENABLED=false`, check `/api/ready`,
+confirm history and the library appear, and open **Providers** to confirm saved
+connections decrypt (that proves the key matches). Re-enable generation only
+after those checks.
+
+### Desktop data folder
+
+The Windows build uses the same layout, with the folder chosen at first launch:
+
+- Default: `Documents\LH Video Data`; any folder can be selected.
+- Recorded as `dataDir` in `%LOCALAPPDATA%\LH Video\config.ini`, next to the
+  generated `encryptionKey`. The launcher passes the folder to the app as
+  `OPEN_HIGGSFIELD_STORAGE_DIR`.
+- `config.ini` holds the key in plain text. Treat it as a secret and keep it out
+  of shared or synced folders.
+- Back up by closing LH Video and copying the data folder plus `config.ini`.
+- Restore by installing the same or a newer version, copying the data folder
+  back, then choosing it in the folder dialog, editing `dataDir` in `config.ini`,
+  or launching `LHVideo.exe --data-dir "D:\LH Video Data"`. Keep the original
+  `encryptionKey` line from the backup.
+- Uninstalling removes `%LOCALAPPDATA%\LH Video`, including `config.ini` and the
+  key, but leaves the chosen data folder untouched. Copy `config.ini` before
+  uninstalling if the connections must remain decryptable.
+
+The restore sequence is the same as the Docker one: start with generation
+disabled, verify readiness, history, library and connection decryption, then
+re-enable. The Docker commands above were not executed on this host; the desktop
+paths and behaviour are taken from `packaging/launcher.cs` and
+`packaging/installer.nsi`.
+
 ## Vercel and distributed execution
 
 Set the common settings and:
