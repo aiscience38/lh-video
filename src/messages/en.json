@@ -4000,5 +4000,113 @@
       "text_4dc4c7f6_6": "Wan2.7",
       "text_80568cd7_12": "Wan3.0 Prime"
     }
+  },
+  "productions": {
+    "eyebrow": "PRODUCTIONS",
+    "title": "Production board",
+    "subtitle": "Every production, its pipeline stops and the human decisions that move it forward.",
+    "new": "New production",
+    "count": "{count, plural, =0 {No productions yet} one {# production} other {# productions}}",
+    "loading": "Loading productions...",
+    "retry": "Retry",
+    "effort": {
+      "label": "Effort",
+      "quick": "Quick",
+      "standard": "Standard",
+      "studio": "Studio"
+    },
+    "stops": {
+      "label": "Pipeline stops",
+      "concept": "Concept",
+      "outline": "Outline",
+      "storyboard": "Storyboard",
+      "sound": "Sound",
+      "cut": "Cut",
+      "delivery": "Delivery"
+    },
+    "states": {
+      "waiting": "Waiting",
+      "working": "Working",
+      "done": "Done",
+      "blocked": "Blocked"
+    },
+    "rail": {
+      "label": "Pipeline stops"
+    },
+    "board": {
+      "label": "Productions",
+      "emptyTitle": "No productions yet",
+      "emptyHint": "Create a production to track its concept, outline, storyboard, sound, cut and delivery stops.",
+      "open": "Open {title}",
+      "pendingGate": "Decision pending",
+      "complete": "Delivered",
+      "atStop": "Now at {stop}",
+      "error": "Productions could not be loaded."
+    },
+    "create": {
+      "title": "New production",
+      "hint": "The pipeline starts at concept and advances one stop at a time.",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Night shift teaser",
+      "briefLabel": "Brief",
+      "briefPlaceholder": "What should this production deliver?",
+      "effortLabel": "Effort",
+      "submit": "Create production",
+      "submitting": "Creating...",
+      "cancel": "Cancel"
+    },
+    "detail": {
+      "back": "All productions",
+      "meta": "Updated {date}",
+      "emptyBrief": "No brief yet.",
+      "pendingTitle": "Waiting for your decision",
+      "pendingHint": "The {stop} stop cannot advance until this gate is decided.",
+      "noPendingTitle": "No decision pending",
+      "noPendingHint": "Advance the stop yourself, or request a human gate when a decision is needed.",
+      "blockedHint": "This stop is blocked. Resume it before advancing.",
+      "completeHint": "This production is delivered.",
+      "advance": "Advance stop",
+      "advancing": "Advancing...",
+      "historyTitle": "Decision history",
+      "historyEmpty": "No gates have been decided yet.",
+      "historyStop": "{stop}: {option}",
+      "historyNoOption": "No option recorded",
+      "notFound": "Production not found",
+      "notFoundHint": "It may have been moved to the trash.",
+      "errorTitle": "Production unavailable"
+    },
+    "gate": {
+      "optionsLabel": "Options",
+      "recommended": "Recommended",
+      "noteLabel": "Note",
+      "notePlaceholder": "Why this decision?",
+      "approve": "Approve and advance",
+      "reject": "Reject and keep the stop",
+      "submitting": "Saving...",
+      "decidedApproved": "Approved",
+      "decidedRejected": "Rejected",
+      "decidedAt": "Decided {date}",
+      "requestTitle": "Request a decision",
+      "requestHint": "Open a human gate on the {stop} stop.",
+      "optionsInputLabel": "Options, one per line",
+      "optionsInputPlaceholder": "Approve the current cut\nAdd one more pass",
+      "optionsHelp": "The first line is preselected as the recommended option. Up to six options.",
+      "requestSubmit": "Open gate",
+      "requesting": "Opening..."
+    },
+    "errors": {
+      "generic": "Something went wrong. Try again.",
+      "ERR_PRODUCTION_NOT_FOUND": "That production no longer exists.",
+      "ERR_PRODUCTION_INVALID": "The production request was not valid.",
+      "ERR_PRODUCTION_CONFLICT": "The production changed. Reload and try again.",
+      "ERR_PRODUCTION_BLOCKED": "The stop is blocked. Resume it first.",
+      "ERR_PRODUCTION_COMPLETE": "Every stop is already done.",
+      "ERR_PRODUCTION_STOP_LOCKED": "Only the current stop can change.",
+      "ERR_PRODUCTION_GATE_PENDING": "A decision is already pending.",
+      "ERR_GATE_INVALID": "The gate request was not valid.",
+      "ERR_GATE_NOT_FOUND": "That gate no longer exists.",
+      "ERR_GATE_DECIDED": "This gate was already decided. Open a new one.",
+      "ERR_PRODUCTIONS_UNAVAILABLE": "Productions are unavailable right now."
+    }
   }
 }
