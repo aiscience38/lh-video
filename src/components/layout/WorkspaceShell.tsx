@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Cloud, Image as ImageIcon, Languages, Library } from "lucide-react";
+import { Check, Clapperboard, Cloud, Image as ImageIcon, Languages, Library } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -20,11 +20,13 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     const params = useSearchParams();
     const locale = useLocale();
     const t = useTranslations("workspace");
+    const scenes = useTranslations("scenes");
     const languages = useTranslations("languages");
     const inSettings = pathname.includes("/settings");
     const inLibrary = pathname.includes("/library");
+    const inScenes = pathname.includes("/scenes") && !pathname.includes("/library/scenes");
     const destinations = [
-        { label: t("studio"), href: `/${locale}`, icon: ImageIcon, active: !inSettings && !inLibrary },
+        { label: t("studio"), href: `/${locale}`, icon: ImageIcon, active: !inSettings && !inLibrary && !inScenes },
         { label: t("library"), href: `/${locale}/library`, icon: Library, active: inLibrary },
         { label: t("providers"), href: `/${locale}/settings`, icon: Cloud, active: inSettings },
     ];
@@ -43,6 +45,11 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                         {destinations.map(({ label, href, icon: Icon, active }) => <Link key={href} href={href} aria-current={active ? "page" : undefined} title={label} className={`flex h-8 min-w-9 items-center justify-center gap-1.5 rounded-[10px] px-2 text-xs font-semibold transition-colors sm:px-3 ${active ? "bg-white/[.1] text-white" : "text-muted-foreground hover:bg-white/[.05] hover:text-white"}`}>
                             <Icon aria-hidden="true" className={`size-4 ${active ? "text-primary" : ""}`} /><span className="sr-only sm:not-sr-only">{label}</span>
                         </Link>)}
+                    </nav>
+                    <nav aria-label={scenes("navLabel")} className="shrink-0">
+                        <Link href={`/${locale}/scenes`} aria-current={inScenes ? "page" : undefined} title={scenes("nav")} data-testid="scenes-nav-link" className={`flex h-8 min-w-9 items-center justify-center gap-1.5 rounded-[10px] border border-white/[.06] px-2 text-xs font-semibold transition-colors sm:px-3 ${inScenes ? "bg-white/[.1] text-white" : "text-muted-foreground hover:bg-white/[.05] hover:text-white"}`}>
+                            <Clapperboard aria-hidden="true" className={`size-4 ${inScenes ? "text-primary" : ""}`} /><span className="sr-only sm:not-sr-only">{scenes("nav")}</span>
+                        </Link>
                     </nav>
                     <div ref={setToolbarSlot} data-workspace-toolbar className="flex min-w-0 flex-1 items-center justify-end gap-1" />
                     <div className="flex shrink-0 justify-end">
