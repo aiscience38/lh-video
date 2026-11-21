@@ -1,5 +1,5 @@
 import { spawn, execFileSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { createReadStream, existsSync, statSync } from "node:fs";
 import { access, cp, mkdtemp, readFile, rm } from "node:fs/promises";
 import { Agent, request as httpRequest } from "node:http";
 import { createServer as createHttpsServer } from "node:https";
@@ -10,6 +10,7 @@ import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const origin = "https://127.0.0.1:3110";
+const fixtureRoot = path.join(root, "tests", "e2e", "assets");
 const production = process.env.E2E_PRODUCTION !== "0";
 const temporary = await mkdtemp(path.join(tmpdir(), "open-higgsfield-e2e-"));
 const sockets = new Set();
@@ -79,6 +80,47 @@ async function assertBackendPortFree() {
     });
 }
 
+/**
+ * Serves the tiny MP4 fixtures directly from this HTTPS origin for Chromium
+ * and Firefox. Real range responses keep seeking reliable; WebKit tests use a
+ * loopback HTTP server because its media stack rejects self-signed HTTPS.
+ */
+function serveFixture(request, response) {
+    let name;
+    try { name = path.basename(decodeURIComponent(new URL(request.url, origin).pathname)); } catch { name = ""; }
+    if (!/^[A-Za-z0-9._-]+\.mp4$/.test(name)) {
+        response.writeHead(404, { "Content-Type": "text/plain" });
+        response.end("fixture not found");
+        return;
+    }
+    const file = path.join(fixtureRoot, name);
+    let size;
+    try { size = statSync(file).size; } catch {
+        response.writeHead(404, { "Content-Type": "text/plain" });
+        response.end("fixture not found");
+        return;
+    }
+    const range = request.headers.range;
+    const match = range ? /^bytes=(\d+)-(\d*)$/.exec(range) : null;
+    const start = match ? Number(match[1]) : 0;
+    const end = match && match[2] ? Math.min(size - 1, Number(match[2])) : size - 1;
+    if (start >= size || start > end) {
+        response.writeHead(416, { "Content-Range": `bytes */${size}` });
+        response.end();
+        return;
+    }
+    const headers = {
+        "Content-Type": "video/mp4",
+        "Content-Length": String(end - start + 1),
+        "Accept-Ranges": "bytes",
+        "Cache-Control": "no-store",
+    };
+    if (match) headers["Content-Range"] = `bytes ${start}-${end}/${size}`;
+    response.writeHead(match ? 206 : 200, headers);
+    if (request.method === "HEAD") { response.end(); return; }
+    createReadStream(file, { start, end }).pipe(response);
+}
+
 async function nextArguments() {
     const cli = path.join(root, "node_modules/next/dist/bin/next");
     if (!production) return [cli, "dev", "--webpack", "--hostname", "127.0.0.1", "--port", "3111"];
@@ -102,6 +144,10 @@ try {
     execFileSync(opensslBinary, ["req", "-x509", "-newkey", "rsa:2048", "-nodes", "-sha256", "-days", "1",
         "-keyout", keyPath, "-out", certPath, "-subj", "/CN=127.0.0.1", "-addext", "subjectAltName=IP:127.0.0.1"], { stdio: "ignore" });
     server = createHttpsServer({ key: await readFile(keyPath), cert: await readFile(certPath) }, (request, response) => {
+        if (request.url?.startsWith("/e2e-fixtures/")) {
+            serveFixture(request, response);
+            return;
+        }
         let upstreamResponse;
         response.once("error", error => {
             if (!expectedDisconnect(error)) console.error("[E2E] Proxy response error", error);

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { readBoundedJson, requestFailure } from "@/server/http/request-limits";
 import { LIBRARY_INVALID_ERROR } from "@/server/library/contract";
-import { addShot, reorderShots, type StoryboardShotDraft } from "@/server/library/storyboards";
+import { addShot, removeShot, reorderShots, setKeyframe, type StoryboardShotDraft } from "@/server/library/storyboards";
 import { applyWorkspaceHeaders, guardWorkspaceRequest } from "@/server/security/workspace-access";
 
 export const runtime = "nodejs";
@@ -25,12 +25,14 @@ function invalidBody(): Response {
 }
 
 /**
- * Shot operations the generic PATCH cannot express (it only replaces the whole
- * `shots` array). Everything else — read, rename, set keyframe, delete — stays
+ * Shot operations that are awkward through the generic PATCH (it only
+ * replaces the whole `shots` array). Read, rename and storyboard delete stay
  * on `/api/library/storyboard/[id]`.
  *
- * Body: `{ "action": "add", "shot": { ... } }` or
- *       `{ "action": "reorder", "orderedIds": ["<uuid>", ...] }`.
+ * Body: `{ "action": "add", "shot": { ... } }`,
+ *       `{ "action": "reorder", "orderedIds": ["<uuid>", ...] }`,
+ *       `{ "action": "remove", "shotId": "<uuid>" }` or
+ *       `{ "action": "keyframe", "shotId": "<uuid>", "assetId": "<id>|null" }`.
  */
 export async function POST(request: Request, context: Context) {
     const denial = guardWorkspaceRequest(request);
@@ -53,6 +55,17 @@ export async function POST(request: Request, context: Context) {
         if (record.action === "reorder") {
             if (!Array.isArray(record.orderedIds)) return invalidBody();
             const entity = await reorderShots(id, record.orderedIds as string[]);
+            return applyWorkspaceHeaders(NextResponse.json({ entity }));
+        }
+        if (record.action === "remove") {
+            if (typeof record.shotId !== "string") return invalidBody();
+            const entity = await removeShot(id, record.shotId);
+            return applyWorkspaceHeaders(NextResponse.json({ entity }));
+        }
+        if (record.action === "keyframe") {
+            if (typeof record.shotId !== "string") return invalidBody();
+            if (record.assetId !== null && typeof record.assetId !== "string") return invalidBody();
+            const entity = await setKeyframe(id, record.shotId, record.assetId);
             return applyWorkspaceHeaders(NextResponse.json({ entity }));
         }
         return invalidBody();
