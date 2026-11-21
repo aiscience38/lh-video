@@ -1,7 +1,7 @@
 import "server-only";
 
 import { z } from "zod";
-import fluxT2i from "./comfyui-templates/flux-t2i.json";
+import qwenT2i from "./comfyui-templates/qwen-t2i.json";
 import type { CustomFieldCapability, ImageModelCapability, MediaSlotCapability } from "@/models/capabilities/types";
 
 /**
@@ -138,7 +138,7 @@ export function validateComfyuiParam(rule: ComfyuiTemplateParam, value: unknown)
     return rule.maximum === undefined || value <= rule.maximum;
 }
 
-const templates = [parseComfyuiTemplate(fluxT2i)];
+const templates = [parseComfyuiTemplate(qwenT2i)];
 export const COMFYUI_TEMPLATES: Record<string, ComfyuiTemplate> = Object.fromEntries(templates.map(entry => [entry.id, entry]));
 
 /**

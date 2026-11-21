@@ -17,7 +17,27 @@ Verified 2026-11-20 from the LH Video host.
 - comfyui_version: 0.46.0 (frontend 1.59.10, templates 0.11.112)
 - OS: Linux, RAM total ~130.6 GB, free ~27 GB at check time
 - Node classes available: 2277; includes `CheckpointLoaderSimple`, `SaveImage`, `LoadImage`
+- `CheckpointLoaderSimple.ckpt_name` is **empty**: no checkpoint is installed on this GX10
 - LTX node classes present: `ModelMergeLTXV`, `LTXVLatentUpsampler`, `LTXVAudioVAELoader`, `LTXVAudioVAEEncode`, `LTXVAudioVAEDecode` (full LTX graph support requires checking loader/sampler classes per workflow)
+
+## Shipped template
+
+- The previous `flux-t2i` template (`CheckpointLoaderSimple` + `flux1-dev.safetensors`)
+  could never run on this host because the checkpoint list is empty. It was
+  **deleted** and replaced by `qwen-t2i`
+  (`src/server/catalog/comfyui-templates/qwen-t2i.json`, capability
+  `comfyui:qwen-t2i`, label "Qwen-Image Text to Image").
+- Installed weights are split, so the graph loads them directly: `UNETLoader`
+  `qwen_image_2.1_int8_convrot.safetensors`, `CLIPLoader`
+  `qwen3vl_8b_fp8_scaled.safetensors` with `type: qwen_image`, `VAELoader`
+  `qwen_image_2.1_vae_bf16.safetensors`.
+- Graph: UNETLoader → `ModelSamplingAuraFlow` (shift 3.1) → `KSampler`
+  (euler/simple, cfg 3, 16 steps, denoise 1); `CLIPTextEncode` positive (node 4)
+  and negative (node 5) on the CLIPLoader; `EmptySD3LatentImage` 512×512 (node 6);
+  `VAEDecode` with the VAELoader (node 8); `SaveImage` (node 9) is the output.
+- Verified live 2026-11-20 with `/queue` empty before submission: `POST /prompt`
+  with this exact graph returned a 512×512 PNG from node 9 in **16.4 s** at
+  16 steps. A repeat run with the model already resident took 6.9 s.
 
 ## Host tools
 

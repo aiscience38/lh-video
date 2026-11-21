@@ -27,7 +27,7 @@ function fixture({ env = { COMFYUI_BASE_URL: BASE, COMFYUI_API_KEY: key }, handl
 }
 
 function model(f) {
-    return f.load("@/server/catalog/image").IMAGE_CAPABILITIES["comfyui:flux-t2i"];
+    return f.load("@/server/catalog/image").IMAGE_CAPABILITIES["comfyui:qwen-t2i"];
 }
 
 function request(f, overrides = {}) {
@@ -39,7 +39,7 @@ function request(f, overrides = {}) {
 
 const completed = {
     status: { status_str: "success", completed: true, messages: [] },
-    outputs: { "7": { images: [{ filename: "lh-video_00001_.png", subfolder: "lh-video", type: "output" }] } },
+    outputs: { "9": { images: [{ filename: "lh-video_00001_.png", subfolder: "lh-video", type: "output" }] } },
 };
 
 function assertError(error, fields) {
@@ -50,7 +50,7 @@ function assertError(error, fields) {
     return true;
 }
 
-test("ComfyUI registers documented environment metadata, one reviewed FLUX template and derived capability controls", () => {
+test("ComfyUI registers documented environment metadata, one reviewed Qwen-Image template and derived capability controls", () => {
     const f = fixture();
     const definitions = f.load("@/providers/definitions");
     const definition = definitions.getProviderDefinition("comfyui");
@@ -61,19 +61,27 @@ test("ComfyUI registers documented environment metadata, one reviewed FLUX templ
     assert.equal(f.load("@/server/providers/registry").getProvider("comfyui").id, "comfyui");
     assert.match(readFileSync(new URL("../.env.example", import.meta.url), "utf8"), /COMFYUI_BASE_URL=http:\/\/100\.92\.10\.72:8188/);
 
-    assert.deepEqual(Object.keys(f.load("@/server/catalog/comfyui").COMFYUI_TEMPLATES), ["flux-t2i"]);
+    assert.deepEqual(Object.keys(f.load("@/server/catalog/comfyui").COMFYUI_TEMPLATES), ["qwen-t2i"]);
     // An LTX image-to-video graph is not shipped: docs/providers/comfyui.md lists
     // only LTX audio/upsample/merge classes and says a full graph is unverified.
     assert.equal(f.load("@/server/catalog/comfyui").getComfyuiTemplate("ltx-i2v"), undefined);
 
-    const template = f.load("@/server/catalog/comfyui").COMFYUI_TEMPLATES["flux-t2i"];
+    const template = f.load("@/server/catalog/comfyui").COMFYUI_TEMPLATES["qwen-t2i"];
     assert.equal(template.mode, "image");
     assert.deepEqual([...new Set(Object.values(template.graph).map(node => node.class_type))].sort(),
-        ["CLIPTextEncode", "CheckpointLoaderSimple", "EmptyLatentImage", "KSampler", "SaveImage", "VAEDecode"]);
-    assert.deepEqual(plain(template.outputs), [{ node: "7", kind: "image", mimeType: "image/png" }]);
+        ["CLIPLoader", "CLIPTextEncode", "EmptySD3LatentImage", "KSampler", "ModelSamplingAuraFlow", "SaveImage", "UNETLoader", "VAEDecode", "VAELoader"]);
+    assert.deepEqual(plain(template.outputs), [{ node: "9", kind: "image", mimeType: "image/png" }]);
+    // The GX10 checkout exposes no checkpoint at all, so the shipped graph must
+    // load the diffusion model, text encoder and VAE through split loaders.
+    assert.equal(Object.values(template.graph).some(node => node.class_type === "CheckpointLoaderSimple"), false);
+    assert.deepEqual(plain(template.graph["4"].inputs.text), "");
+    assert.deepEqual(plain(template.graph["7"].inputs.model), ["10", 0]);
+    assert.deepEqual(plain(template.graph["10"].inputs.model), ["1", 0]);
+    assert.deepEqual(plain(template.graph["8"].inputs.vae), ["3", 0]);
 
     const capability = model(f);
-    assert.equal(capability.label, "FLUX Text to Image");
+    assert.equal(capability.label, "Qwen-Image Text to Image");
+    assert.equal(capability.family, "Qwen");
     assert.equal(capability.group, "ComfyUI");
     assert.equal(capability.provider_mode, "image-model");
     assert.equal(capability.prompt_required, true);
@@ -82,10 +90,10 @@ test("ComfyUI registers documented environment metadata, one reviewed FLUX templ
     assert.deepEqual(plain(capability.seed), { minimum: 0, maximum: 4294967295 });
     assert.deepEqual(plain(capability.custom_fields.map(field => field.id)), ["negative_prompt", "width", "height", "steps", "cfg", "seed"]);
     const controls = Object.fromEntries(capability.custom_fields.map(field => [field.id, field]));
-    assert.deepEqual([controls.width.minimum, controls.width.maximum, controls.width.default], [256, 2048, 1024]);
-    assert.deepEqual([controls.height.minimum, controls.height.maximum, controls.height.default], [256, 2048, 1024]);
-    assert.deepEqual([controls.steps.minimum, controls.steps.maximum, controls.steps.default], [1, 60, 28]);
-    assert.deepEqual([controls.cfg.minimum, controls.cfg.maximum, controls.cfg.default], [0, 30, 1]);
+    assert.deepEqual([controls.width.minimum, controls.width.maximum, controls.width.default], [256, 2048, 512]);
+    assert.deepEqual([controls.height.minimum, controls.height.maximum, controls.height.default], [256, 2048, 512]);
+    assert.deepEqual([controls.steps.minimum, controls.steps.maximum, controls.steps.default], [1, 60, 16]);
+    assert.deepEqual([controls.cfg.minimum, controls.cfg.maximum, controls.cfg.default], [0, 30, 3]);
     assert.deepEqual([controls.seed.minimum, controls.seed.maximum, controls.seed.default], [0, 4294967295, 0]);
     assert.equal(controls.negative_prompt.maxLength, 2048);
     // The UI controls are generated from the JSON templates, never hand-copied.
@@ -109,7 +117,7 @@ test("submit posts the API-format graph once with a stable client_id, then obser
     const submitted = await provider.submit(req);
     assert.equal(submitted.status, "CREATED");
     assert.equal(submitted.providerTaskId, promptId);
-    assert.deepEqual(plain(submitted.operation), { version: 1, promptId, baseUrl: BASE, templateId: "flux-t2i", mediaType: "image" });
+    assert.deepEqual(plain(submitted.operation), { version: 1, promptId, baseUrl: BASE, templateId: "qwen-t2i", mediaType: "image" });
 
     const post = f.calls[0];
     assert.equal(post.method, "POST");
@@ -125,7 +133,7 @@ test("submit posts the API-format graph once with a stable client_id, then obser
     assert.equal(bodies.length, 2);
     assert.equal(bodies[1].client_id, bodies[0].client_id);
 
-    const observed = await provider.observe({ mediaType: "image", providerModelId: "flux-t2i", operation: submitted.operation, connection });
+    const observed = await provider.observe({ mediaType: "image", providerModelId: "qwen-t2i", operation: submitted.operation, connection });
     assert.equal(observed.status, "COMPLETED");
     assert.equal(observed.assets.length, 1);
     assert.equal(observed.assets[0].mimeType, "image/png");
@@ -146,11 +154,11 @@ test("observe keeps a missing history entry pending and normalizes the later com
         ? new Response(bytes, { headers: { "content-type": "image/png" } })
         : json(responses.shift()) });
     const provider = new f.ComfyuiProvider();
-    const poll = () => provider.poll({ mediaType: "image", providerModelId: "flux-t2i",
-        operation: { version: 1, promptId, baseUrl: BASE, templateId: "flux-t2i", mediaType: "image" } });
+    const poll = () => provider.poll({ mediaType: "image", providerModelId: "qwen-t2i",
+        operation: { version: 1, promptId, baseUrl: BASE, templateId: "qwen-t2i", mediaType: "image" } });
     const pending = await poll();
     assert.equal(pending.status, "IN_PROGRESS");
-    assert.deepEqual(plain(pending.operation), { version: 1, promptId, baseUrl: BASE, templateId: "flux-t2i", mediaType: "image" });
+    assert.deepEqual(plain(pending.operation), { version: 1, promptId, baseUrl: BASE, templateId: "qwen-t2i", mediaType: "image" });
     const done = await poll();
     assert.equal(done.status, "COMPLETED");
     assert.equal(done.assets.length, 1);
@@ -162,17 +170,17 @@ test("node_errors are failures: history execution errors and a rejected prompt n
         status: { status_str: "error", completed: false, messages: [["execution_error", { node_id: "3", node_errors: { "3": { errors: [{ message: "clip input is invalid" }] } } }]] },
         outputs: {},
     } }) });
-    const failure = await new historyFailure.ComfyuiProvider().observe({ mediaType: "image", providerModelId: "flux-t2i",
-        operation: { version: 1, promptId, baseUrl: BASE, templateId: "flux-t2i", mediaType: "image" } });
+    const failure = await new historyFailure.ComfyuiProvider().observe({ mediaType: "image", providerModelId: "qwen-t2i",
+        operation: { version: 1, promptId, baseUrl: BASE, templateId: "qwen-t2i", mediaType: "image" } });
     assert.equal(failure.status, "FAILED");
     assert.equal(failure.error, "ERR_COMFYUI_NODE_ERRORS");
 
     const plainError = fixture({ handler: () => json({ [promptId]: { status: { status_str: "error", completed: false, messages: [["execution_error", { node_id: "5" }]] }, outputs: {} } }) });
-    const executed = await new plainError.ComfyuiProvider().observe({ mediaType: "image", providerModelId: "flux-t2i",
-        operation: { version: 1, promptId, baseUrl: BASE, templateId: "flux-t2i", mediaType: "image" } });
+    const executed = await new plainError.ComfyuiProvider().observe({ mediaType: "image", providerModelId: "qwen-t2i",
+        operation: { version: 1, promptId, baseUrl: BASE, templateId: "qwen-t2i", mediaType: "image" } });
     assert.equal(executed.error, "ERR_COMFYUI_EXECUTION_FAILED");
 
-    const rejected = fixture({ handler: () => json({ prompt_id: promptId, node_errors: { "7": { errors: [{ message: "images input missing" }] } } }) });
+    const rejected = fixture({ handler: () => json({ prompt_id: promptId, node_errors: { "9": { errors: [{ message: "images input missing" }] } } }) });
     const provider = new rejected.ComfyuiProvider();
     await assert.rejects(provider.submit(request(rejected)), error => assertError(error, { submissionUncertain: true, retryable: false }));
     assert.equal(rejected.calls.length, 1, "a rejected graph is not resubmitted");
@@ -196,14 +204,17 @@ test("exact param-to-node-input mapping fixture", () => {
         field_values: { width: 768, height: 512, steps: 30, cfg: 3.5, seed: 42 } } });
     const { graph } = f.load("@/server/providers/comfyui").buildComfyuiRequest(req);
     assert.deepEqual(plain(graph), {
-        "1": { class_type: "CheckpointLoaderSimple", inputs: { ckpt_name: "flux1-dev.safetensors" } },
-        "2": { class_type: "CLIPTextEncode", inputs: { text: "A lighthouse at dusk", clip: ["1", 1] } },
-        "3": { class_type: "CLIPTextEncode", inputs: { text: "blurry, low contrast", clip: ["1", 1] } },
-        "4": { class_type: "EmptyLatentImage", inputs: { width: 768, height: 512, batch_size: 1 } },
-        "5": { class_type: "KSampler", inputs: { seed: 42, steps: 30, cfg: 3.5, sampler_name: "euler", scheduler: "normal", denoise: 1,
-            model: ["1", 0], positive: ["2", 0], negative: ["3", 0], latent_image: ["4", 0] } },
-        "6": { class_type: "VAEDecode", inputs: { samples: ["5", 0], vae: ["1", 2] } },
-        "7": { class_type: "SaveImage", inputs: { filename_prefix: "lh-video", images: ["6", 0] } },
+        "1": { class_type: "UNETLoader", inputs: { unet_name: "qwen_image_2.1_int8_convrot.safetensors", weight_dtype: "default" } },
+        "2": { class_type: "CLIPLoader", inputs: { clip_name: "qwen3vl_8b_fp8_scaled.safetensors", type: "qwen_image" } },
+        "3": { class_type: "VAELoader", inputs: { vae_name: "qwen_image_2.1_vae_bf16.safetensors" } },
+        "4": { class_type: "CLIPTextEncode", inputs: { text: "A lighthouse at dusk", clip: ["2", 0] } },
+        "5": { class_type: "CLIPTextEncode", inputs: { text: "blurry, low contrast", clip: ["2", 0] } },
+        "6": { class_type: "EmptySD3LatentImage", inputs: { width: 768, height: 512, batch_size: 1 } },
+        "10": { class_type: "ModelSamplingAuraFlow", inputs: { model: ["1", 0], shift: 3.1 } },
+        "7": { class_type: "KSampler", inputs: { seed: 42, steps: 30, cfg: 3.5, sampler_name: "euler", scheduler: "simple", denoise: 1,
+            model: ["10", 0], positive: ["4", 0], negative: ["5", 0], latent_image: ["6", 0] } },
+        "8": { class_type: "VAEDecode", inputs: { samples: ["7", 0], vae: ["3", 0] } },
+        "9": { class_type: "SaveImage", inputs: { filename_prefix: "lh-video", images: ["8", 0] } },
     });
 
     // Canonical parameters and field values resolve to the same inputs; conflicts,
@@ -240,12 +251,12 @@ test("cancel posts the documented queue delete array and health reads system_sta
 
 test("template media slots become reference uploads for the documented /upload/image endpoint", () => {
     const f = fixture();
-    const template = f.load("@/server/catalog/comfyui").COMFYUI_TEMPLATES["flux-t2i"];
-    const withSlot = { ...plain(template), mediaSlots: [{ id: "first_frame", label: "First frame", kind: "image", target: ["1", "ckpt_name"], required: true }] };
+    const template = f.load("@/server/catalog/comfyui").COMFYUI_TEMPLATES["qwen-t2i"];
+    const withSlot = { ...plain(template), mediaSlots: [{ id: "first_frame", label: "First frame", kind: "image", target: ["1", "unet_name"], required: true }] };
     const request_ = request(f, { media: { slots: { first_frame: [image] } } });
     const { uploads, graph } = f.providerModule.buildComfyuiRequest(request_, withSlot);
-    assert.deepEqual(plain(uploads), [{ url: image, node: "1", input: "ckpt_name", filename: "first_frame.png" }]);
-    assert.equal(graph["1"].inputs.ckpt_name, "flux1-dev.safetensors", "the uploaded name replaces this input before POST /prompt");
+    assert.deepEqual(plain(uploads), [{ url: image, node: "1", input: "unet_name", filename: "first_frame.png" }]);
+    assert.equal(graph["1"].inputs.unet_name, "qwen_image_2.1_int8_convrot.safetensors", "the uploaded name replaces this input before POST /prompt");
     assert.throws(() => f.providerModule.buildComfyuiRequest(request(f), withSlot), /ERR_COMFYUI_MEDIA_REQUIRED/);
     assert.throws(() => f.providerModule.buildComfyuiRequest(request(f, { media: { slots: { reference_images: [image] } } }), withSlot), /ERR_COMFYUI_UNSUPPORTED_MEDIA/);
 });
@@ -264,11 +275,11 @@ test("only local http(s) origins are accepted, and operations are pinned to thei
     const provider = new providerModule.ComfyuiProvider();
     for (const operation of [
         { version: 1, promptId, baseUrl: BASE, templateId: "ltx-i2v", mediaType: "image" },
-        { version: 2, promptId, baseUrl: BASE, templateId: "flux-t2i", mediaType: "image" },
-        { version: 1, promptId: "arbitrary", baseUrl: BASE, templateId: "flux-t2i", mediaType: "image" },
-        { version: 1, promptId, baseUrl: `${BASE}/sub`, templateId: "flux-t2i", mediaType: "image" },
+        { version: 2, promptId, baseUrl: BASE, templateId: "qwen-t2i", mediaType: "image" },
+        { version: 1, promptId: "arbitrary", baseUrl: BASE, templateId: "qwen-t2i", mediaType: "image" },
+        { version: 1, promptId, baseUrl: `${BASE}/sub`, templateId: "qwen-t2i", mediaType: "image" },
     ]) {
-        await assert.rejects(provider.observe({ mediaType: "image", providerModelId: "flux-t2i", operation }), /ERR_COMFYUI_OPERATION|ERR_COMFYUI_BASE_URL/);
+        await assert.rejects(provider.observe({ mediaType: "image", providerModelId: "qwen-t2i", operation }), /ERR_COMFYUI_OPERATION|ERR_COMFYUI_BASE_URL/);
     }
     assert.equal(f.calls.length, 0, "invalid operations never touch the network");
 });
