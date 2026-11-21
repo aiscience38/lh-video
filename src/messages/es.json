@@ -997,6 +997,40 @@
       "ERR_CONTENT_TYPE": "No se aceptó el formato de la carga.",
       "ERR_INVALID_FORM_DATA": "No se pudo leer la carga.",
       "ERR_REQUEST_INVALID": "La solicitud no era válida."
+    },
+    "import": {
+      "trigger": "Importar carpeta",
+      "title": "Importar referencias desde una carpeta",
+      "hint": "Elige una carpeta con imágenes de referencia. Cada subcarpeta de primer nivel se convierte en un personaje; las imágenes sueltas de la raíz van a un personaje con el nombre de la carpeta seleccionada.",
+      "folderLabel": "Carpeta",
+      "choose": "Elegir carpeta",
+      "noFolder": "Aún no hay ninguna carpeta seleccionada.",
+      "selected": "{count, plural, one {# archivo seleccionado} other {# archivos seleccionados}}",
+      "skipHint": "Los archivos que no son imágenes se omiten y se listan en el informe.",
+      "scanning": "Leyendo la carpeta...",
+      "progress": "Personaje {character} de {characters}, archivo {file} de {files}...",
+      "saving": "Guardando {name}...",
+      "summary": "{characters, plural, one {# personaje} other {# personajes}} · {references, plural, one {# referencia} other {# referencias}}",
+      "created": "Se creó {name} con {count} referencias",
+      "appended": "Se añadieron {count} referencias a {name}",
+      "unchanged": "{name} ya tenía todas las referencias",
+      "skippedTitle": "{count, plural, one {# archivo omitido} other {# archivos omitidos}}",
+      "skippedLine": "{path}: no es una imagen",
+      "failedTitle": "{count, plural, one {# entrada fallida} other {# entradas fallidas}}",
+      "failedLine": "{name}: {message}",
+      "empty": "No se encontraron imágenes en esa carpeta.",
+      "close": "Listo"
+    },
+    "backup": {
+      "title": "Crear una copia de seguridad",
+      "hint": "Archiva library/ en EXPORTS/library-TIMESTAMP.tar.gz dentro de la carpeta de datos. Si tar no está disponible, se escribe un manifiesto JSON en su lugar.",
+      "create": "Crear copia",
+      "creating": "Creando copia...",
+      "entries": "{count, plural, one {# entrada archivada} other {# entradas archivadas}}",
+      "done": "Copia escrita en {path}",
+      "manifest": "tar no está disponible, así que se escribió un manifiesto JSON en {path}.",
+      "note": "Nota: {note}",
+      "error": "No se pudo crear la copia de seguridad. Comprueba que la carpeta de datos se pueda escribir."
     }
   },
   "providers": {

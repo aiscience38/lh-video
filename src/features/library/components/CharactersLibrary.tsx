@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AlertCircle, Loader2, Pencil, Plus, Trash2, Users } from "lucide-react";
+import { AlertCircle, FolderInput, Loader2, Pencil, Plus, Trash2, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { LibraryShell } from "./LibraryShell";
 import { CharacterThumbnail } from "./CharacterThumbnail";
 import { CreateCharacterDialog } from "./CreateCharacterDialog";
+import { FolderImportDialog } from "./FolderImportDialog";
 import { RenameCharacterDialog } from "./RenameCharacterDialog";
 import { useCharacters } from "../hooks/useCharacters";
 import { deleteCharacter, libraryErrorKey } from "../lib/api";
@@ -21,6 +22,7 @@ export function CharactersLibrary() {
     const { data, error, isLoading, mutate } = useCharacters();
     const characters = (data?.entities ?? []).filter(isCharacter);
     const [createOpen, setCreateOpen] = useState(false);
+    const [importOpen, setImportOpen] = useState(false);
     const [renaming, setRenaming] = useState<CharacterEntity | null>(null);
     const [deleting, setDeleting] = useState<CharacterEntity | null>(null);
     const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -45,7 +47,10 @@ export function CharactersLibrary() {
     return <LibraryShell active="characters" title={t("characters.title")} subtitle={t("characters.subtitle")}>
         <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">{t("collection.count", { count: characters.length })}</p>
-            <Button onClick={() => setCreateOpen(true)}><Plus />{t("characters.new")}</Button>
+            <div className="flex flex-wrap items-center gap-2">
+                <Button variant="outline" data-testid="folder-import-trigger" onClick={() => setImportOpen(true)}><FolderInput />{t("import.trigger")}</Button>
+                <Button onClick={() => setCreateOpen(true)}><Plus />{t("characters.new")}</Button>
+            </div>
         </div>
 
         {error && <div role="alert" className="flex flex-wrap items-center gap-3 rounded-xl border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive">
@@ -82,6 +87,7 @@ export function CharactersLibrary() {
         </div>}
 
         {createOpen && <CreateCharacterDialog onClose={() => setCreateOpen(false)} onCreated={() => { void mutate().catch(() => undefined); }} />}
+        {importOpen && <FolderImportDialog onClose={() => setImportOpen(false)} onImported={() => { void mutate().catch(() => undefined); }} />}
         {renaming && <RenameCharacterDialog character={renaming} onClose={() => setRenaming(null)} onRenamed={() => { void mutate().catch(() => undefined); }} />}
         <ConfirmDialog open={Boolean(deleting)} onClose={() => { if (!deleteBusy) { setDeleting(null); setDeleteError(null); } }}
             onConfirm={() => void confirmDelete()} busy={deleteBusy}
