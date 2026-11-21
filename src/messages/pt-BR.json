@@ -1097,6 +1097,40 @@
       "ERR_NOTES_INVALID": "A nota não é válida. Adicione texto e um timecode.",
       "ERR_NOTES_NOT_FOUND": "Essa nota não existe mais. Recarregue a revisão.",
       "ERR_NOTES_UNAVAILABLE": "O armazenamento de notas está indisponível. Tente novamente."
+    },
+    "import": {
+      "trigger": "Importar pasta",
+      "title": "Importar referências de uma pasta",
+      "hint": "Escolha uma pasta com imagens de referência. Cada subpasta de primeiro nível vira um personagem; imagens soltas na raiz vão para um personagem com o nome da pasta selecionada.",
+      "folderLabel": "Pasta",
+      "choose": "Escolher pasta",
+      "noFolder": "Nenhuma pasta selecionada ainda.",
+      "selected": "{count, plural, one {# arquivo selecionado} other {# arquivos selecionados}}",
+      "skipHint": "Arquivos que não são imagens são ignorados e listados no relatório.",
+      "scanning": "Lendo a pasta...",
+      "progress": "Personagem {character} de {characters}, arquivo {file} de {files}...",
+      "saving": "Salvando {name}...",
+      "summary": "{characters, plural, one {# personagem} other {# personagens}} · {references, plural, one {# referência} other {# referências}}",
+      "created": "{name} criado com {count} referências",
+      "appended": "{count} referências adicionadas a {name}",
+      "unchanged": "{name} já tinha todas as referências",
+      "skippedTitle": "{count, plural, one {# arquivo ignorado} other {# arquivos ignorados}}",
+      "skippedLine": "{path}: não é uma imagem",
+      "failedTitle": "{count, plural, one {# entrada com falha} other {# entradas com falha}}",
+      "failedLine": "{name}: {message}",
+      "empty": "Nenhuma imagem foi encontrada nessa pasta.",
+      "close": "Concluir"
+    },
+    "backup": {
+      "title": "Criar um backup",
+      "hint": "Arquiva library/ em EXPORTS/library-TIMESTAMP.tar.gz dentro da pasta de dados. Quando o tar não está disponível, um manifesto JSON é gravado no lugar.",
+      "create": "Criar backup",
+      "creating": "Criando backup...",
+      "entries": "{count, plural, one {# entrada arquivada} other {# entradas arquivadas}}",
+      "done": "Backup gravado em {path}",
+      "manifest": "o tar não está disponível, então um manifesto JSON foi gravado em {path}.",
+      "note": "Nota: {note}",
+      "error": "Não foi possível criar o backup. Verifique se a pasta de dados permite gravação."
     }
   },
   "providers": {

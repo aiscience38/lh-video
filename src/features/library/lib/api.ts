@@ -67,6 +67,22 @@ export async function uploadReference(file: File): Promise<LibraryAssetUpload> {
     return libraryRequest<LibraryAssetUpload>("/api/library/assets", { method: "POST", body: form });
 }
 
+export interface LibraryBackupResult {
+    ok: true;
+    mode: "tar" | "manifest";
+    path: string;
+    directory: string;
+    count: number;
+    bytes?: number;
+    note?: string;
+    createdAt: string;
+}
+
+/** Archives library/ into EXPORTS/ on the server; the response carries the absolute path. */
+export function createLibraryBackup(): Promise<LibraryBackupResult> {
+    return libraryRequest<LibraryBackupResult>("/api/library/export", { method: "POST" });
+}
+
 export function findCharacter(entities: LibraryEntity[], slug: string): CharacterEntity | undefined {
     return entities.find((entity): entity is CharacterEntity => entity.kind === "character" && entity.slug === slug);
 }

@@ -22,6 +22,8 @@ Implementation:
 STORAGE_ROOT/
   uploads/                              existing media, referenced by asset id
   downloads/                            existing media, referenced by asset id
+  EXPORTS/                              backup archives and manifests (never scanned)
+    library-2026-11-20T18-30-00-000Z.tar.gz
   library/
     characters/
       ana/
@@ -140,6 +142,23 @@ object store). Deleting a library entity only renames its JSON folder into
 `.trash`; the same asset can remain referenced by other entities. Backup and
 retention for media are unchanged by this feature.
 
+## Folder import
+
+The characters page offers "Import folder", which selects a directory through
+an `<input type="file" webkitdirectory>` and maps the selection like this:
+
+- Every first-level subfolder becomes a character named after the folder.
+- Images directly inside the selected folder go to one character named after
+  the selected folder.
+- Images nested deeper inside a first-level folder stay with that folder's
+  character. Non-images are skipped and produce one report line each.
+- Images are uploaded in natural filename order (`2.png` before `10.png`)
+  through `POST /api/library/assets`; the resulting asset ids are appended to
+  an existing character with the same name or slug, or used to create a new
+  character with `POST /api/library`.
+- Asset ids are content addressed, so importing the same folder twice uploads
+  the same bytes to the same ids and the merge adds nothing.
+
 ## Atomic writes
 
 `writeJsonAtomic(target, value)`:
@@ -206,6 +225,21 @@ Deleting from `.trash` is permanent and remains an operator decision.
 4. Confirm with `GET /api/library/<kind>/<id>` or `findEntityBySlug`.
 
 ## Backup
+
+`POST /api/library/export` archives `library/` with the operating system's tar
+into `STORAGE_ROOT/EXPORTS/library-<timestamp>.tar.gz`, where the timestamp is
+`new Date().toISOString()` with `:` and `.` replaced by `-`. The route is
+guarded like every other mutation, creates `EXPORTS/` through the storage
+containment check, and only accepts generated `library-*.tar.gz` /
+`library-*.manifest.json` names inside that folder.
+
+When tar cannot be spawned on the host (for example a minimal container), the
+route writes the entity documents to `EXPORTS/library-<timestamp>.manifest.json`
+and returns `mode: "manifest"` with a note instead of failing. A host can point
+at another tar binary with `LIBRARY_TAR_COMMAND`; on Windows the System32
+`tar.exe` is preferred over a PATH hit. Both modes report the absolute output
+path in the JSON response (`{ ok, mode, path, directory, count, ... }`), which
+the library overview shows after "Create backup".
 
 Back up `STORAGE_ROOT` as a unit: `library/`, `uploads/`, `downloads/` (or the
 configured object store) and `tasks_history.json`. A database deployment must

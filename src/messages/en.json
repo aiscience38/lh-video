@@ -1097,6 +1097,40 @@
       "ERR_NOTES_INVALID": "The note is not valid. Add text and a timecode.",
       "ERR_NOTES_NOT_FOUND": "That note no longer exists. Reload the review.",
       "ERR_NOTES_UNAVAILABLE": "The notes storage is unavailable. Try again."
+    },
+    "import": {
+      "trigger": "Import folder",
+      "title": "Import references from a folder",
+      "hint": "Choose a folder of reference images. Each first-level subfolder becomes a character; loose images at the top level go to a character named after the selected folder.",
+      "folderLabel": "Folder",
+      "choose": "Choose folder",
+      "noFolder": "No folder selected yet.",
+      "selected": "{count, plural, one {# file selected} other {# files selected}}",
+      "skipHint": "Files that are not images are skipped and listed in the report.",
+      "scanning": "Reading folder...",
+      "progress": "Character {character} of {characters}, file {file} of {files}...",
+      "saving": "Saving {name}...",
+      "summary": "{characters, plural, one {# character} other {# characters}} · {references, plural, one {# reference} other {# references}}",
+      "created": "Created {name} with {count} references",
+      "appended": "Added {count} references to {name}",
+      "unchanged": "{name} already had every reference",
+      "skippedTitle": "{count, plural, one {# file skipped} other {# files skipped}}",
+      "skippedLine": "{path}: not an image",
+      "failedTitle": "{count, plural, one {# entry failed} other {# entries failed}}",
+      "failedLine": "{name}: {message}",
+      "empty": "No image files were found in that folder.",
+      "close": "Done"
+    },
+    "backup": {
+      "title": "Create a backup",
+      "hint": "Archives library/ into EXPORTS/library-TIMESTAMP.tar.gz inside the data folder. When tar is unavailable, a JSON manifest is written instead.",
+      "create": "Create backup",
+      "creating": "Creating backup...",
+      "entries": "{count, plural, one {# entry archived} other {# entries archived}}",
+      "done": "Backup written to {path}",
+      "manifest": "tar is unavailable, so a JSON manifest was written to {path}.",
+      "note": "Note: {note}",
+      "error": "The backup could not be created. Check that the data folder is writable."
     }
   },
   "providers": {

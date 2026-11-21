@@ -1,13 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import useSWR from "swr";
 import { useTranslations } from "next-intl";
-import { AlertCircle, Clapperboard, FolderTree, Loader2, PanelsTopLeft, Users } from "lucide-react";
+import { AlertCircle, Archive, Clapperboard, FolderTree, Loader2, PanelsTopLeft, Users } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LibraryShell } from "./LibraryShell";
-import { listLibrary } from "../lib/api";
+import { createLibraryBackup, listLibrary, type LibraryBackupResult } from "../lib/api";
 import type { LibraryEntity, LibraryKind } from "../types";
 
 const CARDS: Array<{ key: "characters" | "scenes" | "storyboards"; kind: LibraryKind; icon: typeof Users }> = [
@@ -37,6 +38,22 @@ export function LibraryOverview() {
     const { data, error, isLoading, mutate } = useSWR("library:overview", () => listLibrary());
     const entities = data?.entities ?? [];
     const total = entities.length;
+    const [backup, setBackup] = useState<LibraryBackupResult | null>(null);
+    const [backupBusy, setBackupBusy] = useState(false);
+    const [backupError, setBackupError] = useState<string | null>(null);
+
+    async function createBackup() {
+        setBackupBusy(true);
+        setBackupError(null);
+        setBackup(null);
+        try {
+            setBackup(await createLibraryBackup());
+        } catch {
+            setBackupError(t("backup.error"));
+        } finally {
+            setBackupBusy(false);
+        }
+    }
 
     return <LibraryShell active="overview" title={t("overview.title")} subtitle={t("overview.subtitle")}>
         {error && <div role="alert" className="flex flex-wrap items-center gap-3 rounded-xl border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive">
@@ -79,6 +96,30 @@ export function LibraryOverview() {
                 </div>
             </div>
             <pre data-testid="library-layout" className="mt-4 overflow-x-auto rounded-xl border border-white/[.06] bg-black/40 p-4 text-xs leading-relaxed text-muted-foreground">{LAYOUT}</pre>
+        </section>
+
+        <section className="rounded-2xl border border-white/10 bg-[#101214] p-5">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="flex min-w-0 items-start gap-3">
+                    <Archive aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-primary" />
+                    <div className="min-w-0">
+                        <h2 className="text-sm font-semibold">{t("backup.title")}</h2>
+                        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">{t("backup.hint")}</p>
+                    </div>
+                </div>
+                <Button variant="outline" data-testid="library-backup-button" disabled={backupBusy} onClick={() => void createBackup()}>
+                    {backupBusy ? <Loader2 className="animate-spin" /> : <Archive />}
+                    {t(backupBusy ? "backup.creating" : "backup.create")}
+                </Button>
+            </div>
+            {backup && <div role="status" data-testid="library-backup-result" className="mt-4 rounded-xl border border-white/10 bg-black/25 p-3 text-xs leading-relaxed">
+                <p className="text-muted-foreground">{t("backup.entries", { count: backup.count })}</p>
+                <p className="mt-1 break-all font-mono">
+                    {backup.mode === "tar" ? t("backup.done", { path: backup.path }) : t("backup.manifest", { path: backup.path })}
+                </p>
+                {backup.note && <p className="mt-1 text-muted-foreground">{t("backup.note", { note: backup.note })}</p>}
+            </div>}
+            {backupError && <p role="alert" className="mt-3 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">{backupError}</p>}
         </section>
 
         {!isLoading && !error && total === 0 && <div data-testid="library-overview-empty" className="rounded-2xl border border-dashed border-white/15 px-5 py-10 text-center">
