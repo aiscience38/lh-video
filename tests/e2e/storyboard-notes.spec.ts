@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import AxeBuilder from "@axe-core/playwright";
 import { test, expect } from "./fixtures";
 import { startFixtureServer, type FixtureServer } from "./fixture-server";
 
@@ -49,6 +50,7 @@ test("a note at 3.2 seconds persists and appears in the downloaded REVIEW.md", a
 
     await page.reload();
     await expect(page.getByTestId("storyboard-note").filter({ hasText: "Hero enters late" })).toBeVisible();
+    expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
 
     const downloadPromise = page.waitForEvent("download");
     await page.getByTestId("storyboard-download-review").click();

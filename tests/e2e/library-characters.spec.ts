@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { test, expect } from "./fixtures";
 import en from "../../src/messages/en.json";
 
@@ -25,6 +26,7 @@ test("overview shows live counts for all three kinds and the on-disk layout", as
     await expect(page.getByTestId("library-layout")).toContainText("characters/");
     await expect(page.getByTestId("library-layout")).toContainText("character.json");
     await expect(page.getByTestId("library-layout")).toContainText(".trash");
+    expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
 });
 
 test("upload endpoint accepts a reference image and returns a library asset id", async ({ request }) => {

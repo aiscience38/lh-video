@@ -1,4 +1,5 @@
 import type { Page, Route } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 import { test, expect, mockWorkspace } from "./fixtures";
 import type { LibraryEntity } from "../../src/features/library/types";
 import en from "../../src/messages/en.json";
@@ -49,6 +50,7 @@ test("multi-selected characters attach their saved images and over-capacity asse
     const dialog = page.getByTestId("reference-picker");
     await expect(dialog).toBeVisible();
     await expect(dialog.getByRole("heading", { name: en.picker.title })).toBeVisible();
+    expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
 
     // Search is immediate and scoped to the dialog.
     await dialog.getByLabel(en.picker.searchLabel).fill("ben");

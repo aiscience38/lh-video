@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { test, expect } from "./fixtures";
 import en from "../../src/messages/en.json";
 
@@ -15,6 +16,7 @@ test("creates a scene, adds two shots and keeps the reordered shots after a relo
     await page.goto("/en/scenes");
     await expect(page.getByRole("heading", { name: en.scenes.title, exact: true })).toBeVisible();
     await expect(page.getByTestId("scenes-nav-link")).toHaveAttribute("href", "/en/scenes");
+    expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
 
     await page.getByRole("button", { name: en.scenes.new }).click();
     const createDialog = page.getByRole("dialog");

@@ -11,6 +11,7 @@ import {
     ArrowUp,
     Download,
     ImageOff,
+    Images,
     Loader2,
     Plus,
     Save,
@@ -18,10 +19,11 @@ import {
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { LibraryShell } from "../LibraryShell";
-import { libraryErrorKey } from "../../lib/api";
+import { libraryErrorKey, listLibrary } from "../../lib/api";
 import { libraryAssetUrl } from "../../lib/asset-url";
 import {
     addStoryboardShot,
@@ -37,6 +39,7 @@ import {
     resolveVideoSource,
     reviewMarkdownUrl,
     saveStoryboardShots,
+    setStoryboardKeyframe,
     taskIdFromSource,
     type NoteRecord,
     type StoryboardShotRecord,
@@ -46,6 +49,28 @@ interface ShotEdit {
     intent?: string;
     seconds?: string;
     camera?: string;
+}
+
+/** One saved image a character (or other library entry) contributes to the picker. */
+interface KeyframeSource {
+    assetId: string;
+    name: string;
+}
+
+/** Library characters own the reference images a keyframe can be picked from; ids are deduplicated. */
+async function listKeyframeSources(): Promise<KeyframeSource[]> {
+    const { entities } = await listLibrary("character");
+    const seen = new Set<string>();
+    const sources: KeyframeSource[] = [];
+    for (const entity of entities) {
+        if (entity.kind !== "character") continue;
+        for (const assetId of entity.assetIds) {
+            if (seen.has(assetId)) continue;
+            seen.add(assetId);
+            sources.push({ assetId, name: entity.name });
+        }
+    }
+    return sources;
 }
 
 function KeyframeThumbnail({ assetId, name }: { assetId: string | null; name: string }) {
@@ -74,6 +99,17 @@ export function StoryboardEditor({ slug }: { slug: string }) {
     );
     const notes: NoteRecord[] = notesData?.notes ?? [];
 
+    const [pickerShotId, setPickerShotId] = useState<string | null>(null);
+    const {
+        data: keyframeSources,
+        error: keyframeSourcesError,
+        isLoading: keyframeSourcesLoading,
+        mutate: reloadKeyframeSources,
+    } = useSWR(pickerShotId ? "library:keyframe-sources" : null, listKeyframeSources);
+    const pickerShot = storyboard?.shots.find((shot) => shot.id === pickerShotId) ?? null;
+    const pickerIndex = storyboard?.shots.findIndex((shot) => shot.id === pickerShotId) ?? -1;
+    const pickerLabel = pickerIndex >= 0 ? pickerIndex + 1 : 0;
+
     const rawVideo = searchParams.get("video") ?? "";
     const videoUrl = resolveVideoSource(rawVideo);
     const taskId = searchParams.get("task") ?? taskIdFromSource(rawVideo);
@@ -84,6 +120,8 @@ export function StoryboardEditor({ slug }: { slug: string }) {
     const [actionError, setActionError] = useState<string | null>(null);
     const [noteText, setNoteText] = useState("");
     const [noteStatus, setNoteStatus] = useState<string | null>(null);
+    const [keyframeStatus, setKeyframeStatus] = useState<string | null>(null);
+    const [pickerError, setPickerError] = useState<string | null>(null);
     const [playhead, setPlayhead] = useState(0);
 
     function describeError(caught: unknown): string {
@@ -173,6 +211,42 @@ export function StoryboardEditor({ slug }: { slug: string }) {
     async function removeRow(shot: StoryboardShotRecord): Promise<void> {
         if (!storyboard) return;
         await persist(() => removeStoryboardShot(storyboard.id, shot.id), `delete:${shot.id}`);
+    }
+
+    async function chooseKeyframe(shotId: string, assetId: string): Promise<void> {
+        if (!storyboard) return;
+        const index = storyboard.shots.findIndex((item) => item.id === shotId);
+        setBusy(`keyframe:${shotId}`);
+        setActionError(null);
+        setKeyframeStatus(null);
+        setPickerError(null);
+        try {
+            await setStoryboardKeyframe(storyboard.id, shotId, assetId);
+            await mutate();
+            setKeyframeStatus(t("storyboardEditor.keyframeSaved", { index: index + 1 }));
+            setPickerShotId(null);
+        } catch (caught) {
+            setPickerError(describeError(caught));
+        } finally {
+            setBusy(null);
+        }
+    }
+
+    async function clearKeyframe(shot: StoryboardShotRecord): Promise<void> {
+        if (!storyboard) return;
+        const index = storyboard.shots.findIndex((item) => item.id === shot.id);
+        setBusy(`keyframe:${shot.id}`);
+        setActionError(null);
+        setKeyframeStatus(null);
+        try {
+            await setStoryboardKeyframe(storyboard.id, shot.id, null);
+            await mutate();
+            setKeyframeStatus(t("storyboardEditor.keyframeCleared", { index: index + 1 }));
+        } catch (caught) {
+            setActionError(describeError(caught));
+        } finally {
+            setBusy(null);
+        }
     }
 
     async function addNote(): Promise<void> {
@@ -308,7 +382,24 @@ export function StoryboardEditor({ slug }: { slug: string }) {
                                             onChange={(event) => updateEdit(shot.id, { camera: event.currentTarget.value })} className="h-9 min-w-[150px]" />
                                     </td>
                                     <td className="px-3 py-2 align-top">
-                                        <KeyframeThumbnail assetId={shot.keyframeAssetId} name={`${storyboard.name} ${label}`} />
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <KeyframeThumbnail assetId={shot.keyframeAssetId}
+                                                name={t("storyboardEditor.keyframePreview", { name: storyboard.name, index: label })} />
+                                            <div className="flex flex-col items-start gap-1">
+                                                <Button variant="outline" size="sm" data-testid="storyboard-shot-keyframe"
+                                                    aria-label={t("storyboardEditor.setKeyframe", { index: label })}
+                                                    disabled={busy !== null}
+                                                    onClick={() => { setKeyframeStatus(null); setPickerError(null); setPickerShotId(shot.id); }}>
+                                                    {busy === `keyframe:${shot.id}` ? <Loader2 className="animate-spin" /> : <Images aria-hidden="true" />}
+                                                    {t("storyboardEditor.setKeyframeAction")}
+                                                </Button>
+                                                {shot.keyframeAssetId && <Button variant="ghost" size="sm" data-testid="storyboard-shot-keyframe-clear"
+                                                    aria-label={t("storyboardEditor.clearKeyframe", { index: label })}
+                                                    disabled={busy !== null} onClick={() => void clearKeyframe(shot)}>
+                                                    {t("storyboardEditor.clearKeyframeAction")}
+                                                </Button>}
+                                            </div>
+                                        </div>
                                     </td>
                                     <td className="px-3 py-2 align-top">
                                         <div className="flex items-center justify-end gap-1">
@@ -326,6 +417,7 @@ export function StoryboardEditor({ slug }: { slug: string }) {
                         </tbody>
                     </table>
                 </div>}
+            {keyframeStatus && <p role="status" data-testid="storyboard-keyframe-status" className="text-xs text-primary">{keyframeStatus}</p>}
         </section>
 
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
@@ -386,5 +478,72 @@ export function StoryboardEditor({ slug }: { slug: string }) {
                     </ul>}
             </section>
         </div>
+
+        <Dialog open={pickerShotId !== null} onOpenChange={(open) => { if (!open && busy === null) setPickerShotId(null); }}>
+            <DialogContent data-testid="storyboard-keyframe-picker" className="max-h-[calc(100dvh-2rem)] overflow-y-auto bg-[#141618] sm:max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                        <Images aria-hidden="true" className="size-4 text-primary" />
+                        {t("storyboardEditor.keyframePickerTitle")}
+                    </DialogTitle>
+                    <DialogDescription>{t("storyboardEditor.keyframePickerDescription", { index: pickerLabel })}</DialogDescription>
+                </DialogHeader>
+
+                {pickerError && <p role="alert" className="flex items-center gap-2 rounded-xl border border-destructive/25 bg-destructive/10 p-3 text-sm text-destructive">
+                    <AlertCircle className="size-4 shrink-0" />{pickerError}
+                </p>}
+
+                {keyframeSourcesError && <div role="alert" className="flex flex-wrap items-center gap-3 rounded-xl border border-destructive/25 bg-destructive/10 p-3 text-sm text-destructive">
+                    <AlertCircle className="size-4 shrink-0" />
+                    <span className="min-w-0 flex-1">{t("storyboardEditor.keyframePickerError")}</span>
+                    <Button type="button" variant="outline" size="sm"
+                        onClick={() => { void reloadKeyframeSources().catch(() => undefined); }}>
+                        {t("storyboardEditor.keyframePickerRetry")}
+                    </Button>
+                </div>}
+
+                {keyframeSourcesLoading && !keyframeSources && !keyframeSourcesError
+                    && <p role="status" className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
+                        <Loader2 className="size-4 animate-spin" />{t("storyboardEditor.keyframePickerLoading")}
+                    </p>}
+
+                {keyframeSources && keyframeSources.length === 0
+                    && <p className="rounded-xl border border-dashed border-white/15 px-4 py-8 text-center text-sm text-muted-foreground">
+                        {t("storyboardEditor.keyframePickerEmpty")}
+                    </p>}
+
+                {keyframeSources && keyframeSources.length > 0 && <ul data-testid="storyboard-keyframe-options"
+                    className="grid max-h-[52dvh] grid-cols-2 gap-2 overflow-y-auto overscroll-contain pr-0.5 sm:grid-cols-3">
+                    {keyframeSources.map((source) => {
+                        const url = libraryAssetUrl(source.assetId);
+                        const current = pickerShot?.keyframeAssetId === source.assetId;
+                        return <li key={source.assetId}>
+                            <button type="button" data-testid="storyboard-keyframe-option" data-asset-id={source.assetId}
+                                aria-label={t("storyboardEditor.keyframeOption", { name: source.name, id: source.assetId, index: pickerLabel })}
+                                disabled={busy !== null}
+                                onClick={() => void chooseKeyframe(pickerShotId ?? "", source.assetId)}
+                                className={`group flex w-full min-w-0 flex-col overflow-hidden rounded-xl border text-left transition-colors ${current ? "border-primary/60 bg-primary/[.08]" : "border-white/10 bg-white/[.02] hover:border-white/25"}`}>
+                                <span className="relative block aspect-[4/3] w-full overflow-hidden bg-black/40">
+                                    {url
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        ? <img src={url} alt="" loading="lazy" referrerPolicy="no-referrer" className="size-full object-cover" />
+                                        : <span className="grid size-full place-items-center text-muted-foreground"><ImageOff aria-hidden="true" className="size-4" /></span>}
+                                    {current && <span aria-hidden="true" className="absolute top-1.5 right-1.5 grid size-5 place-items-center rounded-full bg-primary text-[11px] font-bold text-black">✓</span>}
+                                </span>
+                                <span className="flex min-w-0 flex-col gap-0.5 px-2.5 py-2">
+                                    <span className="truncate text-[12px] font-semibold text-foreground">{source.name}</span>
+                                    <span className="break-all font-mono text-[10px] text-muted-foreground">{source.assetId}</span>
+                                </span>
+                            </button>
+                        </li>;
+                    })}
+                </ul>}
+
+                <DialogFooter className="flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end">
+                    <Button type="button" variant="outline" disabled={busy !== null}
+                        onClick={() => setPickerShotId(null)}>{t("storyboardEditor.keyframePickerClose")}</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     </LibraryShell>;
 }
