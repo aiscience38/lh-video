@@ -1258,7 +1258,7 @@
     "workflowName": "Nome do modelo",
     "workflowNamePlaceholder": "ex.: Retrato FLUX",
     "workflowId": "ID do modelo",
-    "workflowIdHint": "Minúsculas, dígitos e hífens. O ID do modelo no Studio será comfyui:<id>.",
+    "workflowIdHint": "Minúsculas, dígitos e hífens. O ID do modelo no Studio será comfyui:ID.",
     "workflowIdInvalid": "Use minúsculas, dígitos e hífens simples para o ID do modelo.",
     "workflowFamily": "Família",
     "workflowNodeList": "Classes de nó disponíveis: {count}",

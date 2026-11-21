@@ -1327,7 +1327,7 @@
     "workflowName": "Nombre de la plantilla",
     "workflowNamePlaceholder": "p. ej. Retrato FLUX",
     "workflowId": "ID de la plantilla",
-    "workflowIdHint": "Minúsculas, dígitos y guiones. El ID del modelo en el Studio será comfyui:<id>.",
+    "workflowIdHint": "Minúsculas, dígitos y guiones. El ID del modelo en el Studio será comfyui:ID.",
     "workflowIdInvalid": "Usa minúsculas, dígitos y guiones simples para el ID de la plantilla.",
     "workflowFamily": "Familia",
     "workflowNodeList": "Clases de nodo disponibles: {count}",

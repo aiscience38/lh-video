@@ -1258,7 +1258,7 @@
     "workflowName": "Template name",
     "workflowNamePlaceholder": "e.g. FLUX portrait",
     "workflowId": "Template ID",
-    "workflowIdHint": "Lowercase letters, digits and hyphens. The Studio model ID becomes comfyui:<id>.",
+    "workflowIdHint": "Lowercase letters, digits and hyphens. The Studio model ID becomes comfyui:ID.",
     "workflowIdInvalid": "Use lowercase letters, digits and single hyphens for the template ID.",
     "workflowFamily": "Family",
     "workflowNodeList": "Node classes available: {count}",
