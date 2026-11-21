@@ -13,7 +13,7 @@ test("creates a scene, adds two shots and keeps the reordered shots after a relo
     const second = `Second shot ${Date.now()}`;
 
     await page.goto("/en/scenes");
-    await expect(page.getByRole("heading", { name: en.scenes.title })).toBeVisible();
+    await expect(page.getByRole("heading", { name: en.scenes.title, exact: true })).toBeVisible();
     await expect(page.getByTestId("scenes-nav-link")).toHaveAttribute("href", "/en/scenes");
 
     await page.getByRole("button", { name: en.scenes.new }).click();
