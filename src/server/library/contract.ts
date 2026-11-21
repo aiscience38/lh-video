@@ -47,6 +47,10 @@ const RESERVED_SLUGS = new Set([
 
 export const assetIdSchema = z.string().regex(ASSET_ID_PATTERN, { error: LIBRARY_INVALID_ERROR });
 
+/** Google-Flow-style ingredient role inside the character collection. */
+export const INGREDIENT_KINDS = ["character", "prop", "style"] as const;
+export const ingredientKindSchema = z.enum(INGREDIENT_KINDS, { error: LIBRARY_INVALID_ERROR }).default("character");
+
 export function isValidSlug(value: unknown): value is string {
     return typeof value === "string" && SLUG_PATTERN.test(value) && !RESERVED_SLUGS.has(value);
 }
@@ -94,6 +98,7 @@ export type Shot = z.infer<typeof shotSchema>;
 export const characterSchema = z.object({
     id: entityIdSchema,
     kind: z.literal("character"),
+    ingredientKind: ingredientKindSchema,
     name: entityNameSchema,
     slug: slugSchema,
     notes: z.string().max(4000).default(""),
@@ -149,7 +154,7 @@ export function schemaForKind(kind: LibraryKind): z.ZodType<LibraryEntity> {
     }
 }
 
-export const characterCreateSchema = characterSchema.pick({ name: true, notes: true, assetIds: true });
+export const characterCreateSchema = characterSchema.pick({ name: true, notes: true, assetIds: true, ingredientKind: true });
 export const sceneCreateSchema = sceneSchema.pick({ name: true, shots: true });
 export const storyboardCreateSchema = storyboardSchema.pick({ name: true, productionId: true, shots: true });
 export type CharacterCreateInput = z.infer<typeof characterCreateSchema>;
@@ -162,6 +167,7 @@ export const characterUpdateSchema = z.object({
     name: entityNameSchema.optional(),
     notes: z.string().max(4000).optional(),
     assetIds: z.array(assetIdSchema).optional(),
+    ingredientKind: ingredientKindSchema.optional(),
 });
 export const sceneUpdateSchema = z.object({
     name: entityNameSchema.optional(),

@@ -89,6 +89,7 @@ Character:
 | Field | Contract |
 | --- | --- |
 | `notes` | string, max 4000, default `""` |
+| `ingredientKind` | `character`, `prop` or `style`, default `character` (Google-Flow-style ingredient role) |
 | `assetIds` | asset ids, default `[]` |
 
 Scene:

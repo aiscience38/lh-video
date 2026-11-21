@@ -116,6 +116,15 @@ test("one canonical fixture per kind parses and applies documented defaults", as
     assert.deepEqual(contract.libraryEntitySchema.parse(storyboardFixture).shots.length, 2);
 });
 
+test("character ingredient roles default to character and reject unknown values", async (t) => {
+    const { contract } = await harness(t);
+    assert.equal(contract.characterSchema.parse(characterFixture).ingredientKind, "character");
+    assert.equal(contract.characterSchema.parse({ ...characterFixture, ingredientKind: "prop" }).ingredientKind, "prop");
+    assert.equal(contract.characterSchema.parse({ ...characterFixture, ingredientKind: "style" }).ingredientKind, "style");
+    assert.equal(contract.characterCreateSchema.parse({ name: "Ana" }).ingredientKind, "character");
+    assert.equal(contract.characterSchema.safeParse({ ...characterFixture, ingredientKind: "vehicle" }).success, false);
+});
+
 test("schema validation rejects wrong kinds, identifiers, names, timestamps and shot ranges", async (t) => {
     const { contract } = await harness(t);
     const rejects = (schema, value) => assert.equal(schema.safeParse(value).success, false);
