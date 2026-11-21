@@ -27,3 +27,28 @@ Verified 2026-11-20 from the LH Video host.
 
 - Do not queue jobs while a Canon Foundry render is running; check `GET /queue` first.
 - No credentials are stored in this document.
+
+## Custom workflow import (LAM-14)
+
+The ComfyUI provider settings expose **Import workflow**. It accepts the
+API-format prompt JSON that ComfyUI's *Save (API Format)* action produces, so a
+reviewed graph does not need a source edit and a rebuild.
+
+- `GET /api/providers/comfyui/workflows` returns the node classes from
+  `GET /object_info`. Only class names are cached in
+  `comfyui-object-info.json` under the storage root; repeat imports reuse the
+  cache and `?refresh=1` refetches after installing nodes. A missing connection
+  or an unreachable host fails the request; nothing is written.
+- `POST /api/providers/comfyui/workflows` re-parses the graph (bounded size,
+  API-format node ids, link targets, `class_type` and `inputs`), rejects classes
+  that are not in the cached allowlist, and requires the mapping form to point
+  every exposed parameter at an existing literal input. Prompt is required;
+  `negative_prompt`, `width`, `height`, `seed` and `cfg` are optional.
+- The output node must be `SaveImage` or `SaveAnimatedWEBP`. Imported templates
+  expose no media slot in v1: reference uploads stay on reviewed templates.
+- A successful import stores the template beside the provider config and creates
+  the `comfyui:<template-id>` catalog model **disabled and unverified**, per the
+  custom-model policy. The model is hidden in the Studio until it is enabled in
+  the provider's model list, and it still runs through the unchanged adapter.
+- `DELETE /api/providers/comfyui/workflows` removes the template and its catalog
+  model. Importing never calls `/prompt`, `/upload/image` or `/queue`.

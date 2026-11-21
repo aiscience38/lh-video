@@ -101,7 +101,7 @@ const template = z.strictObject({
 });
 
 /** A template may only target inputs that exist and are not links to another node. */
-function parseTemplate(value: unknown): ComfyuiTemplate {
+export function parseComfyuiTemplate(value: unknown): ComfyuiTemplate {
     const parsed = template.safeParse(value);
     if (!parsed.success) throw new Error("ERR_COMFYUI_TEMPLATE");
     const result = parsed.data as unknown as ComfyuiTemplate;
@@ -138,11 +138,34 @@ export function validateComfyuiParam(rule: ComfyuiTemplateParam, value: unknown)
     return rule.maximum === undefined || value <= rule.maximum;
 }
 
-const templates = [parseTemplate(fluxT2i)];
+const templates = [parseComfyuiTemplate(fluxT2i)];
 export const COMFYUI_TEMPLATES: Record<string, ComfyuiTemplate> = Object.fromEntries(templates.map(entry => [entry.id, entry]));
 
+/**
+ * Imported templates are persisted by the provider store and registered here
+ * before capability validation. The reviewed JSON templates above stay in the
+ * read-only map so a test can prove the shipped set.
+ */
+const importedTemplates = new Map<string, ComfyuiTemplate>();
+
+export function registerComfyuiTemplates(values: readonly ComfyuiTemplate[]): void {
+    for (const value of values) {
+        const template = parseComfyuiTemplate(value);
+        if (Object.hasOwn(COMFYUI_TEMPLATES, template.id)) continue;
+        importedTemplates.set(template.id, template);
+    }
+}
+
+export function unregisterComfyuiTemplate(id: string): void {
+    importedTemplates.delete(id);
+}
+
+export function listImportedComfyuiTemplates(): ComfyuiTemplate[] {
+    return [...importedTemplates.values()];
+}
+
 export function getComfyuiTemplate(id: string | undefined, mode?: ComfyuiMode): ComfyuiTemplate | undefined {
-    const entry = id ? COMFYUI_TEMPLATES[id] : undefined;
+    const entry = id ? COMFYUI_TEMPLATES[id] ?? importedTemplates.get(id) : undefined;
     return entry && (!mode || entry.mode === mode) ? entry : undefined;
 }
 
