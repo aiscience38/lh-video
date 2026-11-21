@@ -5,6 +5,17 @@ services:
       - "127.0.0.1:3000:3000"
     env_file:
       - .env.local
+    environment:
+      # The container must write to the mounted volume, not the host path that
+      # .env.local carries for desktop development.
+      OPEN_HIGGSFIELD_STORAGE_DIR: /app/data
+      # Production startup requires an explicit same-origin; this deployment is
+      # published on loopback only, so the desktop loopback allowance applies.
+      APP_ORIGIN: http://127.0.0.1:3000
+      LH_VIDEO_LOCAL: "true"
+      ASSET_STORAGE_MODE: local
+      DEPLOYMENT_PROFILE: single-process
+      TASK_WORKER_MODE: local
     volumes:
       - lh-video-data:/app/data
     restart: unless-stopped
