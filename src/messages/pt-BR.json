@@ -4189,7 +4189,11 @@
       "text_4ec4c989_6": "Wan2.6",
       "text_57f40113_12": "Wan2.6 Flash",
       "text_4dc4c7f6_6": "Wan2.7",
-      "text_80568cd7_12": "Wan3.0 Prime"
+      "text_80568cd7_12": "Wan3.0 Prime",
+      "text_ed113457_24": "Qwen-Image de texto para imagem"
+    },
+    "image": {
+      "text_ed113457_24": "Qwen-Image de texto para imagem"
     }
   },
   "productions": {
