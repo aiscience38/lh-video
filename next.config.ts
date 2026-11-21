@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   output: process.env.VERCEL ? undefined : "standalone",
   agentRules: false,
   experimental: { agentUpgrade: "security" },
+  outputFileTracingExcludes: { "*": ["./dist/**", "./test-results/**", "./playwright-report/**", "./.hermes/**", "./.hermes-*"] },
   serverExternalPackages: ["formidable", "sharp"],
 };
 
