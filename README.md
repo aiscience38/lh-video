@@ -154,6 +154,19 @@ application, the bundled Node 22.23.5 runtime and the WinForms launcher to
 `%LOCALAPPDATA%\LH Video`, creates Start Menu and desktop shortcuts, and requires
 no administrator rights.
 
+Rebuild it with:
+
+```bash
+npm run build
+bash packaging/prepare-stage.sh   # standalone output + the Next app-route runtimes + node.exe
+csc /target:winexe /out:dist\\stage\\LHVideo.exe /win32icon:packaging\\lh-video.ico \
+    /r:System.Windows.Forms.dll /r:System.Drawing.dll packaging\\launcher.cs
+makensis packaging/installer.nsi
+```
+
+`prepare-stage.sh` restores four `app-route*.runtime.prod.js` files that Next 16's
+standalone output omits; without them pages render but every API route returns 500.
+
 Data folder behaviour:
 
 - On first launch the launcher asks for a data folder, defaulting to
