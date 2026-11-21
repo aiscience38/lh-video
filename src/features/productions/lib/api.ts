@@ -1,4 +1,4 @@
-import type { Gate, Production, ProductionStop, StopState } from "../types";
+import type { Gate, Production, ProductionLedger, ProductionQa, ProductionStop, StopState } from "../types";
 
 export class ProductionRequestError extends Error {
     constructor(public readonly code: string, public readonly status: number) {
@@ -115,4 +115,14 @@ export async function decideGate(id: string, gateId: string, input: GateDecision
             body: JSON.stringify(input),
         },
     );
+}
+
+/** Ledger rows, totals and the budget bar for one production. */
+export async function getProductionLedger(id: string): Promise<ProductionLedger> {
+    return productionRequest<ProductionLedger>(`/api/productions/${encodeURIComponent(id)}/ledger`, { cache: "no-store" });
+}
+
+/** The stored QA report; `report: null` means the cut has not been checked. */
+export async function getProductionQa(id: string): Promise<ProductionQa> {
+    return productionRequest<ProductionQa>(`/api/productions/${encodeURIComponent(id)}/qa`, { cache: "no-store" });
 }

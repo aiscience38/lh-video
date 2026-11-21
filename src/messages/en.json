@@ -4107,6 +4107,50 @@
       "ERR_GATE_NOT_FOUND": "That gate no longer exists.",
       "ERR_GATE_DECIDED": "This gate was already decided. Open a new one.",
       "ERR_PRODUCTIONS_UNAVAILABLE": "Productions are unavailable right now."
+    },
+    "ledger": {
+      "title": "Budget ledger",
+      "subtitle": "Every asset this production has been charged for.",
+      "loading": "Loading ledger...",
+      "error": "The ledger could not be loaded.",
+      "empty": "No assets have been charged to this production yet.",
+      "spentOf": "Spent {spent} of {budget}",
+      "remaining": "{amount} remaining",
+      "overBudget": "Over budget by {amount}",
+      "total": "Total {amount}",
+      "count": "{count, plural, =0 {No assets} one {# asset} other {# assets}}",
+      "exact": "Settled {amount}",
+      "estimated": "On hold {amount}",
+      "estimatedBadge": "Estimated",
+      "settledBadge": "Settled",
+      "providerModel": "{provider} · {model}",
+      "recordedAt": "Recorded {date}",
+      "license": "License {license}",
+      "budgetBarLabel": "Budget used",
+      "rowsLabel": "Ledger entries"
+    },
+    "qa": {
+      "title": "Quality report",
+      "subtitle": "Automated checks on the delivered cut.",
+      "loading": "Loading the QA report...",
+      "error": "The QA report could not be loaded.",
+      "empty": "No QA report yet. Run the checks on the cut to see findings here.",
+      "noFindings": "No findings. Every automated check passed.",
+      "duration": "Duration {duration}",
+      "findingsCount": "{count, plural, =0 {No findings} one {# finding} other {# findings}}",
+      "savedAt": "Checked {date}",
+      "contactSheetAlt": "Contact sheet from the QA run",
+      "contactSheetCaption": "Contact sheet · one frame per tile",
+      "findingsLabel": "QA findings",
+      "timecode": "{start} – {end}",
+      "types": {
+        "black": "Black frames",
+        "frozen": "Frozen frames",
+        "silence": "Silence",
+        "flash": "Flash bursts",
+        "loudness": "Loudness",
+        "duration": "Duration"
+      }
     }
   }
 }

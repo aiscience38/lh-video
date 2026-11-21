@@ -8,6 +8,8 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { DecisionCards } from "./DecisionCards";
+import { LedgerPanel } from "./LedgerPanel";
+import { QaPanel } from "./QaPanel";
 import { StopsRail } from "./StopsRail";
 import { advanceProduction, getProduction, productionErrorKey, requestGate, ProductionRequestError } from "../lib/api";
 import { activeStop, isComplete, optionLabel, pendingGate, type Production } from "../types";
@@ -176,6 +178,11 @@ export function ProductionDetail({ id }: { id: string }) {
             {!pending && !complete && !blocked && stop && <RequestGatePanel production={production} onRequested={() => { void mutate(); }} />}
 
             <GateHistory production={production} />
+
+            <div className="grid items-start gap-5 lg:grid-cols-2">
+                <LedgerPanel productionId={id} />
+                <QaPanel productionId={id} />
+            </div>
         </div>
     </div>;
 }

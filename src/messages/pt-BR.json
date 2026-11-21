@@ -4107,6 +4107,50 @@
       "ERR_GATE_NOT_FOUND": "Essa decisão não existe mais.",
       "ERR_GATE_DECIDED": "Esta decisão já foi tomada. Abra uma nova.",
       "ERR_PRODUCTIONS_UNAVAILABLE": "As produções estão indisponíveis agora."
+    },
+    "ledger": {
+      "title": "Livro de gastos",
+      "subtitle": "Cada recurso cobrado a esta produção.",
+      "loading": "Carregando o livro de gastos...",
+      "error": "Não foi possível carregar o livro de gastos.",
+      "empty": "Nenhum recurso foi cobrado a esta produção ainda.",
+      "spentOf": "Gasto {spent} de {budget}",
+      "remaining": "Restam {amount}",
+      "overBudget": "Orçamento excedido em {amount}",
+      "total": "Total {amount}",
+      "count": "{count, plural, =0 {Sem recursos} one {# recurso} other {# recursos}}",
+      "exact": "Liquidado {amount}",
+      "estimated": "Retido {amount}",
+      "estimatedBadge": "Estimado",
+      "settledBadge": "Liquidado",
+      "providerModel": "{provider} · {model}",
+      "recordedAt": "Registrado {date}",
+      "license": "Licença {license}",
+      "budgetBarLabel": "Orçamento usado",
+      "rowsLabel": "Lançamentos"
+    },
+    "qa": {
+      "title": "Relatório de qualidade",
+      "subtitle": "Verificações automáticas da versão entregue.",
+      "loading": "Carregando o relatório de qualidade...",
+      "error": "Não foi possível carregar o relatório de qualidade.",
+      "empty": "Ainda não há relatório de qualidade. Execute as verificações da versão para ver os achados aqui.",
+      "noFindings": "Sem achados. Todas as verificações automáticas passaram.",
+      "duration": "Duração {duration}",
+      "findingsCount": "{count, plural, =0 {Sem achados} one {# achado} other {# achados}}",
+      "savedAt": "Verificado {date}",
+      "contactSheetAlt": "Folha de contatos da execução de qualidade",
+      "contactSheetCaption": "Folha de contatos · um quadro por bloco",
+      "findingsLabel": "Achados de qualidade",
+      "timecode": "{start} – {end}",
+      "types": {
+        "black": "Quadros pretos",
+        "frozen": "Quadros congelados",
+        "silence": "Silêncio",
+        "flash": "Clarões",
+        "loudness": "Sonoridade",
+        "duration": "Duração"
+      }
     }
   }
 }
