@@ -1,0 +1,205 @@
+[WebServer] [E2E] Isolated production workspace at https://127.0.0.1:3110
+[WebServer] ▲ Next.js 16.4.6
+[WebServer] - Local:         http://127.0.0.1:3111
+[WebServer] - Network:       http://127.0.0.1:3111
+[WebServer] ✓ Ready in 0ms
+[WebServer] ✓ Running next.config took 8ms
+
+Running 76 tests using 1 worker
+
+  ok  1 [chromium] › tests\e2e\library-characters.spec.ts:13:5 › overview shows live counts for all three kinds and the on-disk layout (1.2s)
+  ok  2 [chromium] › tests\e2e\library-characters.spec.ts:31:5 › upload endpoint accepts a reference image and returns a library asset id (271ms)
+  ok  3 [chromium] › tests\e2e\library-characters.spec.ts:43:5 › creates a character with one uploaded reference and persists after reload (959ms)
+  ok  4 [chromium] › tests\e2e\library-characters.spec.ts:67:5 › renames a character through PATCH and persists after reload (874ms)
+  ok  5 [chromium] › tests\e2e\library-characters.spec.ts:91:5 › deletes a character after confirmation and removes the card (745ms)
+  ok  6 [chromium] › tests\e2e\library-characters.spec.ts:113:5 › deep link /library/characters/SLUG opens the card detail (505ms)
+  ok  7 [chromium] › tests\e2e\workspace.spec.ts:9:5 › pages and settings APIs open without login or a browser password challenge (759ms)
+  ok  8 [chromium] › tests\e2e\workspace.spec.ts:21:9 › en: hydration, empty Studio, navigation and accessibility (3.1s)
+  ok  9 [chromium] › tests\e2e\workspace.spec.ts:51:9 › en: every provider dialog has valid labels, validation and focus return (15.8s)
+  ok 10 [chromium] › tests\e2e\workspace.spec.ts:86:9 › en: manifests, missing pages and model search stay localized (2.9s)
+  ok 11 [chromium] › tests\e2e\workspace.spec.ts:21:9 › pt-BR: hydration, empty Studio, navigation and accessibility (6.8s)
+  ok 12 [chromium] › tests\e2e\workspace.spec.ts:51:9 › pt-BR: every provider dialog has valid labels, validation and focus return (14.1s)
+  ok 13 [chromium] › tests\e2e\workspace.spec.ts:86:9 › pt-BR: manifests, missing pages and model search stay localized (1.8s)
+  ok 14 [chromium] › tests\e2e\workspace.spec.ts:21:9 › es: hydration, empty Studio, navigation and accessibility (3.6s)
+  ok 15 [chromium] › tests\e2e\workspace.spec.ts:51:9 › es: every provider dialog has valid labels, validation and focus return (11.7s)
+  ok 16 [chromium] › tests\e2e\workspace.spec.ts:86:9 › es: manifests, missing pages and model search stay localized (1.4s)
+  ok 17 [chromium] › tests\e2e\workspace.spec.ts:109:5 › language switching preserves the provider, query, cookie and reload (2.1s)
+  ok 18 [chromium] › tests\e2e\workspace.spec.ts:126:5 › an uncertain generation response warns about that request without blocking new work (800ms)
+  ok 19 [chromium] › tests\e2e\workspace.spec.ts:142:5 › history pagination failure preserves results and retry deduplicates pages (791ms)
+  x  20 [firefox] › tests\e2e\library-characters.spec.ts:13:5 › overview shows live counts for all three kinds and the on-disk layout (13.6s)
+  -  21 [firefox] › tests\e2e\library-characters.spec.ts:31:5 › upload endpoint accepts a reference image and returns a library asset id
+  -  22 [firefox] › tests\e2e\library-characters.spec.ts:43:5 › creates a character with one uploaded reference and persists after reload
+  -  23 [firefox] › tests\e2e\library-characters.spec.ts:67:5 › renames a character through PATCH and persists after reload
+  -  24 [firefox] › tests\e2e\library-characters.spec.ts:91:5 › deletes a character after confirmation and removes the card
+  -  25 [firefox] › tests\e2e\library-characters.spec.ts:113:5 › deep link /library/characters/SLUG opens the card detail
+  ok 26 [firefox] › tests\e2e\workspace.spec.ts:9:5 › pages and settings APIs open without login or a browser password challenge (2.6s)
+  ok 27 [firefox] › tests\e2e\workspace.spec.ts:21:9 › en: hydration, empty Studio, navigation and accessibility (13.4s)
+  ok 28 [firefox] › tests\e2e\workspace.spec.ts:51:9 › en: every provider dialog has valid labels, validation and focus return (19.9s)
+  ok 29 [firefox] › tests\e2e\workspace.spec.ts:86:9 › en: manifests, missing pages and model search stay localized (1.9s)
+  ok 30 [firefox] › tests\e2e\workspace.spec.ts:21:9 › pt-BR: hydration, empty Studio, navigation and accessibility (7.8s)
+  ok 31 [firefox] › tests\e2e\workspace.spec.ts:51:9 › pt-BR: every provider dialog has valid labels, validation and focus return (23.0s)
+  ok 32 [firefox] › tests\e2e\workspace.spec.ts:86:9 › pt-BR: manifests, missing pages and model search stay localized (2.0s)
+  ok 33 [firefox] › tests\e2e\workspace.spec.ts:21:9 › es: hydration, empty Studio, navigation and accessibility (3.8s)
+  ok 34 [firefox] › tests\e2e\workspace.spec.ts:51:9 › es: every provider dialog has valid labels, validation and focus return (15.0s)
+  ok 35 [firefox] › tests\e2e\workspace.spec.ts:86:9 › es: manifests, missing pages and model search stay localized (2.4s)
+  ok 36 [firefox] › tests\e2e\workspace.spec.ts:109:5 › language switching preserves the provider, query, cookie and reload (3.0s)
+  ok 37 [firefox] › tests\e2e\workspace.spec.ts:126:5 › an uncertain generation response warns about that request without blocking new work (928ms)
+  ok 38 [firefox] › tests\e2e\workspace.spec.ts:142:5 › history pagination failure preserves results and retry deduplicates pages (1.0s)
+  x  39 [webkit] › tests\e2e\library-characters.spec.ts:13:5 › overview shows live counts for all three kinds and the on-disk layout (11.4s)
+  -  40 [webkit] › tests\e2e\library-characters.spec.ts:31:5 › upload endpoint accepts a reference image and returns a library asset id
+  -  41 [webkit] › tests\e2e\library-characters.spec.ts:43:5 › creates a character with one uploaded reference and persists after reload
+  -  42 [webkit] › tests\e2e\library-characters.spec.ts:67:5 › renames a character through PATCH and persists after reload
+  -  43 [webkit] › tests\e2e\library-characters.spec.ts:91:5 › deletes a character after confirmation and removes the card
+  -  44 [webkit] › tests\e2e\library-characters.spec.ts:113:5 › deep link /library/characters/SLUG opens the card detail
+  ok 45 [webkit] › tests\e2e\workspace.spec.ts:9:5 › pages and settings APIs open without login or a browser password challenge (468ms)
+  ok 46 [webkit] › tests\e2e\workspace.spec.ts:21:9 › en: hydration, empty Studio, navigation and accessibility (6.1s)
+  ok 47 [webkit] › tests\e2e\workspace.spec.ts:51:9 › en: every provider dialog has valid labels, validation and focus return (18.4s)
+  ok 48 [webkit] › tests\e2e\workspace.spec.ts:86:9 › en: manifests, missing pages and model search stay localized (3.7s)
+  ok 49 [webkit] › tests\e2e\workspace.spec.ts:21:9 › pt-BR: hydration, empty Studio, navigation and accessibility (6.5s)
+  ok 50 [webkit] › tests\e2e\workspace.spec.ts:51:9 › pt-BR: every provider dialog has valid labels, validation and focus return (18.6s)
+  ok 51 [webkit] › tests\e2e\workspace.spec.ts:86:9 › pt-BR: manifests, missing pages and model search stay localized (3.5s)
+  ok 52 [webkit] › tests\e2e\workspace.spec.ts:21:9 › es: hydration, empty Studio, navigation and accessibility (6.3s)
+  ok 53 [webkit] › tests\e2e\workspace.spec.ts:51:9 › es: every provider dialog has valid labels, validation and focus return (19.1s)
+  ok 54 [webkit] › tests\e2e\workspace.spec.ts:86:9 › es: manifests, missing pages and model search stay localized (3.8s)
+  ok 55 [webkit] › tests\e2e\workspace.spec.ts:109:5 › language switching preserves the provider, query, cookie and reload (5.1s)
+  ok 56 [webkit] › tests\e2e\workspace.spec.ts:126:5 › an uncertain generation response warns about that request without blocking new work (1.6s)
+  ok 57 [webkit] › tests\e2e\workspace.spec.ts:142:5 › history pagination failure preserves results and retry deduplicates pages (2.0s)
+  x  58 [mobile-chromium] › tests\e2e\library-characters.spec.ts:13:5 › overview shows live counts for all three kinds and the on-disk layout (10.5s)
+  -  59 [mobile-chromium] › tests\e2e\library-characters.spec.ts:31:5 › upload endpoint accepts a reference image and returns a library asset id
+  -  60 [mobile-chromium] › tests\e2e\library-characters.spec.ts:43:5 › creates a character with one uploaded reference and persists after reload
+  -  61 [mobile-chromium] › tests\e2e\library-characters.spec.ts:67:5 › renames a character through PATCH and persists after reload
+  -  62 [mobile-chromium] › tests\e2e\library-characters.spec.ts:91:5 › deletes a character after confirmation and removes the card
+  -  63 [mobile-chromium] › tests\e2e\library-characters.spec.ts:113:5 › deep link /library/characters/SLUG opens the card detail
+  ok 64 [mobile-chromium] › tests\e2e\workspace.spec.ts:9:5 › pages and settings APIs open without login or a browser password challenge (320ms)
+  ok 65 [mobile-chromium] › tests\e2e\workspace.spec.ts:21:9 › en: hydration, empty Studio, navigation and accessibility (3.0s)
+  ok 66 [mobile-chromium] › tests\e2e\workspace.spec.ts:51:9 › en: every provider dialog has valid labels, validation and focus return (8.1s)
+  ok 67 [mobile-chromium] › tests\e2e\workspace.spec.ts:86:9 › en: manifests, missing pages and model search stay localized (1.3s)
+  ok 68 [mobile-chromium] › tests\e2e\workspace.spec.ts:21:9 › pt-BR: hydration, empty Studio, navigation and accessibility (4.7s)
+  ok 69 [mobile-chromium] › tests\e2e\workspace.spec.ts:51:9 › pt-BR: every provider dialog has valid labels, validation and focus return (14.9s)
+  ok 70 [mobile-chromium] › tests\e2e\workspace.spec.ts:86:9 › pt-BR: manifests, missing pages and model search stay localized (1.9s)
+  ok 71 [mobile-chromium] › tests\e2e\workspace.spec.ts:21:9 › es: hydration, empty Studio, navigation and accessibility (3.9s)
+  ok 72 [mobile-chromium] › tests\e2e\workspace.spec.ts:51:9 › es: every provider dialog has valid labels, validation and focus return (9.3s)
+  ok 73 [mobile-chromium] › tests\e2e\workspace.spec.ts:86:9 › es: manifests, missing pages and model search stay localized (1.8s)
+  ok 74 [mobile-chromium] › tests\e2e\workspace.spec.ts:109:5 › language switching preserves the provider, query, cookie and reload (2.1s)
+  ok 75 [mobile-chromium] › tests\e2e\workspace.spec.ts:126:5 › an uncertain generation response warns about that request without blocking new work (730ms)
+  ok 76 [mobile-chromium] › tests\e2e\workspace.spec.ts:142:5 › history pagination failure preserves results and retry deduplicates pages (675ms)
+
+
+  1) [firefox] › tests\e2e\library-characters.spec.ts:13:5 › overview shows live counts for all three kinds and the on-disk layout 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('library-overview-empty')
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('library-overview-empty') with timeout 10000ms
+      - waiting for getByTestId('library-overview-empty')
+
+
+      26 |     await expect(page.getByTestId("library-layout")).toContainText("character.json");
+      27 |     await expect(page.getByTestId("library-layout")).toContainText(".trash");
+    > 28 |     await expect(page.getByTestId("library-overview-empty")).toBeVisible();
+         |                                                              ^
+      29 | });
+      30 |
+      31 | test("upload endpoint accepts a reference image and returns a library asset id", async ({ request }) => {
+        at C:\Users\saiya\projects\lh-video\tests\e2e\library-characters.spec.ts:28:62
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\library-characters-overvie-44570-inds-and-the-on-disk-layout-firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\library-characters-overvie-44570-inds-and-the-on-disk-layout-firefox\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\library-characters-overvie-44570-inds-and-the-on-disk-layout-firefox\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\library-characters-overvie-44570-inds-and-the-on-disk-layout-firefox\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [webkit] › tests\e2e\library-characters.spec.ts:13:5 › overview shows live counts for all three kinds and the on-disk layout 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('library-overview-empty')
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('library-overview-empty') with timeout 10000ms
+      - waiting for getByTestId('library-overview-empty')
+
+
+      26 |     await expect(page.getByTestId("library-layout")).toContainText("character.json");
+      27 |     await expect(page.getByTestId("library-layout")).toContainText(".trash");
+    > 28 |     await expect(page.getByTestId("library-overview-empty")).toBeVisible();
+         |                                                              ^
+      29 | });
+      30 |
+      31 | test("upload endpoint accepts a reference image and returns a library asset id", async ({ request }) => {
+        at C:\Users\saiya\projects\lh-video\tests\e2e\library-characters.spec.ts:28:62
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\library-characters-overvie-44570-inds-and-the-on-disk-layout-webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\library-characters-overvie-44570-inds-and-the-on-disk-layout-webkit\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\library-characters-overvie-44570-inds-and-the-on-disk-layout-webkit\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\library-characters-overvie-44570-inds-and-the-on-disk-layout-webkit\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [mobile-chromium] › tests\e2e\library-characters.spec.ts:13:5 › overview shows live counts for all three kinds and the on-disk layout 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('library-overview-empty')
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('library-overview-empty') with timeout 10000ms
+      - waiting for getByTestId('library-overview-empty')
+
+
+      26 |     await expect(page.getByTestId("library-layout")).toContainText("character.json");
+      27 |     await expect(page.getByTestId("library-layout")).toContainText(".trash");
+    > 28 |     await expect(page.getByTestId("library-overview-empty")).toBeVisible();
+         |                                                              ^
+      29 | });
+      30 |
+      31 | test("upload endpoint accepts a reference image and returns a library asset id", async ({ request }) => {
+        at C:\Users\saiya\projects\lh-video\tests\e2e\library-characters.spec.ts:28:62
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\library-characters-overvie-44570-inds-and-the-on-disk-layout-mobile-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\library-characters-overvie-44570-inds-and-the-on-disk-layout-mobile-chromium\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\library-characters-overvie-44570-inds-and-the-on-disk-layout-mobile-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\library-characters-overvie-44570-inds-and-the-on-disk-layout-mobile-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [firefox] › tests\e2e\library-characters.spec.ts:13:5 › overview shows live counts for all three kinds and the on-disk layout 
+    [webkit] › tests\e2e\library-characters.spec.ts:13:5 › overview shows live counts for all three kinds and the on-disk layout 
+    [mobile-chromium] › tests\e2e\library-characters.spec.ts:13:5 › overview shows live counts for all three kinds and the on-disk layout 
+  15 did not run
+  58 passed (6.3m)
+exit=1

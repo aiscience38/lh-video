@@ -1,0 +1,16 @@
+[WebServer] [E2E] Isolated production workspace at https://127.0.0.1:3110
+[WebServer] ▲ Next.js 16.4.6
+[WebServer] - Local:         http://127.0.0.1:3111
+[WebServer] - Network:       http://127.0.0.1:3111
+[WebServer] ✓ Ready in 0ms
+[WebServer] ✓ Running next.config took 18ms
+
+Running 4 tests using 1 worker
+
+  ok 1 [chromium] › tests\e2e\storyboard-keyframe.spec.ts:8:5 › sets a keyframe on shot 2 from the picker and it survives a reload (4.5s)
+  ok 2 [firefox] › tests\e2e\storyboard-keyframe.spec.ts:8:5 › sets a keyframe on shot 2 from the picker and it survives a reload (4.2s)
+  ok 3 [webkit] › tests\e2e\storyboard-keyframe.spec.ts:8:5 › sets a keyframe on shot 2 from the picker and it survives a reload (3.6s)
+  ok 4 [mobile-chromium] › tests\e2e\storyboard-keyframe.spec.ts:8:5 › sets a keyframe on shot 2 from the picker and it survives a reload (1.5s)
+
+  4 passed (38.3s)
+exit=0
