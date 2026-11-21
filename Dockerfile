@@ -24,6 +24,14 @@ RUN addgroup --system --gid 1001 nodejs \
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# Next 16's standalone output omits the app-route runtimes that route handlers
+# require at runtime; without these every API route returns 500.
+COPY --from=builder --chown=nextjs:nodejs \
+    /app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js \
+    /app/node_modules/next/dist/compiled/next-server/app-route-experimental.runtime.prod.js \
+    /app/node_modules/next/dist/compiled/next-server/app-route-turbo.runtime.prod.js \
+    /app/node_modules/next/dist/compiled/next-server/app-route-turbo-experimental.runtime.prod.js \
+    ./node_modules/next/dist/compiled/next-server/
 
 USER nextjs
 EXPOSE 3000
