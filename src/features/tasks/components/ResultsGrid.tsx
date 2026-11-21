@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AlertCircle, ArrowLeft, ArrowRight, ArrowUpRight, Check, CheckCheck, ChevronDown, Clapperboard, Copy, Download, Image as ImageIcon, ImagePlus, Loader2, MoreHorizontal, Play, Search, SlidersHorizontal, Trash2, X } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, ArrowUpRight, Check, CheckCheck, ChevronDown, Clapperboard, Copy, Download, Film, Image as ImageIcon, ImagePlus, Loader2, MoreHorizontal, Play, Search, SlidersHorizontal, Trash2, Users, Video, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useModelCopy } from "@/i18n/use-model-copy";
 import { useRuntimeModels } from "@/features/catalog/hooks/useRuntimeModels";
@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { HeaderToolbar } from "@/components/layout/toolbar-slot";
 import { Lightbox, type PreviewItem } from "./Lightbox";
+import { LibraryActionDialog, type LibraryTarget } from "./LibraryActionDialog";
 import { useVideoTasks, revalidateVideoTasks } from "../hooks/useVideoTasks";
 import { useImageTasks, revalidateImageTasks } from "../hooks/useImageTasks";
 import { useTaskRefresh } from "../hooks/useTaskRefresh";
@@ -99,6 +100,10 @@ function Gallery({ mode, empty, onReusePrompt, onSendImage }: GalleryProps) {
     const [over, setOver] = useState<string | null>(null);
     const [marquee, setMarquee] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
     const [announcement, setAnnouncement] = useState("");
+    const [libraryTarget, setLibraryTarget] = useState<LibraryTarget | null>(null);
+    const [actionNote, setActionNote] = useState<string | null>(null);
+    const [actionError, setActionError] = useState<string | null>(null);
+    const [extending, setExtending] = useState<string | null>(null);
     const lastSelected = useRef<string | null>(null);
     const galleryGrid = useRef<HTMLDivElement | null>(null);
     const marqueeGesture = useRef<{ pointerId: number; startX: number; startY: number; moved: boolean; initial: Set<string>; additive: boolean } | null>(null);
@@ -125,6 +130,7 @@ function Gallery({ mode, empty, onReusePrompt, onSendImage }: GalleryProps) {
     const visible = sort === "custom" ? filtered : [...filtered].sort((a, b) => (sort === "newest" ? -1 : 1) * (Date.parse(a.task.created_at) - Date.parse(b.task.created_at)) || (a.index ?? 0) - (b.index ?? 0));
     const allOutputs = visible.flatMap(item => item.preview ? [item.preview] : []);
     const selectedItems = cards.filter(item => selected.has(galleryKey(item)));
+    const selectedImages = selectedItems.filter(item => item.preview?.mediaType === "image");
     const selecting = selectedItems.length > 0 || marquee !== null;
     const sortable = arranged.filter(canReorder);
     // Dragging always reorders, except while a date sort is shown, where a custom position would not be visible.
@@ -232,6 +238,31 @@ function Gallery({ mode, empty, onReusePrompt, onSendImage }: GalleryProps) {
             document.body.append(link); link.click(); link.remove();
         }, position * 300));
     }
+    /** One character PATCH receives every selected image; the picker dedupes ids already referenced. */
+    function addToCharacter(items: GalleryItem[]) {
+        const assetIds = [...new Set(items.filter(item => item.preview?.mediaType === "image").map(item => item.taskId))];
+        if (!assetIds.length) return;
+        setActionError(null); setActionNote(null);
+        setLibraryTarget({ kind: "character", assetIds });
+    }
+    function setAsKeyframe(item: GalleryItem) {
+        if (item.preview?.mediaType !== "image") return;
+        setActionError(null); setActionNote(null);
+        setLibraryTarget({ kind: "storyboard", assetId: item.taskId });
+    }
+    /** Shot extension: the server returns a stored still that seeds the composer's start frame. */
+    async function extend(item: GalleryItem) {
+        if (extending) return;
+        setExtending(item.taskId); setActionError(null); setActionNote(null);
+        try {
+            const response = await fetch("/api/media/last-frame", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ taskId: item.taskId }) });
+            const result = await response.json().catch(() => null) as { assetId?: unknown; url?: unknown } | null;
+            if (!response.ok || typeof result?.assetId !== "string" || typeof result?.url !== "string") throw new Error("ERR_LAST_FRAME_FAILED");
+            if (onSendImage) { onSendImage(result.url, "start"); setActionNote(t("extendReady")); }
+            else setActionNote(t("extendAsset", { assetId: result.assetId }));
+        } catch { setActionError(t("extendFailed")); }
+        finally { setExtending(null); }
+    }
     const mutate = (action: "delete" | "reorder", items: GalleryReference[]) => galleryMutation(mode, action, items);
     async function removeItems(items: GalleryReference[], closeDialog = false) {
         if (!items.length || busy) return;
@@ -275,6 +306,7 @@ function Gallery({ mode, empty, onReusePrompt, onSendImage }: GalleryProps) {
         <Button type="button" variant="ghost" size="icon-sm" className="size-8" aria-label={t("cancelSelection")} title={t("cancelSelection")} onClick={clearSelection}><X className="size-4" /></Button>
         <span className="whitespace-nowrap px-1 text-xs font-semibold tabular-nums"><span aria-hidden="true" className="sm:hidden">{selectedItems.length}</span><span className="max-sm:sr-only">{t("selectedCount", { count: selectedItems.length })}</span></span>
         <Button type="button" variant="ghost" size="sm" className="h-8" title={t(allSelected ? "deselectVisible" : "selectVisible")} onClick={selectVisible}><CheckCheck className="size-4" /><span className="max-md:sr-only">{t(allSelected ? "deselectVisible" : "selectVisible")}</span></Button>
+        {selectedImages.length > 0 && <Button type="button" variant="ghost" size="icon-sm" className="size-8" aria-label={t("addToCharacter")} title={t("addToCharacter")} disabled={busy} onClick={() => addToCharacter(selectedItems)}><Users className="size-4" /></Button>}
         {selectedItems.some(item => item.preview) && <Button type="button" variant="ghost" size="sm" className="h-8" title={t("downloadSelected")} onClick={downloadSelected}><Download className="size-4" /><span className="max-md:sr-only">{t("downloadSelected")}</span></Button>}
         <Button type="button" variant="destructive" size="sm" className="h-8" title={t("deleteSelected")} disabled={busy} onClick={() => requestDelete(selectedItems)}><Trash2 className="size-4" /><span className="max-md:sr-only">{t("deleteSelected")}</span></Button>
     </div>;
@@ -328,6 +360,8 @@ function Gallery({ mode, empty, onReusePrompt, onSendImage }: GalleryProps) {
         {history.isLoading && <p role="status" className="flex items-center justify-center gap-2 p-8 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" />{t("loadingHistory")}</p>}
         {history.error && <div role="alert" className="mx-auto max-w-2xl p-6 text-center text-sm text-destructive"><p>{t("historyError")}</p><Button type="button" variant="outline" className="mt-4" onClick={() => void history.mutate().catch(() => undefined)}>{t("retryHistory")}</Button></div>}
         {error && !deleting && <p role="alert" className="px-3 pt-2 text-xs text-destructive">{errors.has(error) ? errors(error) : t("orderError")}</p>}
+        {actionError && <p role="alert" className="px-3 pt-2 text-xs text-destructive">{actionError}</p>}
+        {actionNote && <p role="status" className="px-3 pt-2 text-xs text-muted-foreground">{actionNote}</p>}
         {!hasContent && !history.isLoading && !history.error ? empty : hasContent && <div ref={galleryGrid} data-gallery-grid style={{ "--row-size": `${rowSize}px` } as React.CSSProperties} className="flex flex-wrap gap-1 p-1 [--row:calc(var(--row-size)*0.6)] sm:gap-1.5 sm:p-1.5 sm:[--row:var(--row-size)]">
             {localSubmissions.map(item => <SubmissionTile key={item.id} submission={item} ratio={mode === "video" ? 16 / 9 : 1} />)}
             {visible.map(item => {
@@ -338,6 +372,10 @@ function Gallery({ mode, empty, onReusePrompt, onSendImage }: GalleryProps) {
                     onSelect={range => toggle(item, range)} onDelete={() => void removeItems([{ taskId: item.taskId, index: item.index }])}
                     onReusePrompt={onReusePrompt && item.task.prompt ? () => onReusePrompt(item.task.prompt!) : undefined}
                     onSendImage={onSendImage && item.preview?.mediaType === "image" ? target => onSendImage(item.preview!.url, target) : undefined}
+                    onAddToCharacter={item.preview?.mediaType === "image" ? () => addToCharacter([item]) : undefined}
+                    onSetKeyframe={item.preview?.mediaType === "image" ? () => setAsKeyframe(item) : undefined}
+                    onExtend={item.preview?.mediaType === "video" ? () => void extend(item) : undefined}
+                    extending={extending === item.taskId}
                     onPreview={() => { opener.current = document.activeElement as HTMLElement; setPreview({ items: allOutputs, index: allOutputs.findIndex(output => output.url === item.preview?.url) }); }}
                     onDragStart={event => {
                         // One gesture serves both drops: another tile reorders, the prompt receives the image as a reference.
@@ -370,6 +408,11 @@ function Gallery({ mode, empty, onReusePrompt, onSendImage }: GalleryProps) {
                 setDeleting([{ taskId: owner.taskId, index: owner.index }]);
             },
         }} onClose={() => setPreview(null)} onNext={() => setPreview(current => current && ({ ...current, index: (current.index + 1) % current.items.length }))} onPrev={() => setPreview(current => current && ({ ...current, index: (current.index - 1 + current.items.length) % current.items.length }))} />}
+        {libraryTarget && <LibraryActionDialog target={libraryTarget} onClose={() => setLibraryTarget(null)} onDone={message => {
+            setLibraryTarget(null);
+            setActionError(null);
+            setActionNote(message);
+        }} />}
     </section>;
 }
 
@@ -382,9 +425,10 @@ function Hint({ label, children }: { label: string; children: React.ReactElement
     return <Tooltip><TooltipTrigger render={children} /><TooltipContent side="left">{label}</TooltipContent></Tooltip>;
 }
 
-function GalleryTile({ item, selected, selecting, dragging, over, canMoveBefore, canMoveAfter, onSelect, onDelete, onPreview, onReusePrompt, onSendImage, onDragStart, onOver, onLeave, onDrop, onDragEnd, onMove }: {
+function GalleryTile({ item, selected, selecting, dragging, over, canMoveBefore, canMoveAfter, onSelect, onDelete, onPreview, onReusePrompt, onSendImage, onAddToCharacter, onSetKeyframe, onExtend, extending, onDragStart, onOver, onLeave, onDrop, onDragEnd, onMove }: {
     item: GalleryItem; selected: boolean; selecting: boolean; dragging: boolean; over: boolean; canMoveBefore: boolean; canMoveAfter: boolean;
     onSelect: (range: boolean) => void; onDelete: () => void; onPreview: () => void; onReusePrompt?: () => void; onSendImage?: (target: ImageTarget) => void;
+    onAddToCharacter?: () => void; onSetKeyframe?: () => void; onExtend?: () => void; extending: boolean;
     onDragStart: (event: React.DragEvent) => void; onOver: (event: React.DragEvent) => void; onLeave: (event: React.DragEvent) => void; onDrop: (event: React.DragEvent) => void; onDragEnd: () => void; onMove: (direction: number) => void;
 }) {
     const t = useTranslations("tasks");
@@ -407,6 +451,7 @@ function GalleryTile({ item, selected, selecting, dragging, over, canMoveBefore,
     };
     const showActions = !selecting;
     const draggable = !selecting && (Boolean(preview) || canMoveBefore || canMoveAfter);
+    const libraryActions = Boolean(onAddToCharacter || onSetKeyframe || onExtend);
 
     return <article data-gallery-key={galleryKey(item)} aria-label={name} draggable={draggable} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onOver} onDragLeave={onLeave} onDrop={onDrop} onClick={event => {
         if (!selecting || event.defaultPrevented) return;
@@ -452,7 +497,11 @@ function GalleryTile({ item, selected, selecting, dragging, over, canMoveBefore,
                         <DropdownMenuItem className="min-h-9" onClick={() => onSendImage("start")}><Clapperboard />{t("animateFromStart")}</DropdownMenuItem>
                         <DropdownMenuItem className="min-h-9" onClick={() => onSendImage("end")}><Clapperboard />{t("animateToEnd")}</DropdownMenuItem>
                     </>}
-                    {(canMoveBefore || canMoveAfter) && <><DropdownMenuSeparator />
+                    {libraryActions && <DropdownMenuSeparator />}
+                    {onAddToCharacter && <DropdownMenuItem className="min-h-9" onClick={onAddToCharacter}><Users />{t("addToCharacter")}</DropdownMenuItem>}
+                    {onSetKeyframe && <DropdownMenuItem className="min-h-9" onClick={onSetKeyframe}><Film />{t("setAsKeyframe")}</DropdownMenuItem>}
+                    {onExtend && <DropdownMenuItem className="min-h-9" disabled={extending} onClick={onExtend}>{extending ? <Loader2 className="animate-spin" /> : <Video />}{t(extending ? "extending" : "extend")}</DropdownMenuItem>}
+                    {(canMoveBefore || canMoveAfter) && <>{!libraryActions && <DropdownMenuSeparator />}
                         {canMoveBefore && <DropdownMenuItem className="min-h-9" onClick={() => onMove(-1)}><ArrowLeft />{t("moveBefore")}</DropdownMenuItem>}
                         {canMoveAfter && <DropdownMenuItem className="min-h-9" onClick={() => onMove(1)}><ArrowRight />{t("moveAfter")}</DropdownMenuItem>}
                     </>}
