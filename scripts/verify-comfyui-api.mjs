@@ -35,7 +35,7 @@ async function temporaryDirectory(t) {
     return directory;
 }
 
-test("the image-models route lists the ComfyUI FLUX capability with controls derived from the real template", async t => {
+test("the image-models route lists the ComfyUI Qwen-Image capability with controls derived from the real template", async t => {
     const directory = await temporaryDirectory(t);
     const f = fixture({ env: { OPEN_HIGGSFIELD_STORAGE_DIR: directory, COMFYUI_BASE_URL: BASE, COMFYUI_API_KEY: key } });
 
@@ -50,9 +50,9 @@ test("the image-models route lists the ComfyUI FLUX capability with controls der
     assert.equal(body.models.length, 1, "only the configured ComfyUI provider is connected");
     const capability = body.models.find(model => model.id.startsWith("comfyui:"));
     assert.ok(capability, "the image catalog must expose a comfyui: capability");
-    assert.equal(capability.id, "comfyui:flux-t2i");
+    assert.equal(capability.id, "comfyui:qwen-t2i");
     assert.equal(capability.provider, "comfyui");
-    assert.equal(capability.provider_model_id, "flux-t2i");
+    assert.equal(capability.provider_model_id, "qwen-t2i");
     assert.equal(capability.provider_mode, "image-model");
     assert.equal(capability.prompt_required, true);
     assert.equal(capability.negative_prompt, true);
@@ -60,8 +60,8 @@ test("the image-models route lists the ComfyUI FLUX capability with controls der
     assert.deepEqual(plain(capability.seed), { minimum: 0, maximum: 4294967295 });
     assert.deepEqual(plain(capability.media_slots), []);
 
-    const template = f.load("@/server/catalog/comfyui").COMFYUI_TEMPLATES["flux-t2i"];
-    assert.deepEqual(plain(template.mediaSlots), [], "the FLUX text-to-image template declares no media slot");
+    const template = f.load("@/server/catalog/comfyui").COMFYUI_TEMPLATES["qwen-t2i"];
+    assert.deepEqual(plain(template.mediaSlots), [], "the Qwen-Image text-to-image template declares no media slot");
     const controls = Object.fromEntries(capability.custom_fields.map(field => [field.id, field]));
     assert.deepEqual(Object.keys(controls).sort(),
         ["cfg", "height", "negative_prompt", "seed", "steps", "width"]);
@@ -69,17 +69,17 @@ test("the image-models route lists the ComfyUI FLUX capability with controls der
     // by hand into the route or the capability.
     for (const id of Object.keys(controls)) {
         const source = template.params.find(param => param.id === id);
-        assert.ok(source, `${id} must exist in the FLUX template`);
+        assert.ok(source, `${id} must exist in the Qwen-Image template`);
         assert.equal(controls[id].label, source.label, id);
         assert.equal(controls[id].default, source.default, id);
         assert.equal(controls[id].minimum, source.minimum, id);
         assert.equal(controls[id].maximum, source.maximum, id);
         assert.equal(controls[id].maxLength, source.maxLength, id);
     }
-    assert.deepEqual([controls.width.minimum, controls.width.maximum, controls.width.default], [256, 2048, 1024]);
-    assert.deepEqual([controls.height.minimum, controls.height.maximum, controls.height.default], [256, 2048, 1024]);
-    assert.deepEqual([controls.steps.minimum, controls.steps.maximum, controls.steps.default], [1, 60, 28]);
-    assert.deepEqual([controls.cfg.minimum, controls.cfg.maximum, controls.cfg.default], [0, 30, 1]);
+    assert.deepEqual([controls.width.minimum, controls.width.maximum, controls.width.default], [256, 2048, 512]);
+    assert.deepEqual([controls.height.minimum, controls.height.maximum, controls.height.default], [256, 2048, 512]);
+    assert.deepEqual([controls.steps.minimum, controls.steps.maximum, controls.steps.default], [1, 60, 16]);
+    assert.deepEqual([controls.cfg.minimum, controls.cfg.maximum, controls.cfg.default], [0, 30, 3]);
     assert.deepEqual([controls.seed.minimum, controls.seed.maximum, controls.seed.default], [0, 4294967295, 0]);
     assert.equal(controls.negative_prompt.maxLength, 2048);
 
@@ -98,7 +98,7 @@ test("a template without a media slot rejects image inputs with a normalized 400
     const directory = await temporaryDirectory(t);
     const f = fixture({ env: { OPEN_HIGGSFIELD_STORAGE_DIR: directory, COMFYUI_BASE_URL: BASE, COMFYUI_API_KEY: key } });
     const catalog = f.load("@/server/catalog/runtime");
-    const capability = await catalog.getRuntimeCapability("image", "comfyui:flux-t2i");
+    const capability = await catalog.getRuntimeCapability("image", "comfyui:qwen-t2i");
     assert.ok(capability);
     assert.deepEqual(plain(capability.media_slots), []);
 
@@ -153,7 +153,7 @@ test("the keyless local ComfyUI environment connection needs only COMFYUI_BASE_U
 
     const response = await keyless.load("src/app/api/image-models/route.ts").GET(new Request("http://localhost/api/image-models"));
     assert.equal(response.status, 200);
-    assert.equal((await response.json()).models.some(model => model.id === "comfyui:flux-t2i"), true,
+    assert.equal((await response.json()).models.some(model => model.id === "comfyui:qwen-t2i"), true,
         "COMFYUI_BASE_URL alone must connect the keyless LAN provider");
 
     // Without either a saved connection or the base URL the same route must not

@@ -1,0 +1,31 @@
+{
+  "id": "qwen-t2i",
+  "label": "Qwen-Image Text to Image",
+  "family": "Qwen",
+  "description": "Text-to-image through the verified Qwen-Image graph on the GX10 (split loaders, no checkpoint).",
+  "mode": "image",
+  "source": "docs/providers/comfyui.md",
+  "graph": {
+    "1": { "class_type": "UNETLoader", "inputs": { "unet_name": "qwen_image_2.1_int8_convrot.safetensors", "weight_dtype": "default" } },
+    "2": { "class_type": "CLIPLoader", "inputs": { "clip_name": "qwen3vl_8b_fp8_scaled.safetensors", "type": "qwen_image" } },
+    "3": { "class_type": "VAELoader", "inputs": { "vae_name": "qwen_image_2.1_vae_bf16.safetensors" } },
+    "4": { "class_type": "CLIPTextEncode", "inputs": { "text": "", "clip": ["2", 0] } },
+    "5": { "class_type": "CLIPTextEncode", "inputs": { "text": "", "clip": ["2", 0] } },
+    "6": { "class_type": "EmptySD3LatentImage", "inputs": { "width": 512, "height": 512, "batch_size": 1 } },
+    "10": { "class_type": "ModelSamplingAuraFlow", "inputs": { "model": ["1", 0], "shift": 3.1 } },
+    "7": { "class_type": "KSampler", "inputs": { "seed": 0, "steps": 16, "cfg": 3, "sampler_name": "euler", "scheduler": "simple", "denoise": 1, "model": ["10", 0], "positive": ["4", 0], "negative": ["5", 0], "latent_image": ["6", 0] } },
+    "8": { "class_type": "VAEDecode", "inputs": { "samples": ["7", 0], "vae": ["3", 0] } },
+    "9": { "class_type": "SaveImage", "inputs": { "filename_prefix": "lh-video", "images": ["8", 0] } }
+  },
+  "params": [
+    { "id": "prompt", "label": "Prompt", "type": "string", "target": ["4", "text"], "required": true, "maxLength": 4096 },
+    { "id": "negative_prompt", "label": "Negative prompt", "type": "string", "target": ["5", "text"], "default": "", "maxLength": 2048, "description": "Text encoded into the negative prompt of the sampler graph." },
+    { "id": "width", "label": "Width", "type": "integer", "target": ["6", "width"], "default": 512, "minimum": 256, "maximum": 2048, "description": "Output width in pixels. ComfyUI decodes widths in multiples of 8." },
+    { "id": "height", "label": "Height", "type": "integer", "target": ["6", "height"], "default": 512, "minimum": 256, "maximum": 2048, "description": "Output height in pixels. ComfyUI decodes heights in multiples of 8." },
+    { "id": "steps", "label": "Steps", "type": "integer", "target": ["7", "steps"], "default": 16, "minimum": 1, "maximum": 60, "description": "Sampler steps applied by the KSampler node." },
+    { "id": "cfg", "label": "CFG", "type": "number", "target": ["7", "cfg"], "default": 3, "minimum": 0, "maximum": 30, "description": "Classifier-free guidance scale passed to the KSampler node." },
+    { "id": "seed", "label": "Seed", "type": "integer", "target": ["7", "seed"], "default": 0, "minimum": 0, "maximum": 4294967295, "description": "Sampler seed. The same seed and graph reproduce the same image." }
+  ],
+  "mediaSlots": [],
+  "outputs": [{ "node": "9", "kind": "image", "mimeType": "image/png" }]
+}

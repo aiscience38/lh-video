@@ -18,10 +18,11 @@ behavior.
   new LH Video icon set and favicons, and the Qwen-Image brand board. The
   hardcoded lime accent was replaced throughout the composer and empty state.
 - **ComfyUI provider.** A `GenerationProvider` adapter for ComfyUI 0.46.0 on the
-  GX10 (`COMFYUI_BASE_URL`, optional bearer token), an API-format FLUX
-  text-to-image template, catalog entries, reference upload and cancellation
-  support, mocked API contract tests, and the provider parity matrix
-  (`docs/providers/parity.md`).
+  GX10 (`COMFYUI_BASE_URL`, optional bearer token), an API-format Qwen-Image
+  text-to-image template (the host exposes no checkpoint, so the graph uses the
+  split `UNETLoader`/`CLIPLoader`/`VAELoader` weights), catalog entries,
+  reference upload and cancellation support, mocked API contract tests, and the
+  provider parity matrix (`docs/providers/parity.md`).
 - **Creative Library.** A filesystem-backed library for characters, scenes and
   storyboards: zod contract with slug rules, atomic path-contained writes,
   directory-scan store with trash, REST API (`/api/library`, `/api/scenes`), and

@@ -39,9 +39,9 @@ unless generation is disabled.
 
 ## Features
 
-- **ComfyUI first**: FLUX text-to-image through a reviewed API-format template on
-  the GX10, with the same normalized task, progress and gallery flow as hosted
-  providers.
+- **ComfyUI first**: Qwen-Image text-to-image through a reviewed API-format
+  template on the GX10 (split loaders — the host has no checkpoint), with the
+  same normalized task, progress and gallery flow as hosted providers.
 - **Capability-driven studio**: aspect ratio, resolution, seed, CFG, style and
   reference controls come from model descriptors, not hardcoded per-provider UI.
 - **Creative Library**: characters, scenes and storyboards stored as plain JSON
@@ -66,7 +66,7 @@ what the adapters declare.
 
 | Provider | Images | Videos | Credentials |
 | --- | ---: | ---: | --- |
-| **ComfyUI (GX10)** | FLUX template | not yet — no reviewed LTX template | `COMFYUI_BASE_URL`, optional `COMFYUI_API_KEY` |
+| **ComfyUI (GX10)** | Qwen-Image template | not yet — no reviewed LTX template | `COMFYUI_BASE_URL`, optional `COMFYUI_API_KEY` |
 | Magnific | yes | yes | `MAGNIFIC_API_KEY` |
 | Google AI Studio | yes | yes (Veo) | `GEMINI_API_KEY` |
 | Google Vertex AI | yes | yes | Google Cloud credentials |
@@ -78,7 +78,8 @@ The full capability matrix — image/video support, reference slots, native audi
 multi-shot and validation status — is in [provider parity](docs/providers/parity.md).
 ComfyUI's endpoint, template and GX10 inventory are documented in
 [ComfyUI provider](docs/providers/comfyui.md). ComfyUI tests are mocked; the live
-still through the FLUX template is still pending (LAM-15).
+still through the Qwen-Image template was verified on 2026-11-20 (512×512, 16
+steps, 16.4 s).
 
 Model availability, pricing, quotas and preview access are controlled by each
 upstream provider.

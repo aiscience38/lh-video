@@ -169,7 +169,7 @@ test("a hypothetical capability that declares an unsupported control is rejected
     const support = f.load("@/server/catalog/adapter-support");
     const base = {
         id: "synthetic:test", label: "Synthetic", family: "Synthetic", variant: "Synthetic", group: "Synthetic",
-        provider: "comfyui", provider_model_id: "flux-t2i", prompt_required: true, prompt_supported: true,
+        provider: "comfyui", provider_model_id: "qwen-t2i", prompt_required: true, prompt_supported: true,
         duration: false, aspect_ratio: false, size: false, resolution_variant: false,
         negative_prompt: false, cfg_scale: false, style: false, shot_type: true, prompt_expansion: false, elements: false,
         media_slots: [], custom_fields: [], has_edit_variant: false,
