@@ -4002,5 +4002,113 @@
       "text_4dc4c7f6_6": "Wan2.7",
       "text_80568cd7_12": "Wan3.0 Prime"
     }
+  },
+  "productions": {
+    "eyebrow": "PRODUÇÕES",
+    "title": "Quadro de produções",
+    "subtitle": "Cada produção, suas etapas do fluxo e as decisões humanas que a fazem avançar.",
+    "new": "Nova produção",
+    "count": "{count, plural, =0 {Nenhuma produção ainda} one {# produção} other {# produções}}",
+    "loading": "Carregando produções...",
+    "retry": "Tentar de novo",
+    "effort": {
+      "label": "Esforço",
+      "quick": "Rápida",
+      "standard": "Padrão",
+      "studio": "Estúdio"
+    },
+    "stops": {
+      "label": "Etapas do fluxo",
+      "concept": "Conceito",
+      "outline": "Roteiro",
+      "storyboard": "Storyboard",
+      "sound": "Som",
+      "cut": "Montagem",
+      "delivery": "Entrega"
+    },
+    "states": {
+      "waiting": "Aguardando",
+      "working": "Em andamento",
+      "done": "Concluída",
+      "blocked": "Bloqueada"
+    },
+    "rail": {
+      "label": "Etapas do fluxo"
+    },
+    "board": {
+      "label": "Produções",
+      "emptyTitle": "Ainda não há produções",
+      "emptyHint": "Crie uma produção para acompanhar as etapas de conceito, roteiro, storyboard, som, montagem e entrega.",
+      "open": "Abrir {title}",
+      "pendingGate": "Decisão pendente",
+      "complete": "Entregue",
+      "atStop": "Agora em {stop}",
+      "error": "Não foi possível carregar as produções."
+    },
+    "create": {
+      "title": "Nova produção",
+      "hint": "O fluxo começa no conceito e avança uma etapa por vez.",
+      "titleLabel": "Título",
+      "titlePlaceholder": "Teaser do turno da noite",
+      "briefLabel": "Brief",
+      "briefPlaceholder": "O que esta produção deve entregar?",
+      "effortLabel": "Esforço",
+      "submit": "Criar produção",
+      "submitting": "Criando...",
+      "cancel": "Cancelar"
+    },
+    "detail": {
+      "back": "Todas as produções",
+      "meta": "Atualizada {date}",
+      "emptyBrief": "Ainda sem brief.",
+      "pendingTitle": "Aguardando sua decisão",
+      "pendingHint": "A etapa {stop} não pode avançar até esta decisão ser tomada.",
+      "noPendingTitle": "Nenhuma decisão pendente",
+      "noPendingHint": "Avance a etapa você mesmo ou abra uma decisão humana quando precisar.",
+      "blockedHint": "Esta etapa está bloqueada. Retome antes de avançar.",
+      "completeHint": "Esta produção foi entregue.",
+      "advance": "Avançar etapa",
+      "advancing": "Avançando...",
+      "historyTitle": "Histórico de decisões",
+      "historyEmpty": "Nenhuma decisão registrada ainda.",
+      "historyStop": "{stop}: {option}",
+      "historyNoOption": "Nenhuma opção registrada",
+      "notFound": "Produção não encontrada",
+      "notFoundHint": "Ela pode ter sido movida para a lixeira.",
+      "errorTitle": "Produção indisponível"
+    },
+    "gate": {
+      "optionsLabel": "Opções",
+      "recommended": "Recomendada",
+      "noteLabel": "Nota",
+      "notePlaceholder": "Por que esta decisão?",
+      "approve": "Aprovar e avançar",
+      "reject": "Rejeitar e manter a etapa",
+      "submitting": "Salvando...",
+      "decidedApproved": "Aprovada",
+      "decidedRejected": "Rejeitada",
+      "decidedAt": "Decidida em {date}",
+      "requestTitle": "Pedir uma decisão",
+      "requestHint": "Abra uma decisão humana na etapa {stop}.",
+      "optionsInputLabel": "Opções, uma por linha",
+      "optionsInputPlaceholder": "Aprovar a montagem atual\nAdicionar mais uma passada",
+      "optionsHelp": "A primeira linha fica pré-selecionada como opção recomendada. Até seis opções.",
+      "requestSubmit": "Abrir decisão",
+      "requesting": "Abrindo..."
+    },
+    "errors": {
+      "generic": "Algo deu errado. Tente de novo.",
+      "ERR_PRODUCTION_NOT_FOUND": "Essa produção não existe mais.",
+      "ERR_PRODUCTION_INVALID": "A solicitação de produção não era válida.",
+      "ERR_PRODUCTION_CONFLICT": "A produção mudou. Recarregue e tente de novo.",
+      "ERR_PRODUCTION_BLOCKED": "A etapa está bloqueada. Retome primeiro.",
+      "ERR_PRODUCTION_COMPLETE": "Todas as etapas já estão concluídas.",
+      "ERR_PRODUCTION_STOP_LOCKED": "Somente a etapa atual pode mudar.",
+      "ERR_PRODUCTION_GATE_PENDING": "Já existe uma decisão pendente.",
+      "ERR_GATE_INVALID": "A solicitação da decisão não era válida.",
+      "ERR_GATE_NOT_FOUND": "Essa decisão não existe mais.",
+      "ERR_GATE_DECIDED": "Esta decisão já foi tomada. Abra uma nova.",
+      "ERR_PRODUCTIONS_UNAVAILABLE": "As produções estão indisponíveis agora."
+    }
   }
 }
