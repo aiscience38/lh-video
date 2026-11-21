@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createCharacter, libraryErrorKey, uploadReference } from "../lib/api";
+import { INGREDIENT_KINDS, type IngredientKind } from "../types";
 
 const MAX_REFERENCES = 8;
 
@@ -20,6 +21,7 @@ export function CreateCharacterDialog({ onClose, onCreated }: {
     const common = useTranslations("common");
     const [name, setName] = useState("");
     const [notes, setNotes] = useState("");
+    const [kind, setKind] = useState<IngredientKind>("character");
     const [files, setFiles] = useState<File[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [busy, setBusy] = useState(false);
@@ -42,7 +44,7 @@ export function CreateCharacterDialog({ onClose, onCreated }: {
                 const uploaded = await uploadReference(file);
                 assetIds.push(uploaded.assetId);
             }
-            await createCharacter({ name: trimmed, notes: notes.trim(), assetIds });
+            await createCharacter({ name: trimmed, notes: notes.trim(), assetIds, ingredientKind: kind });
             onCreated();
             onClose();
         } catch (caught) {
@@ -69,6 +71,13 @@ export function CreateCharacterDialog({ onClose, onCreated }: {
                 <div className="grid gap-1.5">
                     <Label htmlFor="character-name">{t("characters.nameLabel")}</Label>
                     <Input id="character-name" value={name} onChange={event => setName(event.target.value)} placeholder={t("characters.namePlaceholder")} autoComplete="off" maxLength={120} disabled={busy} aria-invalid={Boolean(error)} />
+                </div>
+                <div className="grid gap-1.5">
+                    <Label htmlFor="character-kind">{t("characters.ingredientLabel")}</Label>
+                    <select id="character-kind" value={kind} onChange={event => setKind(event.target.value as IngredientKind)} disabled={busy}
+                        className="h-9 rounded-lg border border-white/10 bg-[#101214] px-2 text-sm text-foreground outline-none focus-visible:border-ring">
+                        {INGREDIENT_KINDS.map(value => <option key={value} value={value}>{t(`characters.kinds.${value}`)}</option>)}
+                    </select>
                 </div>
                 <div className="grid gap-1.5">
                     <Label htmlFor="character-notes">{t("characters.notesLabel")}</Label>

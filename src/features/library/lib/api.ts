@@ -1,4 +1,4 @@
-import type { CharacterEntity, LibraryAssetUpload, LibraryEntity, LibraryKind, LibraryListResponse } from "../types";
+import type { CharacterEntity, IngredientKind, LibraryAssetUpload, LibraryEntity, LibraryKind, LibraryListResponse } from "../types";
 
 export class LibraryRequestError extends Error {
     constructor(public readonly code: string, public readonly status: number) {
@@ -36,6 +36,7 @@ export interface CharacterInput {
     name: string;
     notes: string;
     assetIds: string[];
+    ingredientKind?: IngredientKind;
 }
 
 export async function createCharacter(input: CharacterInput): Promise<CharacterEntity> {

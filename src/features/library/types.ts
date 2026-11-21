@@ -1,5 +1,9 @@
 export type LibraryKind = "character" | "scene" | "storyboard";
 
+/** Google-Flow-style ingredient role stored on a character entity. */
+export const INGREDIENT_KINDS = ["character", "prop", "style"] as const;
+export type IngredientKind = (typeof INGREDIENT_KINDS)[number];
+
 export interface LibraryEntityBase {
     id: string;
     kind: LibraryKind;
@@ -11,6 +15,7 @@ export interface LibraryEntityBase {
 
 export interface CharacterEntity extends LibraryEntityBase {
     kind: "character";
+    ingredientKind: IngredientKind;
     notes: string;
     assetIds: string[];
 }

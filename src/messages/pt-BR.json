@@ -928,6 +928,8 @@
       "retry": "Tentar de novo"
     },
     "characters": {
+        "ingredientLabel": "Ingrediente",
+        "kinds": { "character": "Personagem", "prop": "Objeto", "style": "Estilo" },
       "title": "Personagens",
       "subtitle": "Membros do elenco reutilizáveis para suas gerações.",
       "new": "Novo personagem",

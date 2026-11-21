@@ -55,6 +55,7 @@ test("creates a character with one uploaded reference and persists after reload"
     const card = page.getByTestId("character-card").filter({ hasText: name });
     await expect(card).toBeVisible();
     await expect(card.getByTestId("character-reference-count")).toHaveAttribute("data-count", "1");
+    await expect(card.getByTestId("character-ingredient-kind")).toHaveAttribute("data-kind", "character");
     const image = card.locator("img");
     await expect(image).toHaveAttribute("src", /\/api\/uploaded\/[a-f0-9]{64}\.jpg$/);
     await expect.poll(() => image.evaluate(node => (node as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);

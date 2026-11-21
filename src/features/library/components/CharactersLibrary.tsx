@@ -72,6 +72,7 @@ export function CharactersLibrary() {
                     <CardTitle><Link href={`/library/characters/${character.slug}`} className="rounded-sm hover:text-primary focus-visible:outline-1">{character.name}</Link></CardTitle>
                     <CardDescription>
                         <span data-testid="character-reference-count" data-count={character.assetIds.length}>{t("characters.references", { count: character.assetIds.length })}</span>
+                        <span data-testid="character-ingredient-kind" data-kind={character.ingredientKind} className="ml-2 inline-flex rounded-full border border-white/10 bg-white/[.04] px-2 py-0.5 text-[11px] text-muted-foreground">{t(`characters.kinds.${character.ingredientKind}`)}</span>
                     </CardDescription>
                 </CardHeader>
                 <CardFooter className="justify-end gap-1">

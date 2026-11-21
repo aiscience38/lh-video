@@ -928,6 +928,8 @@
       "retry": "Retry"
     },
     "characters": {
+        "ingredientLabel": "Ingredient",
+        "kinds": { "character": "Character", "prop": "Prop", "style": "Style" },
       "title": "Characters",
       "subtitle": "Reusable cast members for your generations.",
       "new": "New character",
