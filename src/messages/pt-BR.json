@@ -1146,6 +1146,29 @@
       "manifest": "o tar não está disponível, então um manifesto JSON foi gravado em {path}.",
       "note": "Nota: {note}",
       "error": "Não foi possível criar o backup. Verifique se a pasta de dados permite gravação."
+    },
+    "trash": {
+      "title": "Lixeira",
+      "subtitle": "Pastas da biblioteca excluídas mantidas no armazenamento para revisão do operador.",
+      "emptyTitle": "A lixeira está vazia",
+      "emptyHint": "Personagens, cenas e storyboards excluídos aparecem aqui. A restauração ainda não está disponível; recupere uma pasta manualmente no armazenamento.",
+      "emptyAction": "Voltar para a biblioteca",
+      "count": "{count, plural, =0 {Nenhuma pasta excluída} one {# pasta excluída} other {# pastas excluídas}}",
+      "loading": "Carregando lixeira...",
+      "retry": "Tentar novamente",
+      "error": "Não foi possível ler a lixeira.",
+      "columns": {
+        "kind": "Tipo",
+        "folder": "Pasta",
+        "date": "Excluído em"
+      },
+      "kinds": {
+        "character": "Personagem",
+        "scene": "Cena",
+        "storyboard": "Storyboard"
+      },
+      "unknownName": "Sem nome",
+      "unknownDate": "Data desconhecida"
     }
   },
   "providers": {
@@ -4486,5 +4509,60 @@
         "label": "Whip pan"
       }
     }
+  },
+  "sidebar": {
+    "navigation": "Barra lateral do espaço de trabalho",
+    "toggle": "Alternar barra lateral",
+    "close": "Fechar barra lateral",
+    "collapse": "Recolher barra lateral",
+    "expand": "Expandir barra lateral",
+    "groups": {
+      "media": "Mídia",
+      "tools": "Ferramentas"
+    },
+    "items": {
+      "allMedia": "Todas as mídias",
+      "characters": "Personagens",
+      "scenes": "Cenas",
+      "library": "Biblioteca",
+      "tools": "Ferramentas",
+      "createTool": "Criar ferramenta",
+      "trash": "Lixeira"
+    },
+    "newCharacter": "Novo personagem"
+  },
+  "tools": {
+    "eyebrow": "FLUXOS DE TRABALHO COMFYUI",
+    "title": "Ferramentas",
+    "subtitle": "Modelos de fluxo de trabalho importados do backend ComfyUI conectado.",
+    "count": "{count, plural, =0 {Nenhuma ferramenta} one {# ferramenta} other {# ferramentas}}",
+    "create": "Criar ferramenta",
+    "loading": "Carregando ferramentas...",
+    "retry": "Tentar novamente",
+    "error": "Não foi possível carregar os fluxos do ComfyUI.",
+    "emptyTitle": "Ainda não há ferramentas ComfyUI",
+    "emptyHint": "As ferramentas ComfyUI são modelos de fluxo de trabalho do backend ComfyUI conectado. Conecte-o em Configurações e importe um fluxo.",
+    "emptyAction": "Abrir configurações",
+    "columns": {
+      "label": "Nome",
+      "id": "ID do modelo",
+      "mode": "Modo",
+      "source": "Origem",
+      "status": "Status"
+    },
+    "modes": {
+      "image": "Imagem",
+      "video": "Vídeo"
+    },
+    "sources": {
+      "builtin": "Integrado",
+      "imported": "Importado"
+    },
+    "status": {
+      "enabled": "Ativado",
+      "disabled": "Desativado",
+      "unverified": "Não verificado"
+    },
+    "providerMissing": "A definição do provedor ComfyUI não está disponível, então o diálogo de importação não pode abrir."
   }
 }

@@ -1141,6 +1141,29 @@
       "manifest": "tar no está disponible, así que se escribió un manifiesto JSON en {path}.",
       "note": "Nota: {note}",
       "error": "No se pudo crear la copia de seguridad. Comprueba que la carpeta de datos se pueda escribir."
+    },
+    "trash": {
+      "title": "Papelera",
+      "subtitle": "Carpetas de la biblioteca eliminadas que se conservan en el almacenamiento para revisión del operador.",
+      "emptyTitle": "La papelera está vacía",
+      "emptyHint": "Los personajes, escenas y storyboards eliminados aparecen aquí. La restauración aún no está disponible; recupera una carpeta manualmente del almacenamiento.",
+      "emptyAction": "Volver a la biblioteca",
+      "count": "{count, plural, =0 {Ninguna carpeta eliminada} one {# carpeta eliminada} other {# carpetas eliminadas}}",
+      "loading": "Cargando papelera...",
+      "retry": "Reintentar",
+      "error": "No se pudo leer la papelera.",
+      "columns": {
+        "kind": "Tipo",
+        "folder": "Carpeta",
+        "date": "Eliminado"
+      },
+      "kinds": {
+        "character": "Personaje",
+        "scene": "Escena",
+        "storyboard": "Storyboard"
+      },
+      "unknownName": "Sin nombre",
+      "unknownDate": "Fecha desconocida"
     }
   },
   "scenes": {
@@ -4486,5 +4509,60 @@
         "duration": "Duración"
       }
     }
+  },
+  "sidebar": {
+    "navigation": "Barra lateral del espacio de trabajo",
+    "toggle": "Alternar barra lateral",
+    "close": "Cerrar barra lateral",
+    "collapse": "Contraer barra lateral",
+    "expand": "Expandir barra lateral",
+    "groups": {
+      "media": "Medios",
+      "tools": "Herramientas"
+    },
+    "items": {
+      "allMedia": "Todos los medios",
+      "characters": "Personajes",
+      "scenes": "Escenas",
+      "library": "Biblioteca",
+      "tools": "Herramientas",
+      "createTool": "Crear herramienta",
+      "trash": "Papelera"
+    },
+    "newCharacter": "Nuevo personaje"
+  },
+  "tools": {
+    "eyebrow": "FLUJOS DE TRABAJO COMFYUI",
+    "title": "Herramientas",
+    "subtitle": "Plantillas de flujo de trabajo importadas del backend ComfyUI conectado.",
+    "count": "{count, plural, =0 {Ninguna herramienta} one {# herramienta} other {# herramientas}}",
+    "create": "Crear herramienta",
+    "loading": "Cargando herramientas...",
+    "retry": "Reintentar",
+    "error": "No se pudieron cargar los flujos de ComfyUI.",
+    "emptyTitle": "Aún no hay herramientas ComfyUI",
+    "emptyHint": "Las herramientas ComfyUI son plantillas de flujo de trabajo del backend ComfyUI conectado. Conéctalo en Ajustes e importa un flujo.",
+    "emptyAction": "Abrir ajustes",
+    "columns": {
+      "label": "Nombre",
+      "id": "ID de plantilla",
+      "mode": "Modo",
+      "source": "Origen",
+      "status": "Estado"
+    },
+    "modes": {
+      "image": "Imagen",
+      "video": "Vídeo"
+    },
+    "sources": {
+      "builtin": "Integrado",
+      "imported": "Importado"
+    },
+    "status": {
+      "enabled": "Activado",
+      "disabled": "Desactivado",
+      "unverified": "Sin verificar"
+    },
+    "providerMissing": "La definición del proveedor ComfyUI no está disponible, por lo que el diálogo de importación no puede abrirse."
   }
 }

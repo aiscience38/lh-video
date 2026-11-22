@@ -1,13 +1,14 @@
 "use client";
 
-import { Check, Clapperboard, Cloud, Image as ImageIcon, Languages, Library } from "lucide-react";
+import { Check, Clapperboard, Cloud, Image as ImageIcon, Languages, Library, Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { MotionConfig } from "framer-motion";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { ToolbarSlotContext } from "./toolbar-slot";
+import { SidebarNav } from "./SidebarNav";
 import { Link as LocaleLink, usePathname as useLocalePathname } from "@/i18n/navigation";
 import { locales, localeLabels, type AppLocale } from "@/i18n/locales";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -20,8 +21,11 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     const params = useSearchParams();
     const locale = useLocale();
     const t = useTranslations("workspace");
+    const sidebar = useTranslations("sidebar");
     const scenes = useTranslations("scenes");
     const languages = useTranslations("languages");
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const closeSidebar = useCallback(() => setSidebarOpen(false), []);
     const inSettings = pathname.includes("/settings");
     const inLibrary = pathname.includes("/library");
     const inScenes = pathname.includes("/scenes") && !pathname.includes("/library/scenes");
@@ -37,6 +41,11 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
             <a href="#workspace-content" className="sr-only z-[100] rounded-lg bg-primary px-4 py-3 font-semibold text-primary-foreground focus:not-sr-only focus:absolute focus:left-3 focus:top-3">{t("skip")}</a>
             <header ref={header} data-workspace-header className="relative shrink-0 border-b border-white/[.06] bg-[#0b0c0d]">
                 <div className="flex h-12 items-center gap-1.5 px-2 sm:gap-3 sm:px-4">
+                    <button type="button" data-testid="sidebar-toggle" aria-label={sidebar("toggle")} aria-expanded={sidebarOpen} aria-controls={sidebarOpen ? "workspace-sidebar-overlay" : "workspace-sidebar"}
+                        onClick={() => setSidebarOpen(open => !open)}
+                        className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-white/[.05] hover:text-white md:hidden">
+                        {sidebarOpen ? <X aria-hidden="true" className="size-4" /> : <Menu aria-hidden="true" className="size-4" />}
+                    </button>
                     <Link href={`/${locale}`} aria-label={t("home")} className="flex shrink-0 items-center gap-2 rounded-lg">
                         <Image src="/icon.svg" width={28} height={28} alt="" className="size-7" priority />
                         <span className="hidden text-[15px] tracking-[0.3em] text-white xl:block" style={{ fontFamily: "var(--font-display)" }}>LH <span className="text-primary">VIDEO</span></span>
@@ -61,7 +70,10 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                     </div>
                 </div>
             </header>
-            <main id="workspace-content" tabIndex={-1} className="min-h-0 min-w-0 flex-1 outline-none"><ToolbarSlotContext.Provider value={toolbarSlot}>{children}</ToolbarSlotContext.Provider></main>
+            <div className="flex min-h-0 flex-1 overflow-hidden">
+                <SidebarNav mobileOpen={sidebarOpen} onMobileClose={closeSidebar} />
+                <main id="workspace-content" tabIndex={-1} className="min-h-0 min-w-0 flex-1 outline-none"><ToolbarSlotContext.Provider value={toolbarSlot}>{children}</ToolbarSlotContext.Provider></main>
+            </div>
         </div>
     </MotionConfig>;
 }
