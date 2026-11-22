@@ -1,0 +1,47 @@
+{
+  "id": "qwen3-tts",
+  "label": "Qwen3-TTS Voice Design",
+  "family": "Qwen",
+  "description": "Text-to-speech through the GX10's FB_Qwen3TTSVoiceDesign node and SaveAudioMP3. Voices are natural-language design instructions, so the speaker control is the node's instruct input and speed is folded into that instruction as a pace hint.",
+  "mode": "audio",
+  "source": "docs/voice.md",
+  "requiredNodes": ["FB_Qwen3TTSVoiceDesign", "SaveAudioMP3"],
+  "ttsNode": "1",
+  "outputNode": "2",
+  "graph": {
+    "1": {
+      "class_type": "FB_Qwen3TTSVoiceDesign",
+      "inputs": {
+        "text": "",
+        "instruct": "A warm, grounded adult voice with a relaxed pace and clear articulation.",
+        "model_choice": "1.7B",
+        "device": "auto",
+        "precision": "bf16",
+        "language": "Auto"
+      }
+    },
+    "2": {
+      "class_type": "SaveAudioMP3",
+      "inputs": {
+        "audio": ["1", 0],
+        "filename_prefix": "audio/lh-voice",
+        "quality": "128k"
+      }
+    }
+  },
+  "params": [
+    { "id": "text", "label": "Text", "type": "string", "target": ["1", "text"], "required": true, "maxLength": 2000, "description": "The line to speak." },
+    { "id": "speaker", "label": "Speaker / voice design", "type": "string", "target": ["1", "instruct"], "default": "warm-narrator", "maxLength": 600, "description": "A voice preset id from GET /api/tts/voices?provider=comfyui, or a free-form voice design instruction. FB_Qwen3TTSVoiceDesign has no fixed speaker list; the instruction is its documented voice control." },
+    { "id": "language", "label": "Language", "type": "string", "target": ["1", "language"], "default": "Auto", "maxLength": 32, "description": "One of the node's documented language values, or Auto." },
+    { "id": "speed", "label": "Speed", "type": "number", "target": ["1", "instruct"], "default": 1, "minimum": 0.5, "maximum": 2, "description": "Playback-rate hint appended to the voice instruction. FB_Qwen3TTSVoiceDesign has no numeric speed input, so this is a soft direction, not a hard time-stretch." }
+  ],
+  "mediaSlots": [],
+  "voices": [
+    { "id": "warm-narrator", "name": "Warm Narrator", "language": "English", "instruct": "A warm, grounded adult voice with a relaxed pace, gentle rasp and clear articulation." },
+    { "id": "bright-host", "name": "Bright Host", "language": "English", "instruct": "A bright, energetic young adult voice with crisp diction and an upbeat, welcoming tone." },
+    { "id": "deep-documentary", "name": "Deep Documentary", "language": "English", "instruct": "A deep, authoritative middle-aged voice with measured pacing and a calm documentary delivery." },
+    { "id": "soft-conversational", "name": "Soft Conversational", "language": "English", "instruct": "A soft, intimate conversational voice with natural pauses and a friendly, unforced tone." },
+    { "id": "clear-announcer", "name": "Clear Announcer", "language": "English", "instruct": "A neutral, professional announcer voice with even pacing and precise pronunciation." }
+  ],
+  "outputs": [{ "node": "2", "kind": "audio", "mimeType": "audio/mpeg" }]
+}
