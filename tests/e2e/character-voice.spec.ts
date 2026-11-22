@@ -125,7 +125,7 @@ test("saves provider, voice, language and preview asset, then persists after rel
     const edit = page.getByRole("dialog");
     await expect(edit.getByRole("heading", { name: en.library.voice.editTitle })).toBeVisible();
     await expect(edit.getByLabel(en.library.voice.providerLabel)).toHaveValue("elevenlabs");
-    await expect(edit.getByLabel(en.library.voice.voiceLabel)).toHaveValue("voice_ana");
+    await expect(edit.getByTestId("voice-section").getByLabel(en.library.voice.voiceLabel)).toHaveValue("voice_ana");
     await expect(edit.getByLabel(en.library.voice.languageLabel)).toHaveValue("es");
     await expect(edit.getByText(en.library.voice.previewSaved)).toBeVisible();
 
@@ -154,7 +154,7 @@ test("no available provider shows fallback copy, disables options and still save
     await expect(provider.locator('option[value="comfyui"]')).toBeDisabled();
     await expect(dialog.getByTestId("voice-unavailable-elevenlabs")).toContainText(en.library.voice.reasons.no_api_key);
     await expect(dialog.getByTestId("voice-unavailable-comfyui")).toContainText(en.library.voice.reasons.no_base_url);
-    await expect(dialog.getByLabel(en.library.voice.voiceLabel)).toHaveCount(0);
+    await expect(dialog.getByTestId("voice-section").getByLabel(en.library.voice.voiceLabel)).toHaveCount(0);
 
     await dialog.getByRole("button", { name: en.library.characters.create }).click();
     const card = page.getByTestId("character-card").filter({ hasText: name });
@@ -181,7 +181,7 @@ test("create dialog with the voice section has no axe violations", async ({ page
     await page.getByRole("button", { name: en.library.characters.new }).click();
     const dialog = page.getByRole("dialog");
     await dialog.getByLabel(en.library.voice.providerLabel).selectOption("elevenlabs");
-    await expect(dialog.getByLabel(en.library.voice.voiceLabel)).toBeVisible();
+    await expect(dialog.getByTestId("voice-section").getByLabel(en.library.voice.voiceLabel)).toBeVisible();
 
     const results = await new AxeBuilder({ page })
         .include('[data-slot="dialog-content"]')
