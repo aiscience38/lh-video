@@ -12,7 +12,11 @@ export const test = base.extend<{ browserErrors: string[] }>({
         page.on("pageerror", error => errors.push(error.message));
         page.on("console", message => {
             // Intentional HTTP failures are asserted by each test; React errors must still fail.
-            if (message.type() === "error" && !message.text().startsWith("Failed to load resource:")) errors.push(message.text());
+            if (message.type() !== "error" || message.text().startsWith("Failed to load resource:")) return;
+            // WebKit blocks Next.js speculative RSC prefetches against the self-signed e2e origin.
+            // Navigation itself succeeds and is asserted by the test, so this is not a render error.
+            if (message.text().includes("due to access control checks") && message.text().includes("_rsc=")) return;
+            errors.push(message.text());
         });
         await use(errors);
         expect(errors, "No hydration, render or unhandled-promise errors").toEqual([]);
