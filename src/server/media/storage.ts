@@ -15,6 +15,7 @@ export const UPLOADS_DIR = path.join(STORAGE_ROOT, "uploads");
 export const DOWNLOADS_DIR = path.join(STORAGE_ROOT, "downloads");
 export const DOWNLOADS_IMAGES_DIR = path.join(DOWNLOADS_DIR, "images");
 export const DOWNLOADS_VIDEOS_DIR = path.join(DOWNLOADS_DIR, "videos");
+export const TTS_AUDIO_DIR = path.join(STORAGE_ROOT, "tts", "audio");
 
 export function assertAssetId(value: unknown): asserts value is string {
     if (typeof value !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(value)) throw new Error("ERR_INVALID_TASK_ID");
@@ -134,7 +135,7 @@ export async function openLocalMedia(filePath: string, root: string, options: Tr
     } catch (error) { await handle.close(); throw error; }
 }
 
-async function atomicMediaWrite(filePath: string, buffer: Buffer, signal: AbortSignal): Promise<void> {
+async function atomicMediaWrite(filePath: string, buffer: Buffer, signal: AbortSignal, root: string = DOWNLOADS_DIR): Promise<void> {
     signal.throwIfAborted();
     await fs.mkdir(path.dirname(filePath), { recursive: true });
     const temporary = `${filePath}.${randomUUID()}.tmp`;
@@ -147,7 +148,7 @@ async function atomicMediaWrite(filePath: string, buffer: Buffer, signal: AbortS
         try { await fs.link(temporary, filePath); }
         catch (error) {
             if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
-            const existing = await openLocalMedia(filePath, filePath.startsWith(UPLOADS_DIR + path.sep) ? UPLOADS_DIR : DOWNLOADS_DIR, { signal });
+            const existing = await openLocalMedia(filePath, filePath.startsWith(UPLOADS_DIR + path.sep) ? UPLOADS_DIR : root, { signal });
             try {
                 const bytes = await existing.handle.readFile({ signal });
                 if (!bytes.equals(buffer)) throw new Error("ERR_ASSET_CONTENT_CONFLICT");
@@ -165,7 +166,7 @@ export async function saveInputLocally(buffer: Buffer, ext: string, options: Tra
     const mime = detectMediaMime(buffer, mediaMimeForExtension(ext));
     assertInputFileSize(buffer.length, mime);
     const filename = `${createHash("sha256").update(buffer).digest("hex")}${mediaExtension(mime)}`;
-    await atomicMediaWrite(path.join(UPLOADS_DIR, filename), buffer, signal);
+    await atomicMediaWrite(path.join(UPLOADS_DIR, filename), buffer, signal, UPLOADS_DIR);
     return `/api/uploaded/${filename}`;
 }
 
@@ -194,6 +195,25 @@ export async function readDownload(filePath: string, options: TransferOptions = 
     const signal = transferSignal(options.signal);
     const file = await openLocalMedia(filePath, DOWNLOADS_DIR, { signal });
     try { return await file.handle.readFile({ signal }); } finally { await file.handle.close(); }
+}
+
+/**
+ * TTS previews are content-addressed MP3 files under `tts/audio`. They are
+ * deliberately outside downloads/: they have no task id and are served by
+ * their own guarded route, not by the task download route.
+ */
+export async function saveTtsAudio(buffer: Buffer, options: TransferOptions = {}): Promise<string> {
+    const mime = detectMediaMime(buffer, "audio/mpeg");
+    if (mime !== "audio/mpeg") throw new Error("ERR_UNSUPPORTED_MEDIA_TYPE");
+    assertInputFileSize(buffer.length, mime);
+    const filename = `${createHash("sha256").update(buffer).digest("hex")}.mp3`;
+    await atomicMediaWrite(path.join(TTS_AUDIO_DIR, filename), buffer, transferSignal(options.signal), TTS_AUDIO_DIR);
+    return filename;
+}
+
+export async function openTtsAudio(filename: string, options: TransferOptions = {}) {
+    if (!/^[a-f0-9]{64}\.mp3$/.test(filename)) throw new Error("ERR_UNSAFE_ASSET_PATH");
+    return openLocalMedia(path.join(TTS_AUDIO_DIR, filename), TTS_AUDIO_DIR, options);
 }
 
 export async function downloadUrl(url: string, taskId: string, index: number, options: TransferOptions = {}): Promise<string> {
