@@ -95,7 +95,7 @@ test("saves provider, voice, language and preview asset, then persists after rel
     await expect(dialog.getByTestId("voice-unavailable-comfyui")).toContainText(en.library.voice.reasons.upstream_down);
 
     await provider.selectOption("elevenlabs");
-    const voice = dialog.getByLabel(en.library.voice.voiceLabel);
+    const voice = dialog.getByTestId("voice-section").getByLabel(en.library.voice.voiceLabel);
     await expect(voice.locator('option[value="voice_ana"]')).toHaveCount(1);
     await voice.selectOption("voice_ana");
     await dialog.getByLabel(en.library.voice.languageLabel).selectOption("es");
