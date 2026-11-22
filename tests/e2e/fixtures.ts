@@ -13,7 +13,11 @@ export const test = base.extend<{ browserErrors: string[] }>({
         // origin and can report it as a console error or a pageerror. Navigation itself
         // succeeds and is asserted by each test, so this is not a render error.
         const blockedPrefetch = (text: string) => text.includes("due to access control checks") && /[?&]_rsc=/.test(text);
-        page.on("pageerror", error => { if (!blockedPrefetch(error.message)) errors.push(error.message); });
+        // WebKit reports benign browser warnings as pageerror too; only these exact shapes.
+        const benign = (text: string) => blockedPrefetch(text)
+            || text === "ResizeObserver loop completed with undelivered notifications."
+            || text === "ResizeObserver loop limit exceeded";
+        page.on("pageerror", error => { if (!benign(error.message)) errors.push(error.message); });
         page.on("console", message => {
             // Intentional HTTP failures are asserted by each test; React errors must still fail.
             if (message.type() !== "error" || message.text().startsWith("Failed to load resource:")) return;
