@@ -1,10 +1,11 @@
 "use client";
 
-import { ArrowDown, ArrowUp, GripVertical, MoreHorizontal, Trash2, Wand2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Film, GripVertical, MoreHorizontal, Trash2, Wand2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Link } from "@/i18n/navigation";
 import type { SceneShot, ShotStatus } from "../types";
 
 const STATUS_CLASS: Record<ShotStatus, string> = {
@@ -17,11 +18,12 @@ const STATUS_CLASS: Record<ShotStatus, string> = {
 
 export const SHOT_DRAG_TYPE = "application/x-lh-scene-shot";
 
-export function ShotCard({ shot, index, total, status, saving, dragging, over, onMove, onDelete, onDragStart, onOver, onLeave, onDrop, onDragEnd }: {
+export function ShotCard({ shot, index, total, status, videoTaskIds, saving, dragging, over, onMove, onDelete, onDragStart, onOver, onLeave, onDrop, onDragEnd }: {
     shot: SceneShot;
     index: number;
     total: number;
     status: ShotStatus;
+    videoTaskIds: string[];
     saving: boolean;
     dragging: boolean;
     over: boolean;
@@ -47,6 +49,14 @@ export function ShotCard({ shot, index, total, status, saving, dragging, over, o
                     {shot.taskIds.length > 0 && <span className="text-xs text-muted-foreground">{t("taskCount", { count: shot.taskIds.length })}</span>}
                 </div>
                 <p data-testid="shot-prompt" className="mt-2 whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground/90">{shot.prompt.trim() || t("noPrompt")}</p>
+                {videoTaskIds.length > 0 && <ul className="mt-2 flex flex-wrap gap-2">
+                    {videoTaskIds.map(taskId => <li key={taskId}>
+                        <Link href={`/media/${encodeURIComponent(taskId)}`} data-testid="shot-video-link"
+                            className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-primary">
+                            <Film aria-hidden="true" className="size-3.5" />{t("openVideo")}
+                        </Link>
+                    </li>)}
+                </ul>}
                 {shot.capabilityId && <p className="mt-2 font-mono text-xs text-muted-foreground">{shot.capabilityId}</p>}
                 <div className="mt-3 flex flex-wrap items-center gap-1">
                     <Button type="button" size="sm" disabled data-testid="shot-generate" title={t("generateHint")} aria-describedby="scenes-generate-hint"><Wand2 />{t("generate")}</Button>

@@ -57,6 +57,18 @@ export interface MediaSlotCapability {
     description?: string;
 }
 
+/**
+ * Explicit video-to-video editing support. A source video becomes the edit
+ * target (not merely a reference or motion input), so the detail composer may
+ * offer provider-backed editing only for capabilities that set this field.
+ */
+export interface VideoEditCapability {
+    /** Media slot id that receives the source video. */
+    source_slot: string;
+    /** Declared edit operations, e.g. "restyle", "replace_subject". */
+    modes: string[];
+}
+
 /** A custom field not covered by canonical params */
 export interface CustomFieldCapability {
     id: string;
@@ -125,6 +137,12 @@ export interface ModelCapabilities {
     elements: boolean;
     /** Optional seed control for providers using the canonical seed parameter. */
     seed?: false | { minimum: number; maximum: number };
+
+    /**
+     * True video-to-video editing. Omitted by every current capability because
+     * no adapter translates an edited source video end to end.
+     */
+    video_edit?: false | VideoEditCapability;
 
     /** Media input slots */
     media_slots: MediaSlotCapability[];
