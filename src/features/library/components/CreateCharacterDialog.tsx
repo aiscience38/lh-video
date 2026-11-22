@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createCharacter, libraryErrorKey, uploadReference } from "../lib/api";
-import { INGREDIENT_KINDS, type IngredientKind } from "../types";
+import { DEFAULT_CHARACTER_VOICE, INGREDIENT_KINDS, type CharacterVoice, type IngredientKind } from "../types";
+import { VoiceSection } from "./VoiceSection";
 
 const MAX_REFERENCES = 8;
 
@@ -22,6 +23,7 @@ export function CreateCharacterDialog({ onClose, onCreated }: {
     const [name, setName] = useState("");
     const [notes, setNotes] = useState("");
     const [kind, setKind] = useState<IngredientKind>("character");
+    const [voice, setVoice] = useState<CharacterVoice>(() => ({ ...DEFAULT_CHARACTER_VOICE, settings: {} }));
     const [files, setFiles] = useState<File[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [busy, setBusy] = useState(false);
@@ -44,7 +46,7 @@ export function CreateCharacterDialog({ onClose, onCreated }: {
                 const uploaded = await uploadReference(file);
                 assetIds.push(uploaded.assetId);
             }
-            await createCharacter({ name: trimmed, notes: notes.trim(), assetIds, ingredientKind: kind });
+            await createCharacter({ name: trimmed, notes: notes.trim(), assetIds, ingredientKind: kind, voice });
             onCreated();
             onClose();
         } catch (caught) {
@@ -62,7 +64,7 @@ export function CreateCharacterDialog({ onClose, onCreated }: {
     }
 
     return <Dialog open onOpenChange={next => { if (!next && !busy) onClose(); }}>
-        <DialogContent showCloseButton={!busy} className="bg-[#141618] sm:max-w-lg">
+        <DialogContent showCloseButton={!busy} className="max-h-[calc(100vh-2rem)] overflow-y-auto bg-[#141618] sm:max-w-xl">
             <DialogHeader>
                 <DialogTitle>{t("characters.createTitle")}</DialogTitle>
                 <DialogDescription>{t("characters.createHint")}</DialogDescription>
@@ -94,6 +96,7 @@ export function CreateCharacterDialog({ onClose, onCreated }: {
                     <input ref={fileInput} id="character-references" type="file" accept="image/*" multiple className="sr-only" disabled={busy} onChange={event => chooseFiles(event.target.files)} aria-describedby="character-references-hint" />
                     <p id="character-references-hint" className="text-xs leading-relaxed text-muted-foreground">{t("characters.referencesHint", { max: MAX_REFERENCES })}</p>
                 </div>
+                <VoiceSection idPrefix="character-create" value={voice} onChange={setVoice} disabled={busy} />
                 {progress && <p role="status" className="text-xs text-muted-foreground">{t("characters.uploading", { index: progress.index, total: progress.total })}</p>}
                 {error && <p role="alert" className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
                 <DialogFooter>

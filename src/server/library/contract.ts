@@ -83,6 +83,44 @@ const entityNameSchema = z.string().min(1).max(120);
 const timestampSchema = z.iso.datetime({ offset: true });
 const productionIdSchema = z.string().min(1).max(128);
 
+/** Text-to-speech providers a character voice may reference. `none` means no voice attached. */
+export const VOICE_PROVIDERS = ["elevenlabs", "comfyui", "none"] as const;
+export const voiceProviderSchema = z.enum(VOICE_PROVIDERS, { error: LIBRARY_INVALID_ERROR }).default("none");
+export const DEFAULT_VOICE_LANGUAGE = "en";
+
+/**
+ * Optional voice profile. `settings` is provider-owned tuning data (for example
+ * stability or speaker id) and is stored as an opaque JSON object.
+ * `previewAssetId` references the TTS preview asset chosen in the UI; it is an
+ * opaque asset id and is never re-validated by the library.
+ */
+export const voiceProfileSchema = z.object({
+    provider: voiceProviderSchema,
+    voiceId: z.string().min(1).max(128).nullable().default(null),
+    language: z.string().min(2).max(35).default(DEFAULT_VOICE_LANGUAGE),
+    settings: z.record(z.string(), z.unknown()).default(() => ({})),
+    previewAssetId: assetIdSchema.nullable().default(null),
+});
+export type VoiceProfile = z.infer<typeof voiceProfileSchema>;
+
+/** The complete default profile, used when a document predates the voice field. */
+export const DEFAULT_VOICE_PROFILE: VoiceProfile = {
+    provider: "none",
+    voiceId: null,
+    language: DEFAULT_VOICE_LANGUAGE,
+    settings: {},
+    previewAssetId: null,
+};
+
+/** Update payloads replace the whole profile and therefore carry no defaults. */
+export const voiceProfileUpdateSchema = z.object({
+    provider: z.enum(VOICE_PROVIDERS, { error: LIBRARY_INVALID_ERROR }),
+    voiceId: z.string().min(1).max(128).nullable(),
+    language: z.string().min(2).max(35),
+    settings: z.record(z.string(), z.unknown()),
+    previewAssetId: assetIdSchema.nullable(),
+});
+
 /** A scene shot: generation intent plus references to existing assets and tasks. */
 export const shotSchema = z.object({
     id: entityIdSchema,
@@ -103,6 +141,7 @@ export const characterSchema = z.object({
     slug: slugSchema,
     notes: z.string().max(4000).default(""),
     assetIds: z.array(assetIdSchema).default(() => []),
+    voice: voiceProfileSchema.default(() => ({ ...DEFAULT_VOICE_PROFILE, settings: {} })),
     createdAt: timestampSchema,
     updatedAt: timestampSchema,
 });
@@ -154,7 +193,7 @@ export function schemaForKind(kind: LibraryKind): z.ZodType<LibraryEntity> {
     }
 }
 
-export const characterCreateSchema = characterSchema.pick({ name: true, notes: true, assetIds: true, ingredientKind: true });
+export const characterCreateSchema = characterSchema.pick({ name: true, notes: true, assetIds: true, ingredientKind: true, voice: true });
 export const sceneCreateSchema = sceneSchema.pick({ name: true, shots: true });
 export const storyboardCreateSchema = storyboardSchema.pick({ name: true, productionId: true, shots: true });
 export type CharacterCreateInput = z.infer<typeof characterCreateSchema>;
@@ -168,6 +207,7 @@ export const characterUpdateSchema = z.object({
     notes: z.string().max(4000).optional(),
     assetIds: z.array(assetIdSchema).optional(),
     ingredientKind: ingredientKindSchema.optional(),
+    voice: voiceProfileUpdateSchema.optional(),
 });
 export const sceneUpdateSchema = z.object({
     name: entityNameSchema.optional(),

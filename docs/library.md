@@ -93,6 +93,7 @@ Character:
 | `notes` | string, max 4000, default `""` |
 | `ingredientKind` | `character`, `prop` or `style`, default `character` (Google-Flow-style ingredient role) |
 | `assetIds` | asset ids, default `[]` |
+| `voice` | voice profile object, default `{ "provider": "none", ... }` (see below) |
 
 Scene:
 
@@ -133,6 +134,49 @@ Storyboard shot:
 Asset and task ids are opaque: `^[A-Za-z0-9_-]{1,128}$`. The library does not
 verify that a referenced asset exists; that check belongs to the media layer
 when the asset is actually used.
+
+## Character voice profile
+
+`voice` is optional in the UI but always present in a stored character document.
+Documents written before this field existed parse with the complete default
+profile, so reads and listings never fail:
+
+```json
+{
+  "provider": "none",
+  "voiceId": null,
+  "language": "en",
+  "settings": {},
+  "previewAssetId": null
+}
+```
+
+| Field | Contract |
+| --- | --- |
+| `provider` | `elevenlabs`, `comfyui` or `none`, default `none` |
+| `voiceId` | provider voice identifier, 1–128 characters, or `null`, default `null` |
+| `language` | BCP-47-style language tag, 2–35 characters, default `en` |
+| `settings` | opaque JSON object for provider tuning, default `{}` |
+| `previewAssetId` | asset id of the last generated preview, or `null`, default `null` |
+
+Rules:
+
+- `provider: "none"` means no voice is attached; the other fields stay at their
+  defaults (`voiceId` and `previewAssetId` are `null`).
+- Provider availability is **not** stored. The UI asks the TTS server
+  (`GET /api/tts/providers`) for `{ configured, reachable, reason }` per
+  provider and only enables providers that are both configured and reachable.
+  A character may therefore keep a voice whose provider is temporarily down.
+- `previewAssetId` is an opaque asset id, like every other asset reference: the
+  library never checks that the preview still exists.
+- `POST /api/library` accepts a partial `voice` object; missing fields take the
+  defaults above.
+- `PATCH /api/library/character/[id]` replaces the **whole** voice profile. The
+  update schema has no defaults, so send all five fields when changing a voice
+  (the UI always does). Omitting `voice` leaves the stored profile untouched.
+- An unknown provider, an empty or over-long `language`, a `voiceId` longer than
+  128 characters, a non-object `settings` or a malformed `previewAssetId` is
+  `400 ERR_LIBRARY_INVALID`.
 
 ## Media rule
 
@@ -293,8 +337,8 @@ unknown kind → `400 ERR_LIBRARY_KIND`.
 
 ### `PATCH /api/library/[kind]/[id]`
 
-Body: any mutable subset (`name`, `notes`, `assetIds` for characters; `name`,
-`shots` for scenes; `name`, `productionId`, `shots` for storyboards).
+Body: any mutable subset (`name`, `notes`, `assetIds`, `voice` for characters;
+`name`, `shots` for scenes; `name`, `productionId`, `shots` for storyboards).
 
 `id`, `kind` and `slug` are immutable: sending the current values is accepted,
 sending different values is `400 ERR_LIBRARY_INVALID`. `createdAt` is likewise
