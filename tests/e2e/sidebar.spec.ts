@@ -29,12 +29,12 @@ test("sidebar links navigate and mark the active route", async ({ page }) => {
     await expect(page).toHaveURL(/\/en\/library\/characters$/);
     await expect(sidebar.getByTestId("sidebar-characters")).toHaveAttribute("aria-current", "page");
     await expect(sidebar.getByTestId("sidebar-library")).not.toHaveAttribute("aria-current", "page");
-    await expect(page.getByRole("heading", { name: en.library.characters.title })).toBeVisible();
+    await expect(page.getByRole("heading", { name: en.library.characters.title, exact: true })).toBeVisible();
 
     await sidebar.getByTestId("sidebar-library").click();
     await expect(page).toHaveURL(/\/en\/library$/);
     await expect(sidebar.getByTestId("sidebar-library")).toHaveAttribute("aria-current", "page");
-    await expect(page.getByRole("heading", { name: en.library.overview.title })).toBeVisible();
+    await expect(page.getByRole("heading", { name: en.library.overview.title, exact: true })).toBeVisible();
 
     await sidebar.getByTestId("sidebar-scenes").click();
     await expect(page).toHaveURL(/\/en\/scenes$/);
