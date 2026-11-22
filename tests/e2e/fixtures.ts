@@ -9,13 +9,15 @@ import type { AnyTask } from "../../src/types";
 export const test = base.extend<{ browserErrors: string[] }>({
     browserErrors: [async ({ page }, use) => {
         const errors: string[] = [];
-        page.on("pageerror", error => errors.push(error.message));
+        // WebKit blocks Next.js speculative RSC prefetches against the self-signed e2e
+        // origin and can report it as a console error or a pageerror. Navigation itself
+        // succeeds and is asserted by each test, so this is not a render error.
+        const blockedPrefetch = (text: string) => text.includes("due to access control checks") && /[?&]_rsc=/.test(text);
+        page.on("pageerror", error => { if (!blockedPrefetch(error.message)) errors.push(error.message); });
         page.on("console", message => {
             // Intentional HTTP failures are asserted by each test; React errors must still fail.
             if (message.type() !== "error" || message.text().startsWith("Failed to load resource:")) return;
-            // WebKit blocks Next.js speculative RSC prefetches against the self-signed e2e origin.
-            // Navigation itself succeeds and is asserted by the test, so this is not a render error.
-            if (message.text().includes("due to access control checks") && message.text().includes("_rsc=")) return;
+            if (blockedPrefetch(message.text())) return;
             errors.push(message.text());
         });
         await use(errors);
