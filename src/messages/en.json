@@ -1146,6 +1146,29 @@
       "manifest": "tar is unavailable, so a JSON manifest was written to {path}.",
       "note": "Note: {note}",
       "error": "The backup could not be created. Check that the data folder is writable."
+    },
+    "trash": {
+      "title": "Trash",
+      "subtitle": "Deleted library folders kept in storage for operator review.",
+      "emptyTitle": "Trash is empty",
+      "emptyHint": "Deleted characters, scenes and storyboards appear here. Restore is not available yet; recover a folder from storage manually.",
+      "emptyAction": "Back to library",
+      "count": "{count, plural, =0 {No deleted folders} one {# deleted folder} other {# deleted folders}}",
+      "loading": "Loading trash...",
+      "retry": "Retry",
+      "error": "Could not read the trash folder.",
+      "columns": {
+        "kind": "Kind",
+        "folder": "Folder",
+        "date": "Deleted"
+      },
+      "kinds": {
+        "character": "Character",
+        "scene": "Scene",
+        "storyboard": "Storyboard"
+      },
+      "unknownName": "Unnamed",
+      "unknownDate": "Unknown date"
     }
   },
   "providers": {
@@ -4486,5 +4509,60 @@
         "label": "Whip pan"
       }
     }
+  },
+  "sidebar": {
+    "navigation": "Workspace sidebar",
+    "toggle": "Toggle sidebar",
+    "close": "Close sidebar",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar",
+    "groups": {
+      "media": "Media",
+      "tools": "Tools"
+    },
+    "items": {
+      "allMedia": "All media",
+      "characters": "Characters",
+      "scenes": "Scenes",
+      "library": "Library",
+      "tools": "Tools",
+      "createTool": "Create tool",
+      "trash": "Trash"
+    },
+    "newCharacter": "New character"
+  },
+  "tools": {
+    "eyebrow": "COMFYUI WORKFLOWS",
+    "title": "Tools",
+    "subtitle": "Workflow templates imported from the connected ComfyUI backend.",
+    "count": "{count, plural, =0 {No tools} one {# tool} other {# tools}}",
+    "create": "Create tool",
+    "loading": "Loading tools...",
+    "retry": "Retry",
+    "error": "Could not load the ComfyUI workflows.",
+    "emptyTitle": "No ComfyUI tools yet",
+    "emptyHint": "ComfyUI tools are workflow templates from the connected ComfyUI backend. Connect it in Settings, then import a workflow.",
+    "emptyAction": "Open settings",
+    "columns": {
+      "label": "Name",
+      "id": "Template id",
+      "mode": "Mode",
+      "source": "Source",
+      "status": "Status"
+    },
+    "modes": {
+      "image": "Image",
+      "video": "Video"
+    },
+    "sources": {
+      "builtin": "Built-in",
+      "imported": "Imported"
+    },
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "unverified": "Unverified"
+    },
+    "providerMissing": "The ComfyUI provider definition is unavailable, so the import dialog cannot open."
   }
 }

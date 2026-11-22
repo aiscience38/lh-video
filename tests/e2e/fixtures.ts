@@ -79,6 +79,12 @@ export async function mockWorkspace(page: Page, { connected = true }: { connecte
                     && (!query || entity.name.toLowerCase().includes(query) || entity.slug.includes(query)));
                 return route.fulfill({ json: { entities, count: entities.length } });
             }
+            case "/api/scenes":
+                return route.fulfill({ json: { scenes: [], count: 0 } });
+            case "/api/library/trash":
+                return route.fulfill({ json: { entries: [], count: 0 } });
+            case "/api/providers/comfyui/workflows":
+                return route.fulfill({ json: { nodes: [], fetchedAt: new Date(0).toISOString(), cached: true, templates: [] } });
             case "/api/motion-presets":
                 return route.fulfill({ json: { presets: state.motionPresets } });
             default:

@@ -67,6 +67,22 @@ export async function uploadReference(file: File): Promise<LibraryAssetUpload> {
     return libraryRequest<LibraryAssetUpload>("/api/library/assets", { method: "POST", body: form });
 }
 
+export interface LibraryTrashEntry {
+    kind: LibraryKind;
+    folder: string;
+    trashedAt: string | null;
+    name: string | null;
+}
+
+export interface LibraryTrashResponse {
+    entries: LibraryTrashEntry[];
+    count: number;
+}
+
+export function listLibraryTrash(): Promise<LibraryTrashResponse> {
+    return libraryRequest<LibraryTrashResponse>("/api/library/trash", { cache: "no-store" });
+}
+
 export interface LibraryBackupResult {
     ok: true;
     mode: "tar" | "manifest";

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AlertCircle, FolderInput, Loader2, Pencil, Plus, Trash2, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { useCreateParam } from "@/lib/use-create-param";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -21,12 +22,20 @@ export function CharactersLibrary() {
     const common = useTranslations("common");
     const { data, error, isLoading, mutate } = useCharacters();
     const characters = (data?.entities ?? []).filter(isCharacter);
+    const createParam = useCreateParam();
     const [createOpen, setCreateOpen] = useState(false);
+    const creating = createOpen || createParam.open;
     const [importOpen, setImportOpen] = useState(false);
     const [renaming, setRenaming] = useState<CharacterEntity | null>(null);
     const [deleting, setDeleting] = useState<CharacterEntity | null>(null);
     const [deleteError, setDeleteError] = useState<string | null>(null);
     const [deleteBusy, setDeleteBusy] = useState(false);
+
+    // Deep link from the sidebar: /library/characters?create=1 opens the same dialog.
+    function closeCreate() {
+        setCreateOpen(false);
+        createParam.close();
+    }
 
     async function confirmDelete() {
         if (!deleting) return;
@@ -87,7 +96,7 @@ export function CharactersLibrary() {
             </Card>)}
         </div>}
 
-        {createOpen && <CreateCharacterDialog onClose={() => setCreateOpen(false)} onCreated={() => { void mutate().catch(() => undefined); }} />}
+        {creating && <CreateCharacterDialog onClose={closeCreate} onCreated={() => { void mutate().catch(() => undefined); }} />}
         {importOpen && <FolderImportDialog onClose={() => setImportOpen(false)} onImported={() => { void mutate().catch(() => undefined); }} />}
         {renaming && <RenameCharacterDialog character={renaming} onClose={() => setRenaming(null)} onRenamed={() => { void mutate().catch(() => undefined); }} />}
         <ConfirmDialog open={Boolean(deleting)} onClose={() => { if (!deleteBusy) { setDeleting(null); setDeleteError(null); } }}
