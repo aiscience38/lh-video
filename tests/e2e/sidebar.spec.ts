@@ -8,6 +8,7 @@ function accessibility(page: Page) {
 }
 
 test("sidebar links navigate and mark the active route", async ({ page }) => {
+    test.skip(test.info().project.name === "mobile-chromium", "Desktop rail; the overlay is covered by the mobile test.");
     await mockWorkspace(page);
     await page.goto("/en");
     const sidebar = page.getByTestId("sidebar");
@@ -46,6 +47,7 @@ test("sidebar links navigate and mark the active route", async ({ page }) => {
 });
 
 test("sidebar library + opens the character create dialog from the query string", async ({ page }) => {
+    test.skip(test.info().project.name === "mobile-chromium", "Desktop rail; the overlay is covered by the mobile test.");
     await mockWorkspace(page);
     await page.goto("/en");
     await page.getByTestId("sidebar-library-create").click();
@@ -54,6 +56,7 @@ test("sidebar library + opens the character create dialog from the query string"
 });
 
 test("sidebar collapse is icons-only and persists across reload", async ({ page }) => {
+    test.skip(test.info().project.name === "mobile-chromium", "Desktop rail; the overlay is covered by the mobile test.");
     await mockWorkspace(page);
     await page.goto("/en");
     const sidebar = page.getByTestId("sidebar");
@@ -72,6 +75,7 @@ test("sidebar collapse is icons-only and persists across reload", async ({ page 
 });
 
 test("tools link opens the workflow page and create tool opens the import dialog", async ({ page }) => {
+    test.skip(test.info().project.name === "mobile-chromium", "Desktop rail; the overlay is covered by the mobile test.");
     await mockWorkspace(page);
     await page.goto("/en");
     await page.getByTestId("sidebar-tools").click();
@@ -109,6 +113,7 @@ test("trash API returns a read-only listing", async ({ request }) => {
 });
 
 test("workspace shell passes automated accessibility checks with the sidebar", async ({ page }) => {
+    test.skip(test.info().project.name === "mobile-chromium", "Desktop rail; the overlay is covered by the mobile test.");
     await mockWorkspace(page);
     await page.goto("/en");
     await expect(page.getByTestId("sidebar")).toBeVisible();
