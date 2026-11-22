@@ -72,6 +72,8 @@ Error taxonomy:
 ```bash
 export COMFYUI_BASE_URL="http://100.92.10.72:8188"
 # COMFYUI_API_KEY is optional on the LAN/Tailscale network.
+# Cold Qwen3TTS loads can take minutes; the poll deadline defaults to 300s.
+# export COMFYUI_TTS_TIMEOUT_MS=300000   # 5s..15min
 ```
 
 The shipped template is

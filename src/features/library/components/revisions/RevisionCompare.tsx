@@ -52,6 +52,16 @@ export function RevisionCompare() {
         return () => window.clearInterval(timer);
     }, []);
 
+    // A seek issued while B still held only metadata can be dropped by WebKit, and no
+    // single event guarantees delivery. Keep B converged on the master clock instead.
+    useEffect(() => {
+        const b = videoBRef.current;
+        if (!b) return;
+        if (Math.abs(b.currentTime - playheadA) > 0.12) {
+            try { b.currentTime = playheadA; } catch { /* next tick retries. */ }
+        }
+    }, [playheadA]);
+
     function seekBoth(time: number): void {
         const limit = Number.isFinite(duration) && duration > 0 ? duration : Number.POSITIVE_INFINITY;
         const next = Math.max(0, Math.min(limit, time));
@@ -155,7 +165,7 @@ export function RevisionCompare() {
             <figure className="rounded-2xl border border-white/10 bg-[#101214] p-3">
                 <figcaption className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("revisions.cutA")}</figcaption>
                 <video ref={videoARef} data-testid="revision-video-a" data-current-time={playheadA.toFixed(3)}
-                    src={sourceA} preload="metadata" muted={audioSource !== "a"} playsInline
+                    src={sourceA} preload="auto" muted={audioSource !== "a"} playsInline
                     onLoadedMetadata={(event) => {
                         setDuration(event.currentTarget.duration || 0);
                         if (videoBRef.current) videoBRef.current.currentTime = event.currentTarget.currentTime;
@@ -173,9 +183,17 @@ export function RevisionCompare() {
             <figure className="rounded-2xl border border-white/10 bg-[#101214] p-3">
                 <figcaption className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("revisions.cutB")}</figcaption>
                 <video ref={videoBRef} data-testid="revision-video-b" data-current-time={playheadB.toFixed(3)}
-                    src={sourceB} preload="metadata" muted={audioSource !== "b"} playsInline
+                    src={sourceB} preload="auto" muted={audioSource !== "b"} playsInline
                     onLoadedMetadata={(event) => {
                         if (videoARef.current) event.currentTarget.currentTime = videoARef.current.currentTime;
+                    }}
+                    onCanPlay={(event) => {
+                        // A seek issued while B still held only metadata can be dropped by WebKit;
+                        // re-align B to A once it can actually play.
+                        const a = videoARef.current;
+                        if (a && Math.abs(event.currentTarget.currentTime - a.currentTime) > 0.12) {
+                            try { event.currentTarget.currentTime = a.currentTime; } catch { /* retried on the next canplay. */ }
+                        }
                     }}
                     onSeeked={handleSeeked}
                     className="aspect-video w-full rounded-xl bg-black" />

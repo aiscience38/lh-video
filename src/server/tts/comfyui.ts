@@ -61,7 +61,15 @@ const LANGUAGES = ["Auto", "Chinese", "English", "Japanese", "Korean", "French",
 const MAX_AUDIO_BYTES = 20 * 1024 * 1024;
 const DISCOVERY_CACHE_MS = 60_000;
 const DEFAULT_POLL_INTERVAL_MS = 750;
-const DEFAULT_TIMEOUT_MS = 120_000;
+/**
+ * Qwen3TTS on a cold GX10 can spend minutes loading weights before the first
+ * audio chunk; 120s reported a false timeout on a healthy job. Override with
+ * COMFYUI_TTS_TIMEOUT_MS (5s..15min).
+ */
+function defaultTimeoutMs(): number {
+    const raw = Number(process.env.COMFYUI_TTS_TIMEOUT_MS);
+    return Number.isFinite(raw) && raw >= 5_000 && raw <= 900_000 ? raw : 300_000;
+}
 const CLIENT_ID = randomUUID();
 
 function recordOf(value: unknown): Record<string, unknown> | undefined {
@@ -411,7 +419,7 @@ export async function synthesizeComfyui(
     const baseUrl = requireBaseUrl(options);
     const graph = buildComfyuiTtsGraph(text, settings);
     const promptId = await submit(options, baseUrl, graph);
-    const deadline = Date.now() + (options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+    const deadline = Date.now() + (options.timeoutMs ?? defaultTimeoutMs());
     const interval = Math.max(1, options.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS);
     for (;;) {
         const response = await send(options, `${baseUrl}/history/${promptId}`, {
