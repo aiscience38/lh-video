@@ -954,6 +954,7 @@
       "title": "Personajes",
       "subtitle": "Miembros del reparto reutilizables para tus generaciones.",
       "new": "Nuevo personaje",
+      "editVoice": "Editar voz",
       "emptyTitle": "Aún no hay personajes",
       "emptyHint": "Crea el primer personaje con nombre, notas e imágenes de referencia.",
       "emptyAction": "Crear un personaje",
@@ -989,6 +990,58 @@
         "slug": "Carpeta: {slug}",
         "loading": "Cargando personaje..."
       }
+    },
+    "voice": {
+      "sectionTitle": "Voz",
+      "sectionHint": "Opcional. Elige un proveedor de texto a voz, una voz y un idioma para las vistas previas y el diálogo.",
+      "checking": "Comprobando proveedores de voz...",
+      "providerLabel": "Proveedor",
+      "providerNone": "Sin voz",
+      "providers": {
+        "elevenlabs": "ElevenLabs",
+        "comfyui": "ComfyUI"
+      },
+      "providerUnavailable": "{provider}: {reason}",
+      "reasons": {
+        "no_api_key": "Clave de API no configurada",
+        "no_base_url": "URL base no configurada",
+        "upstream_down": "Proveedor inaccesible",
+        "unknown": "No disponible"
+      },
+      "noProvidersTitle": "No hay ningún proveedor de voz disponible",
+      "noProviders": "Las vistas previas de voz no están disponibles porque no hay ningún proveedor de texto a voz configurado o accesible. Puedes crear y guardar el personaje ahora y añadir una voz más tarde.",
+      "selectedUnavailable": "{provider} no está disponible: {reason}. Elige otro proveedor o ninguna voz.",
+      "providersError": "No se pudieron cargar los proveedores de voz. Puedes guardar el personaje sin voz.",
+      "voiceLabel": "Voz",
+      "voicePlaceholder": "Elige una voz",
+      "voicesLoading": "Cargando voces...",
+      "voicesEmpty": "Este proveedor no devolvió voces.",
+      "voicesError": "No se pudieron cargar las voces.",
+      "languageLabel": "Idioma",
+      "languages": {
+        "en": "Inglés",
+        "es": "Español",
+        "pt-BR": "Portugués (Brasil)",
+        "fr": "Francés",
+        "de": "Alemán",
+        "it": "Italiano",
+        "ja": "Japonés",
+        "ko": "Coreano",
+        "zh": "Chino"
+      },
+      "sampleLabel": "Texto de vista previa",
+      "sampleDefault": "Hola, esta es una vista previa de voz.",
+      "samplePlaceholder": "Texto para leer en voz alta",
+      "preview": "Vista previa",
+      "previewing": "Generando vista previa...",
+      "previewError": "No se pudo generar la vista previa.",
+      "previewReady": "Vista previa lista.",
+      "previewSaved": "Hay una vista previa guardada con este personaje.",
+      "audioLabel": "Audio de vista previa de voz",
+      "editTitle": "Editar la voz del personaje",
+      "editHint": "Elige la voz de {name}. La voz es opcional.",
+      "save": "Guardar voz",
+      "saving": "Guardando..."
     },
     "scenes": {
       "title": "Escenas",

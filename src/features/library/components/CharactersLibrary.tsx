@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AlertCircle, FolderInput, Loader2, Pencil, Plus, Trash2, Users } from "lucide-react";
+import { AlertCircle, FolderInput, Loader2, Mic, Pencil, Plus, Trash2, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useCreateParam } from "@/lib/use-create-param";
@@ -11,6 +11,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { LibraryShell } from "./LibraryShell";
 import { CharacterThumbnail } from "./CharacterThumbnail";
 import { CreateCharacterDialog } from "./CreateCharacterDialog";
+import { EditCharacterVoiceDialog } from "./EditCharacterVoiceDialog";
 import { FolderImportDialog } from "./FolderImportDialog";
 import { RenameCharacterDialog } from "./RenameCharacterDialog";
 import { useCharacters } from "../hooks/useCharacters";
@@ -27,6 +28,7 @@ export function CharactersLibrary() {
     const creating = createOpen || createParam.open;
     const [importOpen, setImportOpen] = useState(false);
     const [renaming, setRenaming] = useState<CharacterEntity | null>(null);
+    const [editingVoice, setEditingVoice] = useState<CharacterEntity | null>(null);
     const [deleting, setDeleting] = useState<CharacterEntity | null>(null);
     const [deleteError, setDeleteError] = useState<string | null>(null);
     const [deleteBusy, setDeleteBusy] = useState(false);
@@ -87,9 +89,13 @@ export function CharactersLibrary() {
                     <CardDescription>
                         <span data-testid="character-reference-count" data-count={character.assetIds.length}>{t("characters.references", { count: character.assetIds.length })}</span>
                         <span data-testid="character-ingredient-kind" data-kind={character.ingredientKind} className="ml-2 inline-flex rounded-full border border-white/10 bg-white/[.04] px-2 py-0.5 text-[11px] text-muted-foreground">{t(`characters.kinds.${character.ingredientKind}`)}</span>
+                        {character.voice.provider !== "none" && <span data-testid="character-voice" data-provider={character.voice.provider} data-voice-id={character.voice.voiceId ?? ""} className="ml-2 inline-flex rounded-full border border-white/10 bg-white/[.04] px-2 py-0.5 text-[11px] text-muted-foreground">
+                            <Mic aria-hidden="true" className="mr-1 size-3" />{t(`voice.providers.${character.voice.provider}`)}
+                        </span>}
                     </CardDescription>
                 </CardHeader>
                 <CardFooter className="justify-end gap-1">
+                    <Button variant="ghost" size="sm" onClick={() => setEditingVoice(character)}><Mic />{t("characters.editVoice")}</Button>
                     <Button variant="ghost" size="sm" onClick={() => setRenaming(character)}><Pencil />{t("characters.rename")}</Button>
                     <Button variant="ghost" size="sm" onClick={() => { setDeleteError(null); setDeleting(character); }}><Trash2 />{t("characters.delete")}</Button>
                 </CardFooter>
@@ -99,6 +105,7 @@ export function CharactersLibrary() {
         {creating && <CreateCharacterDialog onClose={closeCreate} onCreated={() => { void mutate().catch(() => undefined); }} />}
         {importOpen && <FolderImportDialog onClose={() => setImportOpen(false)} onImported={() => { void mutate().catch(() => undefined); }} />}
         {renaming && <RenameCharacterDialog character={renaming} onClose={() => setRenaming(null)} onRenamed={() => { void mutate().catch(() => undefined); }} />}
+        {editingVoice && <EditCharacterVoiceDialog character={editingVoice} onClose={() => setEditingVoice(null)} onSaved={() => { void mutate().catch(() => undefined); }} />}
         <ConfirmDialog open={Boolean(deleting)} onClose={() => { if (!deleteBusy) { setDeleting(null); setDeleteError(null); } }}
             onConfirm={() => void confirmDelete()} busy={deleteBusy}
             title={t("characters.deleteTitle")}

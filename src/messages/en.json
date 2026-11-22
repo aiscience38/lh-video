@@ -959,6 +959,7 @@
       "title": "Characters",
       "subtitle": "Reusable cast members for your generations.",
       "new": "New character",
+      "editVoice": "Edit voice",
       "emptyTitle": "No characters yet",
       "emptyHint": "Create the first character with a name, notes and reference images.",
       "emptyAction": "Create a character",
@@ -994,6 +995,58 @@
         "slug": "Folder: {slug}",
         "loading": "Loading character..."
       }
+    },
+    "voice": {
+      "sectionTitle": "Voice",
+      "sectionHint": "Optional. Pick a text-to-speech provider, a voice and a language for previews and dialogue.",
+      "checking": "Checking voice providers...",
+      "providerLabel": "Provider",
+      "providerNone": "No voice",
+      "providers": {
+        "elevenlabs": "ElevenLabs",
+        "comfyui": "ComfyUI"
+      },
+      "providerUnavailable": "{provider}: {reason}",
+      "reasons": {
+        "no_api_key": "API key not configured",
+        "no_base_url": "Base URL not configured",
+        "upstream_down": "Provider unreachable",
+        "unknown": "Unavailable"
+      },
+      "noProvidersTitle": "No voice provider available",
+      "noProviders": "Voice previews are unavailable because no text-to-speech provider is configured or reachable. You can still create and save the character now and attach a voice later.",
+      "selectedUnavailable": "{provider} is unavailable: {reason}. Choose another provider or no voice.",
+      "providersError": "Voice providers could not be loaded. You can still save the character without a voice.",
+      "voiceLabel": "Voice",
+      "voicePlaceholder": "Choose a voice",
+      "voicesLoading": "Loading voices...",
+      "voicesEmpty": "This provider returned no voices.",
+      "voicesError": "Voices could not be loaded.",
+      "languageLabel": "Language",
+      "languages": {
+        "en": "English",
+        "es": "Spanish",
+        "pt-BR": "Portuguese (Brazil)",
+        "fr": "French",
+        "de": "German",
+        "it": "Italian",
+        "ja": "Japanese",
+        "ko": "Korean",
+        "zh": "Chinese"
+      },
+      "sampleLabel": "Preview text",
+      "sampleDefault": "Hello, this is a voice preview.",
+      "samplePlaceholder": "Text to read aloud",
+      "preview": "Preview",
+      "previewing": "Generating preview...",
+      "previewError": "The preview could not be generated.",
+      "previewReady": "Preview ready.",
+      "previewSaved": "A preview is saved with this character.",
+      "audioLabel": "Voice preview audio",
+      "editTitle": "Edit character voice",
+      "editHint": "Choose the voice for {name}. Voice is optional.",
+      "save": "Save voice",
+      "saving": "Saving..."
     },
     "scenes": {
       "title": "Scenes",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AlertCircle, ArrowLeft, Loader2, Pencil, Trash2 } from "lucide-react";
+import { AlertCircle, ArrowLeft, Loader2, Mic, Pencil, Trash2 } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { LibraryShell } from "./LibraryShell";
 import { CharacterThumbnail } from "./CharacterThumbnail";
 import { RenameCharacterDialog } from "./RenameCharacterDialog";
+import { EditCharacterVoiceDialog } from "./EditCharacterVoiceDialog";
 import { useCharacters } from "../hooks/useCharacters";
 import { deleteCharacter, findCharacter, libraryErrorKey } from "../lib/api";
 
@@ -19,6 +20,7 @@ export function CharacterDetail({ slug }: { slug: string }) {
     const { data, error, isLoading, mutate } = useCharacters();
     const character = data ? findCharacter(data.entities, slug) : undefined;
     const [renaming, setRenaming] = useState(false);
+    const [editingVoice, setEditingVoice] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState<string | null>(null);
     const [deleteBusy, setDeleteBusy] = useState(false);
@@ -57,6 +59,7 @@ export function CharacterDetail({ slug }: { slug: string }) {
         <div className="flex flex-wrap items-center justify-between gap-3">
             <Link href="/library/characters" className="inline-flex items-center gap-2 rounded-md text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="size-4" />{t("characters.detail.back")}</Link>
             <div className="flex gap-1">
+                <Button variant="outline" size="sm" onClick={() => setEditingVoice(true)}><Mic />{t("characters.editVoice")}</Button>
                 <Button variant="outline" size="sm" onClick={() => setRenaming(true)}><Pencil />{t("characters.rename")}</Button>
                 <Button variant="ghost" size="sm" onClick={() => { setDeleteError(null); setDeleting(true); }}><Trash2 />{t("characters.delete")}</Button>
             </div>
@@ -78,6 +81,7 @@ export function CharacterDetail({ slug }: { slug: string }) {
         </div>
 
         {renaming && <RenameCharacterDialog character={character} onClose={() => setRenaming(false)} onRenamed={() => { void mutate().catch(() => undefined); }} />}
+        {editingVoice && <EditCharacterVoiceDialog character={character} onClose={() => setEditingVoice(false)} onSaved={() => { void mutate().catch(() => undefined); }} />}
         <ConfirmDialog open={deleting} onClose={() => { if (!deleteBusy) { setDeleting(false); setDeleteError(null); } }}
             onConfirm={() => void confirmDelete()} busy={deleteBusy}
             title={t("characters.deleteTitle")}

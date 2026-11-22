@@ -959,6 +959,7 @@
       "title": "Personagens",
       "subtitle": "Membros do elenco reutilizáveis para suas gerações.",
       "new": "Novo personagem",
+      "editVoice": "Editar voz",
       "emptyTitle": "Ainda não há personagens",
       "emptyHint": "Crie o primeiro personagem com nome, notas e imagens de referência.",
       "emptyAction": "Criar um personagem",
@@ -994,6 +995,58 @@
         "slug": "Pasta: {slug}",
         "loading": "Carregando personagem..."
       }
+    },
+    "voice": {
+      "sectionTitle": "Voz",
+      "sectionHint": "Opcional. Escolha um provedor de texto para fala, uma voz e um idioma para as prévias e o diálogo.",
+      "checking": "Verificando provedores de voz...",
+      "providerLabel": "Provedor",
+      "providerNone": "Sem voz",
+      "providers": {
+        "elevenlabs": "ElevenLabs",
+        "comfyui": "ComfyUI"
+      },
+      "providerUnavailable": "{provider}: {reason}",
+      "reasons": {
+        "no_api_key": "Chave de API não configurada",
+        "no_base_url": "URL base não configurada",
+        "upstream_down": "Provedor inacessível",
+        "unknown": "Indisponível"
+      },
+      "noProvidersTitle": "Nenhum provedor de voz disponível",
+      "noProviders": "As prévias de voz não estão disponíveis porque nenhum provedor de texto para fala está configurado ou acessível. Você ainda pode criar e salvar o personagem agora e adicionar uma voz depois.",
+      "selectedUnavailable": "{provider} não está disponível: {reason}. Escolha outro provedor ou nenhuma voz.",
+      "providersError": "Não foi possível carregar os provedores de voz. Você ainda pode salvar o personagem sem voz.",
+      "voiceLabel": "Voz",
+      "voicePlaceholder": "Escolha uma voz",
+      "voicesLoading": "Carregando vozes...",
+      "voicesEmpty": "Este provedor não retornou vozes.",
+      "voicesError": "Não foi possível carregar as vozes.",
+      "languageLabel": "Idioma",
+      "languages": {
+        "en": "Inglês",
+        "es": "Espanhol",
+        "pt-BR": "Português (Brasil)",
+        "fr": "Francês",
+        "de": "Alemão",
+        "it": "Italiano",
+        "ja": "Japonês",
+        "ko": "Coreano",
+        "zh": "Chinês"
+      },
+      "sampleLabel": "Texto da prévia",
+      "sampleDefault": "Olá, esta é uma prévia de voz.",
+      "samplePlaceholder": "Texto para ler em voz alta",
+      "preview": "Prévia",
+      "previewing": "Gerando prévia...",
+      "previewError": "Não foi possível gerar a prévia.",
+      "previewReady": "Prévia pronta.",
+      "previewSaved": "Há uma prévia salva com este personagem.",
+      "audioLabel": "Áudio da prévia de voz",
+      "editTitle": "Editar a voz do personagem",
+      "editHint": "Escolha a voz de {name}. A voz é opcional.",
+      "save": "Salvar voz",
+      "saving": "Salvando..."
     },
     "scenes": {
       "title": "Cenas",

@@ -16,7 +16,9 @@ const generate = (page: Page) => page.getByRole("button", { name: new RegExp(`^$
 
 const timestamp = "2026-11-01T00:00:00.000Z";
 function character(id: string, name: string, assetIds: string[]): LibraryEntity {
-    return { id, kind: "character", ingredientKind: "character", name, slug: id, notes: "", assetIds, createdAt: timestamp, updatedAt: timestamp };
+    return { id, kind: "character", ingredientKind: "character", name, slug: id, notes: "", assetIds,
+        voice: { provider: "none", voiceId: null, language: "en", settings: {}, previewAssetId: null },
+        createdAt: timestamp, updatedAt: timestamp };
 }
 
 async function setup(page: Page) {

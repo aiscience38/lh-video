@@ -1,4 +1,4 @@
-import type { CharacterEntity, IngredientKind, LibraryAssetUpload, LibraryEntity, LibraryKind, LibraryListResponse } from "../types";
+import type { CharacterEntity, CharacterVoice, IngredientKind, LibraryAssetUpload, LibraryEntity, LibraryKind, LibraryListResponse, VoiceProvider } from "../types";
 
 export class LibraryRequestError extends Error {
     constructor(public readonly code: string, public readonly status: number) {
@@ -37,6 +37,7 @@ export interface CharacterInput {
     notes: string;
     assetIds: string[];
     ingredientKind?: IngredientKind;
+    voice?: CharacterVoice;
 }
 
 export async function createCharacter(input: CharacterInput): Promise<CharacterEntity> {
@@ -59,6 +60,83 @@ export async function updateCharacter(id: string, input: Partial<CharacterInput>
 
 export async function deleteCharacter(id: string): Promise<void> {
     await libraryRequest<{ ok: true }>(`/api/library/character/${encodeURIComponent(id)}`, { method: "DELETE" });
+}
+
+/** TTS availability as reported by the server half (sibling branch). */
+export interface TtsProviderStatus {
+    provider: string;
+    configured: boolean;
+    reachable: boolean;
+    reason: string | null;
+}
+
+export interface TtsVoice {
+    id: string;
+    name: string;
+    language?: string | null;
+}
+
+export interface TtsPreview {
+    assetId: string;
+    url: string;
+    mimeType: string;
+}
+
+export interface TtsPreviewInput {
+    provider: VoiceProvider;
+    voiceId: string;
+    text: string;
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+    return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
+}
+
+/**
+ * Normalizes `{ providers: [...] }` (or a bare array) so the UI keeps working
+ * while the server half evolves. Only `configured && reachable` is usable.
+ */
+export async function listTtsProviders(): Promise<TtsProviderStatus[]> {
+    const body = await libraryRequest<unknown>("/api/tts/providers", { cache: "no-store" });
+    const raw = Array.isArray(body) ? body : asRecord(body)?.providers;
+    if (!Array.isArray(raw)) return [];
+    return raw.flatMap(item => {
+        const record = asRecord(item);
+        if (!record || typeof record.provider !== "string") return [];
+        const reason = typeof record.reason === "string" && record.reason.trim() ? record.reason : null;
+        return [{
+            provider: record.provider,
+            configured: record.configured === true,
+            reachable: record.reachable === true,
+            reason,
+        }];
+    });
+}
+
+/** Normalizes `{ voices: [{ id, name }] }` or a bare array of voice objects. */
+export async function listTtsVoices(provider: VoiceProvider): Promise<TtsVoice[]> {
+    const params = new URLSearchParams({ provider });
+    const body = await libraryRequest<unknown>(`/api/tts/voices?${params}`, { cache: "no-store" });
+    const raw = Array.isArray(body) ? body : asRecord(body)?.voices;
+    if (!Array.isArray(raw)) return [];
+    return raw.flatMap(item => {
+        const record = asRecord(item);
+        if (!record) return [];
+        const id = typeof record.id === "string" ? record.id : typeof record.voiceId === "string" ? record.voiceId : null;
+        if (!id) return [];
+        const name = typeof record.name === "string" && record.name.trim() ? record.name
+            : typeof record.label === "string" && record.label.trim() ? record.label : id;
+        const language = typeof record.language === "string" ? record.language : null;
+        return [{ id, name, language }];
+    });
+}
+
+export function previewTtsVoice(input: TtsPreviewInput): Promise<TtsPreview> {
+    return libraryRequest<TtsPreview>("/api/tts/preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+    });
 }
 
 export async function uploadReference(file: File): Promise<LibraryAssetUpload> {
