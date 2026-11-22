@@ -31,6 +31,7 @@ export function MediaDetail({ taskId }: { taskId: string }) {
     const { filmstrip, error: filmstripError, isLoading: filmstripLoading } = useFilmstrip(taskId);
 
     const videoRef = useRef<HTMLVideoElement>(null);
+    const pendingSeekRef = useRef<number | null>(null);
     const requestRef = useRef<HTMLTextAreaElement>(null);
     const [currentTime, setCurrentTime] = useState(0);
     const [mediaDuration, setMediaDuration] = useState(0);
@@ -74,10 +75,22 @@ export function MediaDetail({ taskId }: { taskId: string }) {
         const limit = duration > 0 ? duration : Number.POSITIVE_INFINITY;
         const next = Math.max(0, Math.min(limit, Number.isFinite(time) ? time : 0));
         const video = videoRef.current;
+        pendingSeekRef.current = next;
         if (video) {
             try { video.currentTime = next; } catch { /* Metadata is not ready; loadedmetadata keeps the clock. */ }
         }
         setCurrentTime(next);
+    }
+
+    /** A late seeked/timeupdate event from the previous seek must not undo a newer frame step. */
+    function syncFromVideo(video: HTMLVideoElement): void {
+        const pending = pendingSeekRef.current;
+        const reported = video.currentTime;
+        if (pending !== null) {
+            if (Math.abs(reported - pending) <= 0.5 / fps) pendingSeekRef.current = null;
+            else return;
+        }
+        setCurrentTime(reported);
     }
 
     function stepFrame(direction: -1 | 1): void {
@@ -180,10 +193,10 @@ export function MediaDetail({ taskId }: { taskId: string }) {
                                     const video = event.currentTarget;
                                     setMediaDuration(Number.isFinite(video.duration) ? video.duration : 0);
                                     if (video.videoWidth && video.videoHeight) setDimensions({ width: video.videoWidth, height: video.videoHeight });
-                                    setCurrentTime(video.currentTime);
+                                    syncFromVideo(video);
                                 }}
-                                onTimeUpdate={event => setCurrentTime(event.currentTarget.currentTime)}
-                                onSeeked={event => setCurrentTime(event.currentTarget.currentTime)}
+                                onTimeUpdate={event => syncFromVideo(event.currentTarget)}
+                                onSeeked={event => syncFromVideo(event.currentTarget)}
                                 className="aspect-video max-h-[72dvh] w-full bg-black object-contain" />
                                 : <p role="status" className="grid aspect-video place-items-center gap-2 p-8 text-center text-sm text-muted-foreground">
                                     <Clapperboard aria-hidden="true" className="mx-auto size-6" />{t("notReady")}
@@ -317,10 +330,8 @@ export function MediaDetail({ taskId }: { taskId: string }) {
                             <div><dt className="text-xs text-muted-foreground">{t("prompt")}</dt><dd className="mt-1 whitespace-pre-wrap break-words leading-relaxed">{prompt}</dd></div>
                             <div><dt className="text-xs text-muted-foreground">{t("model")}</dt><dd data-testid="media-model" className="mt-1 break-words">{model}</dd></div>
                             <div><dt className="text-xs text-muted-foreground">{t("provider")}</dt><dd data-testid="media-provider" className="mt-1 break-words">{provider}</dd></div>
-                            <div className="grid grid-cols-2 gap-3">
-                                <div><dt className="text-xs text-muted-foreground">{t("duration")}</dt><dd data-testid="media-duration" className="mt-1 font-mono tabular-nums">{formatFrameTimecode(duration, fps)}</dd></div>
-                                <div><dt className="text-xs text-muted-foreground">{t("resolution")}</dt><dd data-testid="media-resolution" className="mt-1">{resolution}</dd></div>
-                            </div>
+                            <div><dt className="text-xs text-muted-foreground">{t("duration")}</dt><dd data-testid="media-duration" className="mt-1 font-mono tabular-nums">{formatFrameTimecode(duration, fps)}</dd></div>
+                            <div><dt className="text-xs text-muted-foreground">{t("resolution")}</dt><dd data-testid="media-resolution" className="mt-1">{resolution}</dd></div>
                             <div><dt className="flex items-center gap-1.5 text-xs text-muted-foreground"><CalendarDays aria-hidden="true" className="size-3.5" />{t("createdAt")}</dt><dd className="mt-1">{createdAt}</dd></div>
                             {seed !== null && <div><dt className="text-xs text-muted-foreground">{t("seed")}</dt><dd data-testid="media-seed" className="mt-1 font-mono tabular-nums">{seed}</dd></div>}
                             {params.length > 0 && <div>

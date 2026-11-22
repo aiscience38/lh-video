@@ -28,8 +28,10 @@ export function formatTimecode(seconds: number): string {
 export function formatFrameTimecode(seconds: number, fps = 24): string {
     const rate = Number.isFinite(fps) && fps > 0 ? Math.min(120, Math.round(fps)) : 24;
     const safe = Math.max(0, Number.isFinite(seconds) ? seconds : 0);
-    const whole = Math.floor(safe);
-    const frames = Math.min(rate - 1, Math.floor((safe - whole) * rate));
+    // Round to the nearest frame: 3.5416s at 24fps is frame 85, not 84 (float floor drift).
+    const totalFrames = Math.round(safe * rate);
+    const frames = totalFrames % rate;
+    const whole = Math.floor(totalFrames / rate);
     const hours = Math.floor(whole / 3600);
     const minutes = Math.floor((whole % 3600) / 60);
     const displaySeconds = whole % 60;

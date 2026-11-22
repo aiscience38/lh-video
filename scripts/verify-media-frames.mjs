@@ -64,6 +64,7 @@ test("the timeline timecode is hh:mm:ss:ff", () => {
     const { formatFrameTimecode } = environment(os.tmpdir()).load("@/lib/timecode");
     assert.equal(formatFrameTimecode(0, 24), "00:00:00:00");
     assert.equal(formatFrameTimecode(3.5, 24), "00:00:03:12");
+    assert.equal(formatFrameTimecode(3.5 + 1 / 24, 24), "00:00:03:13");
     assert.equal(formatFrameTimecode(3661.25, 24), "01:01:01:06");
     assert.equal(formatFrameTimecode(Number.NaN, 0), "00:00:00:00");
 });
