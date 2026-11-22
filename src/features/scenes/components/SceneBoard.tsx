@@ -10,7 +10,7 @@ import { ScenesShell } from "./ScenesShell";
 import { AddShotDialog } from "./AddShotDialog";
 import { ShotCard, SHOT_DRAG_TYPE } from "./ShotCard";
 import { useScene, SCENES_KEY } from "../hooks/useScenes";
-import { deriveShotStatus, useTaskStatuses } from "../hooks/useShotStatuses";
+import { deriveShotStatus, completedVideoTaskIds, useTaskStatuses } from "../hooks/useShotStatuses";
 import { deleteScene, sceneErrorKey, updateSceneShots } from "../lib/api";
 import { sortShots, type SceneShotInput } from "../types";
 import { useSWRConfig } from "swr";
@@ -148,6 +148,7 @@ export function SceneBoard({ sceneId }: { sceneId: string }) {
                 {shots.map((shot, index) => <li key={shot.id}>
                     <ShotCard shot={shot} index={index} total={shots.length}
                         status={deriveShotStatus(shot.taskIds, taskStatuses)}
+                        videoTaskIds={completedVideoTaskIds(shot.taskIds, taskStatuses)}
                         saving={saving} dragging={dragging === shot.id} over={over === shot.id}
                         onMove={direction => moveShot(index, index + direction)}
                         onDelete={() => { setDeleteError(null); setDeletingShot(index); }}

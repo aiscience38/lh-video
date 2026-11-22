@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertCircle, ArrowLeft, ArrowRight, ArrowUpRight, Check, CheckCheck, ChevronDown, Clapperboard, Copy, Download, Film, Image as ImageIcon, ImagePlus, Loader2, MoreHorizontal, Play, Search, SlidersHorizontal, Trash2, Users, Video, X } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { useModelCopy } from "@/i18n/use-model-copy";
 import { useRuntimeModels } from "@/features/catalog/hooks/useRuntimeModels";
 import { Button } from "@/components/ui/button";
@@ -376,6 +377,7 @@ function Gallery({ mode, empty, onReusePrompt, onSendImage }: GalleryProps) {
                     onSetKeyframe={item.preview?.mediaType === "image" ? () => setAsKeyframe(item) : undefined}
                     onExtend={item.preview?.mediaType === "video" ? () => void extend(item) : undefined}
                     extending={extending === item.taskId}
+                    detailHref={item.preview?.mediaType === "video" && (item.task.status ?? item.task.freepik_status) === "COMPLETED" ? `/media/${encodeURIComponent(item.taskId)}` : undefined}
                     onPreview={() => { opener.current = document.activeElement as HTMLElement; setPreview({ items: allOutputs, index: allOutputs.findIndex(output => output.url === item.preview?.url) }); }}
                     onDragStart={event => {
                         // One gesture serves both drops: another tile reorders, the prompt receives the image as a reference.
@@ -425,10 +427,10 @@ function Hint({ label, children }: { label: string; children: React.ReactElement
     return <Tooltip><TooltipTrigger render={children} /><TooltipContent side="left">{label}</TooltipContent></Tooltip>;
 }
 
-function GalleryTile({ item, selected, selecting, dragging, over, canMoveBefore, canMoveAfter, onSelect, onDelete, onPreview, onReusePrompt, onSendImage, onAddToCharacter, onSetKeyframe, onExtend, extending, onDragStart, onOver, onLeave, onDrop, onDragEnd, onMove }: {
+function GalleryTile({ item, selected, selecting, dragging, over, canMoveBefore, canMoveAfter, onSelect, onDelete, onPreview, onReusePrompt, onSendImage, onAddToCharacter, onSetKeyframe, onExtend, extending, detailHref, onDragStart, onOver, onLeave, onDrop, onDragEnd, onMove }: {
     item: GalleryItem; selected: boolean; selecting: boolean; dragging: boolean; over: boolean; canMoveBefore: boolean; canMoveAfter: boolean;
     onSelect: (range: boolean) => void; onDelete: () => void; onPreview: () => void; onReusePrompt?: () => void; onSendImage?: (target: ImageTarget) => void;
-    onAddToCharacter?: () => void; onSetKeyframe?: () => void; onExtend?: () => void; extending: boolean;
+    onAddToCharacter?: () => void; onSetKeyframe?: () => void; onExtend?: () => void; extending: boolean; detailHref?: string;
     onDragStart: (event: React.DragEvent) => void; onOver: (event: React.DragEvent) => void; onLeave: (event: React.DragEvent) => void; onDrop: (event: React.DragEvent) => void; onDragEnd: () => void; onMove: (direction: number) => void;
 }) {
     const t = useTranslations("tasks");
@@ -452,6 +454,14 @@ function GalleryTile({ item, selected, selecting, dragging, over, canMoveBefore,
     const showActions = !selecting;
     const draggable = !selecting && (Boolean(preview) || canMoveBefore || canMoveAfter);
     const libraryActions = Boolean(onAddToCharacter || onSetKeyframe || onExtend);
+    // A completed video's tile opens the detail page; images keep the lightbox.
+    const previewSurface = preview ? <>
+        {preview.mediaType === "video"
+            ? <video ref={video} src={preview.url} muted loop playsInline preload="metadata" onLoadedMetadata={event => measured(event.currentTarget.videoWidth, event.currentTarget.videoHeight)} className={`size-full object-cover transition-transform duration-200 ${selected ? "scale-[.94] rounded-md" : ""}`} />
+            // eslint-disable-next-line @next/next/no-img-element
+            : <img src={preview.url} alt={t("imageAlt", { index: (item.index ?? 0) + 1 })} draggable={false} loading="lazy" onLoad={event => measured(event.currentTarget.naturalWidth, event.currentTarget.naturalHeight)} className={`size-full object-cover transition-transform duration-200 ${selected ? "scale-[.94] rounded-md" : ""}`} />}
+        {preview.mediaType === "video" && <span aria-hidden="true" className="absolute bottom-2 left-2 grid size-6 place-items-center rounded-full bg-black/60 transition-opacity group-hover/tile:opacity-0"><Play className="ml-px size-3 fill-current" /></span>}
+    </> : null;
 
     return <article data-gallery-key={galleryKey(item)} aria-label={name} draggable={draggable} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onOver} onDragLeave={onLeave} onDrop={onDrop} onClick={event => {
         if (!selecting || event.defaultPrevented) return;
@@ -462,14 +472,16 @@ function GalleryTile({ item, selected, selecting, dragging, over, canMoveBefore,
         onMouseEnter={() => { if (!selecting) void video.current?.play().catch(() => undefined); }}
         onMouseLeave={() => { if (video.current) { video.current.pause(); video.current.currentTime = 0; } }}
         className={`group/tile @container relative min-w-0 overflow-hidden rounded-lg bg-white/[.04] transition-[opacity,box-shadow] ${selected || over ? "outline-2 -outline-offset-2 outline-primary" : ""} ${dragging ? "opacity-40" : ""}`}>
-        {preview ? <button type="button" data-gallery-preview aria-label={selecting ? t("selectItem", { name }) : `${t("preview")} - ${name}`} title={selecting ? undefined : t("dragImageHint")} onClick={event => { event.stopPropagation(); if (selecting || event.shiftKey || event.ctrlKey || event.metaKey) onSelect(event.shiftKey); else onPreview(); }}
-            className={`absolute inset-0 block size-full overflow-hidden focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary ${selecting ? "cursor-pointer" : "cursor-zoom-in"}`}>
-            {preview.mediaType === "video"
-                ? <video ref={video} src={preview.url} muted loop playsInline preload="metadata" onLoadedMetadata={event => measured(event.currentTarget.videoWidth, event.currentTarget.videoHeight)} className={`size-full object-cover transition-transform duration-200 ${selected ? "scale-[.94] rounded-md" : ""}`} />
-                // eslint-disable-next-line @next/next/no-img-element
-                : <img src={preview.url} alt={t("imageAlt", { index: (item.index ?? 0) + 1 })} draggable={false} loading="lazy" onLoad={event => measured(event.currentTarget.naturalWidth, event.currentTarget.naturalHeight)} className={`size-full object-cover transition-transform duration-200 ${selected ? "scale-[.94] rounded-md" : ""}`} />}
-            {preview.mediaType === "video" && <span aria-hidden="true" className="absolute bottom-2 left-2 grid size-6 place-items-center rounded-full bg-black/60 transition-opacity group-hover/tile:opacity-0"><Play className="ml-px size-3 fill-current" /></span>}
-        </button> : <div role={pending ? "status" : undefined} title={technicalError} className="absolute inset-0 flex flex-col items-center justify-center gap-2 overflow-hidden bg-[radial-gradient(circle_at_center,rgba(255,255,255,.05),transparent_70%)] p-4 text-center">
+        {preview ? (detailHref
+            ? <Link href={detailHref} data-gallery-preview aria-label={`${t("openVideo")} - ${name}`}
+                onClick={event => { if (selecting || event.shiftKey || event.ctrlKey || event.metaKey) { event.preventDefault(); onSelect(event.shiftKey); } }}
+                className={`absolute inset-0 block size-full overflow-hidden focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary ${selecting ? "cursor-pointer" : ""}`}>
+                {previewSurface}
+            </Link>
+            : <button type="button" data-gallery-preview aria-label={selecting ? t("selectItem", { name }) : `${t("preview")} - ${name}`} title={selecting ? undefined : t("dragImageHint")} onClick={event => { event.stopPropagation(); if (selecting || event.shiftKey || event.ctrlKey || event.metaKey) onSelect(event.shiftKey); else onPreview(); }}
+                className={`absolute inset-0 block size-full overflow-hidden focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary ${selecting ? "cursor-pointer" : "cursor-zoom-in"}`}>
+                {previewSurface}
+            </button>) : <div role={pending ? "status" : undefined} title={technicalError} className="absolute inset-0 flex flex-col items-center justify-center gap-2 overflow-hidden bg-[radial-gradient(circle_at_center,rgba(255,255,255,.05),transparent_70%)] p-4 text-center">
             {pending ? <><Loader2 aria-hidden="true" className="size-6 animate-spin text-primary" /><p className="text-xs">{t("waiting")}</p><p className="text-[11px] tabular-nums text-muted-foreground">{t("status.IN_PROGRESS")} · {t("elapsed", { seconds: elapsed })}</p></>
                 : <><AlertCircle aria-hidden="true" className="size-5 shrink-0 text-destructive" /><p className="line-clamp-4 text-[11px] leading-relaxed text-destructive/90">{status === "COMPLETED" ? t("noOutput") : failure}</p></>}
         </div>}
@@ -491,6 +503,7 @@ function GalleryTile({ item, selected, selecting, dragging, over, canMoveBefore,
                 <DropdownMenuTrigger aria-label={t("moreActions")} className={roundAction}><MoreHorizontal className="size-4" /></DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-64 p-1.5">
                     {preview && <DropdownMenuItem className="min-h-9" onClick={onPreview}><ArrowUpRight />{t("open")}</DropdownMenuItem>}
+                    {detailHref && <DropdownMenuItem className="min-h-9" render={<Link href={detailHref} />}><Video />{t("openVideo")}</DropdownMenuItem>}
                     {onReusePrompt && <DropdownMenuItem className="min-h-9" onClick={onReusePrompt}><Copy />{t("reusePrompt")}</DropdownMenuItem>}
                     {onSendImage && <>
                         <DropdownMenuItem className="min-h-9" onClick={() => onSendImage("reference")}><ImagePlus />{t("useAsReference")}</DropdownMenuItem>

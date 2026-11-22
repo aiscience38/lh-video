@@ -5,12 +5,10 @@ import path from "node:path";
 import { readBoundedJson, requestFailure } from "@/server/http/request-limits";
 import { ASSET_ID_PATTERN } from "@/server/library/contract";
 import { getTask, initStore } from "@/server/tasks/store";
-import { DOWNLOADS_DIR, openLocalMedia, saveInputLocally } from "@/server/media/storage";
-import { reusableTaskAsset } from "@/server/media/asset-source";
-import { fetchRemoteMedia, mediaByteLimit } from "@/server/media/transfer";
+import { saveInputLocally } from "@/server/media/storage";
 import { toJpeg } from "@/server/media/input-upload";
 import { extractLastFrame, FFMPEG_MISSING_ERROR, LastFrameError } from "@/server/media/last-frame";
-import type { AnyTask } from "@/types";
+import { taskVideoFile } from "@/server/media/task-video";
 import { applyWorkspaceHeaders, guardWorkspaceRequest } from "@/server/security/workspace-access";
 
 export const runtime = "nodejs";
@@ -21,22 +19,6 @@ const UPLOADED_JPEG = /^\/api\/uploaded\/([a-f0-9]{64})\.jpg$/;
 
 function failure(code: string, status: number): Response {
     return applyWorkspaceHeaders(NextResponse.json({ error: code }, { status }));
-}
-
-/** A local file ffmpeg can seek in; remote-only tasks are downloaded to the temp directory first. */
-async function videoFile(task: Extract<AnyTask, { media_type: "video" }>, directory: string): Promise<string> {
-    if (task.video_path) {
-        const local = await openLocalMedia(task.video_path, DOWNLOADS_DIR);
-        await local.handle.close();
-        return task.video_path;
-    }
-    const asset = await reusableTaskAsset(task, 0);
-    const data = "data" in asset
-        ? asset.data
-        : (await fetchRemoteMedia(asset.url, { maxBytes: mediaByteLimit("video/") })).data;
-    const target = path.join(directory, "source.mp4");
-    await fs.writeFile(target, data);
-    return target;
 }
 
 /**
@@ -63,7 +45,7 @@ export async function POST(request: Request) {
     if ((task.status ?? task.freepik_status) !== "COMPLETED") return failure("ERR_LAST_FRAME_NOT_READY", 409);
     const directory = await fs.mkdtemp(path.join(os.tmpdir(), "lh-last-frame-"));
     try {
-        const source = await videoFile(task, directory);
+        const source = await taskVideoFile(task, directory, { signal: request.signal });
         const frame = await extractLastFrame(source, path.join(directory, "last-frame.png"), { signal: request.signal });
         const url = await saveInputLocally(await toJpeg(frame), ".jpg");
         const match = UPLOADED_JPEG.exec(url);

@@ -231,7 +231,8 @@
     "copyPrompt": "Copy prompt",
     "promptCopied": "Prompt copied",
     "copyFailed": "Could not copy",
-    "previewActions": "Image actions"
+    "previewActions": "Image actions",
+    "openVideo": "Open video details"
   },
   "errors": {
     "ERR_NO_API_KEY": "Connect an account in Providers before generating.",
@@ -291,7 +292,8 @@
     "ERR_INVALID_MODEL_PARAMS": "Some generation settings are invalid for this model. Review the settings and try again.",
     "ERR_GALLERY_CONFLICT": "The gallery changed while you were editing. Reload the history and try again.",
     "ERR_GALLERY_INVALID_REQUEST": "This selection cannot be saved. Select up to 1,000 current items and try again.",
-    "ERR_END_FRAME_UNSUPPORTED": "The selected video model does not accept an end frame. Choose a model with start and end frames."
+    "ERR_END_FRAME_UNSUPPORTED": "The selected video model does not accept an end frame. Choose a model with start and end frames.",
+    "ERR_QA_FFMPEG_MISSING": "ffmpeg or ffprobe is required for the filmstrip and last-frame tools. Install them or set FFMPEG_PATH and FFPROBE_PATH."
   },
   "validation": {
     "promptRequired": "Prompt is required",
@@ -4503,7 +4505,8 @@
       "ERR_REQUEST_INVALID": "The request was not valid.",
       "ERR_REQUEST_TOO_LARGE": "The request is too large.",
       "ERR_SHOT_PROMPT_REQUIRED": "Write a prompt for the shot."
-    }
+    },
+    "openVideo": "Open video"
   },
   "picker": {
     "trigger": "Add from library",
@@ -4617,5 +4620,66 @@
       "unverified": "Unverified"
     },
     "providerMissing": "The ComfyUI provider definition is unavailable, so the import dialog cannot open."
+  },
+  "media": {
+    "detail": {
+      "eyebrow": "Rendered video",
+      "title": "Video details",
+      "backToGallery": "Back to gallery",
+      "loading": "Loading video…",
+      "notFound": "Video not found",
+      "notFoundHint": "This task does not exist or does not contain a video.",
+      "loadError": "The video could not be loaded",
+      "loadErrorHint": "The detail service is unavailable. Try again from the gallery.",
+      "playerLabel": "Rendered video player",
+      "notReady": "This video is still rendering. The player appears when the task completes.",
+      "timelineLabel": "Timeline",
+      "framesLoading": "Building the filmstrip…",
+      "framesError": "The filmstrip could not be generated.",
+      "seekTo": "Seek to {time}",
+      "scrub": "Timeline playhead",
+      "previousFrame": "Previous frame",
+      "nextFrame": "Next frame",
+      "play": "Play",
+      "noPrompt": "No prompt was stored for this render.",
+      "unknown": "Not recorded",
+      "prompt": "Prompt",
+      "model": "Model",
+      "provider": "Provider",
+      "duration": "Duration",
+      "resolution": "Resolution",
+      "createdAt": "Created",
+      "seed": "Seed",
+      "params": "Parameters",
+      "download": "Download video",
+      "metadataLabel": "Video metadata",
+      "nativePlayerHint": "Playback uses the browser's native video controls. The filmstrip is generated from the stored render and cached on disk."
+    },
+    "edit": {
+      "title": "Request an edit",
+      "subtitle": "Describe the change you want. The request is stored with this task for review; no provider job is submitted.",
+      "model": "Editing model",
+      "chooseModel": "Choose a model",
+      "noVideoEditingModels": "No video-to-video editing model is available",
+      "noModelsExplanation": "No connected model declares video-to-video editing. Requests are recorded for a future adapter; this page will not pretend to render an edit.",
+      "requestLabel": "Edit request",
+      "requestPlaceholder": "Describe the change, timing and anything that must stay identical…",
+      "submit": "Save edit request",
+      "submitting": "Saving…",
+      "submitted": "Edit request saved to this video's review notes.",
+      "submitError": "The edit request could not be saved.",
+      "extend": "Extend from last frame",
+      "extending": "Extracting last frame…",
+      "extendReady": "The last frame is ready as the start frame. Describe the extension below.",
+      "extendError": "The last frame could not be extracted.",
+      "startFrame": "Start frame from the last frame",
+      "startFrameAlt": "Last frame of the rendered video",
+      "compare": "Compare revisions",
+      "notesTitle": "Edit requests and notes",
+      "notesHint": "Saved through the notes API and linked to this task; reloading the page keeps them.",
+      "notesLoading": "Loading notes…",
+      "notesEmpty": "No edit requests or notes yet.",
+      "notesError": "Notes could not be loaded."
+    }
   }
 }

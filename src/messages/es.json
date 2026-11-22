@@ -231,7 +231,8 @@
     "copyPrompt": "Copiar prompt",
     "promptCopied": "Prompt copiado",
     "copyFailed": "No se pudo copiar",
-    "previewActions": "Acciones de la imagen"
+    "previewActions": "Acciones de la imagen",
+    "openVideo": "Abrir detalles del video"
   },
   "errors": {
     "ERR_NO_API_KEY": "Conecta una cuenta en Proveedores antes de generar.",
@@ -291,7 +292,8 @@
     "ERR_INVALID_MODEL_PARAMS": "Algunos ajustes de generación no son válidos para este modelo. Revisa los ajustes e inténtalo de nuevo.",
     "ERR_GALLERY_CONFLICT": "La galería cambió durante la edición. Recarga el historial e inténtalo de nuevo.",
     "ERR_GALLERY_INVALID_REQUEST": "No se puede guardar esta selección. Selecciona hasta 1.000 elementos actuales e inténtalo de nuevo.",
-    "ERR_END_FRAME_UNSUPPORTED": "El modelo de vídeo seleccionado no acepta un fotograma final. Elige un modelo con fotograma inicial y final."
+    "ERR_END_FRAME_UNSUPPORTED": "El modelo de vídeo seleccionado no acepta un fotograma final. Elige un modelo con fotograma inicial y final.",
+    "ERR_QA_FFMPEG_MISSING": "Se requieren ffmpeg o ffprobe para la tira de fotogramas y el último fotograma. Instálalos o define FFMPEG_PATH y FFPROBE_PATH."
   },
   "commandBar": {
     "chooseModel": "Elegir modelo",
@@ -1298,7 +1300,8 @@
       "ERR_REQUEST_INVALID": "La solicitud no es válida.",
       "ERR_REQUEST_TOO_LARGE": "La solicitud es demasiado grande.",
       "ERR_SHOT_PROMPT_REQUIRED": "Escribe un prompt para el plano."
-    }
+    },
+    "openVideo": "Abrir video"
   },
   "providers": {
     "eyebrow": "PROVEEDORES",
@@ -4617,5 +4620,66 @@
       "unverified": "Sin verificar"
     },
     "providerMissing": "La definición del proveedor ComfyUI no está disponible, por lo que el diálogo de importación no puede abrirse."
+  },
+  "media": {
+    "detail": {
+      "eyebrow": "Video renderizado",
+      "title": "Detalles del video",
+      "backToGallery": "Volver a la galería",
+      "loading": "Cargando video…",
+      "notFound": "Video no encontrado",
+      "notFoundHint": "Esta tarea no existe o no contiene un video.",
+      "loadError": "No se pudo cargar el video",
+      "loadErrorHint": "El servicio de detalles no está disponible. Vuelve a intentarlo desde la galería.",
+      "playerLabel": "Reproductor de video renderizado",
+      "notReady": "Este video aún se está renderizando. El reproductor aparece cuando la tarea termina.",
+      "timelineLabel": "Línea de tiempo",
+      "framesLoading": "Generando la tira de fotogramas…",
+      "framesError": "No se pudo generar la tira de fotogramas.",
+      "seekTo": "Ir a {time}",
+      "scrub": "Cabezal de la línea de tiempo",
+      "previousFrame": "Fotograma anterior",
+      "nextFrame": "Fotograma siguiente",
+      "play": "Reproducir",
+      "noPrompt": "No se guardó ningún prompt para este render.",
+      "unknown": "No registrado",
+      "prompt": "Prompt",
+      "model": "Modelo",
+      "provider": "Proveedor",
+      "duration": "Duración",
+      "resolution": "Resolución",
+      "createdAt": "Creado",
+      "seed": "Semilla",
+      "params": "Parámetros",
+      "download": "Descargar video",
+      "metadataLabel": "Metadatos del video",
+      "nativePlayerHint": "La reproducción usa los controles nativos del navegador. La tira de fotogramas se genera a partir del render guardado y se almacena en caché."
+    },
+    "edit": {
+      "title": "Solicitar una edición",
+      "subtitle": "Describe el cambio que quieres. La solicitud se guarda con esta tarea para revisión; no se envía ningún trabajo al proveedor.",
+      "model": "Modelo de edición",
+      "chooseModel": "Elige un modelo",
+      "noVideoEditingModels": "No hay ningún modelo de edición video a video disponible",
+      "noModelsExplanation": "Ningún modelo conectado declara edición video a video. Las solicitudes se registran para un adaptador futuro; esta página no finge renderizar una edición.",
+      "requestLabel": "Solicitud de edición",
+      "requestPlaceholder": "Describe el cambio, el momento y lo que debe permanecer idéntico…",
+      "submit": "Guardar solicitud",
+      "submitting": "Guardando…",
+      "submitted": "Solicitud guardada en las notas de revisión de este video.",
+      "submitError": "No se pudo guardar la solicitud.",
+      "extend": "Extender desde el último fotograma",
+      "extending": "Extrayendo el último fotograma…",
+      "extendReady": "El último fotograma está listo como fotograma inicial. Describe la extensión abajo.",
+      "extendError": "No se pudo extraer el último fotograma.",
+      "startFrame": "Fotograma inicial del último fotograma",
+      "startFrameAlt": "Último fotograma del video renderizado",
+      "compare": "Comparar revisiones",
+      "notesTitle": "Solicitudes y notas",
+      "notesHint": "Guardadas mediante la API de notas y vinculadas a esta tarea; al recargar la página se conservan.",
+      "notesLoading": "Cargando notas…",
+      "notesEmpty": "Aún no hay solicitudes ni notas.",
+      "notesError": "No se pudieron cargar las notas."
+    }
   }
 }

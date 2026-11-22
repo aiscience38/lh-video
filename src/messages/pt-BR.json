@@ -231,7 +231,8 @@
     "copyPrompt": "Copiar prompt",
     "promptCopied": "Prompt copiado",
     "copyFailed": "Não foi possível copiar",
-    "previewActions": "Ações da imagem"
+    "previewActions": "Ações da imagem",
+    "openVideo": "Abrir detalhes do vídeo"
   },
   "errors": {
     "ERR_NO_API_KEY": "Conecte uma conta em Provedores antes de gerar.",
@@ -291,7 +292,8 @@
     "ERR_INVALID_MODEL_PARAMS": "Algumas configurações de geração são inválidas para este modelo. Revise as configurações e tente novamente.",
     "ERR_GALLERY_CONFLICT": "A galeria mudou durante a edição. Recarregue o histórico e tente novamente.",
     "ERR_GALLERY_INVALID_REQUEST": "Não foi possível salvar esta seleção. Selecione até 1.000 itens atuais e tente novamente.",
-    "ERR_END_FRAME_UNSUPPORTED": "O modelo de vídeo selecionado não aceita quadro final. Escolha um modelo com quadro inicial e final."
+    "ERR_END_FRAME_UNSUPPORTED": "O modelo de vídeo selecionado não aceita quadro final. Escolha um modelo com quadro inicial e final.",
+    "ERR_QA_FFMPEG_MISSING": "ffmpeg ou ffprobe é necessário para a tira de quadros e o último quadro. Instale-os ou defina FFMPEG_PATH e FFPROBE_PATH."
   },
   "validation": {
     "promptRequired": "O prompt é obrigatório",
@@ -4503,7 +4505,8 @@
       "ERR_REQUEST_INVALID": "A solicitação não é válida.",
       "ERR_REQUEST_TOO_LARGE": "A solicitação é grande demais.",
       "ERR_SHOT_PROMPT_REQUIRED": "Escreva um prompt para o plano."
-    }
+    },
+    "openVideo": "Abrir vídeo"
   },
   "picker": {
     "trigger": "Adicionar da biblioteca",
@@ -4617,5 +4620,66 @@
       "unverified": "Não verificado"
     },
     "providerMissing": "A definição do provedor ComfyUI não está disponível, então o diálogo de importação não pode abrir."
+  },
+  "media": {
+    "detail": {
+      "eyebrow": "Vídeo renderizado",
+      "title": "Detalhes do vídeo",
+      "backToGallery": "Voltar à galeria",
+      "loading": "Carregando vídeo…",
+      "notFound": "Vídeo não encontrado",
+      "notFoundHint": "Esta tarefa não existe ou não contém um vídeo.",
+      "loadError": "Não foi possível carregar o vídeo",
+      "loadErrorHint": "O serviço de detalhes está indisponível. Tente novamente pela galeria.",
+      "playerLabel": "Player de vídeo renderizado",
+      "notReady": "Este vídeo ainda está sendo renderizado. O player aparece quando a tarefa termina.",
+      "timelineLabel": "Linha do tempo",
+      "framesLoading": "Gerando a tira de quadros…",
+      "framesError": "Não foi possível gerar a tira de quadros.",
+      "seekTo": "Ir para {time}",
+      "scrub": "Cursor da linha do tempo",
+      "previousFrame": "Quadro anterior",
+      "nextFrame": "Próximo quadro",
+      "play": "Reproduzir",
+      "noPrompt": "Nenhum prompt foi salvo para esta renderização.",
+      "unknown": "Não registrado",
+      "prompt": "Prompt",
+      "model": "Modelo",
+      "provider": "Provedor",
+      "duration": "Duração",
+      "resolution": "Resolução",
+      "createdAt": "Criado em",
+      "seed": "Semente",
+      "params": "Parâmetros",
+      "download": "Baixar vídeo",
+      "metadataLabel": "Metadados do vídeo",
+      "nativePlayerHint": "A reprodução usa os controles nativos do navegador. A tira de quadros é gerada a partir da renderização armazenada e fica em cache no disco."
+    },
+    "edit": {
+      "title": "Solicitar uma edição",
+      "subtitle": "Descreva a mudança desejada. A solicitação fica salva com esta tarefa para revisão; nenhum job é enviado ao provedor.",
+      "model": "Modelo de edição",
+      "chooseModel": "Escolha um modelo",
+      "noVideoEditingModels": "Nenhum modelo de edição vídeo a vídeo disponível",
+      "noModelsExplanation": "Nenhum modelo conectado declara edição vídeo a vídeo. As solicitações são registradas para um adaptador futuro; esta página não finge renderizar uma edição.",
+      "requestLabel": "Solicitação de edição",
+      "requestPlaceholder": "Descreva a mudança, o momento e tudo que deve permanecer idêntico…",
+      "submit": "Salvar solicitação",
+      "submitting": "Salvando…",
+      "submitted": "Solicitação salva nas notas de revisão deste vídeo.",
+      "submitError": "Não foi possível salvar a solicitação.",
+      "extend": "Estender a partir do último quadro",
+      "extending": "Extraindo o último quadro…",
+      "extendReady": "O último quadro está pronto como quadro inicial. Descreva a extensão abaixo.",
+      "extendError": "Não foi possível extrair o último quadro.",
+      "startFrame": "Quadro inicial do último quadro",
+      "startFrameAlt": "Último quadro do vídeo renderizado",
+      "compare": "Comparar revisões",
+      "notesTitle": "Solicitações e notas",
+      "notesHint": "Salvas pela API de notas e vinculadas a esta tarefa; recarregar a página mantém tudo.",
+      "notesLoading": "Carregando notas…",
+      "notesEmpty": "Ainda não há solicitações nem notas.",
+      "notesError": "Não foi possível carregar as notas."
+    }
   }
 }
