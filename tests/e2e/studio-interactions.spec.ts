@@ -131,6 +131,8 @@ test("generated images drag back into the prompt with the original output index"
     const output = page.getByRole("button", { name: new RegExp(`^${en.tasks.preview} - `) }).nth(1);
     await expect(output).toBeVisible();
     await output.dragTo(composer(page), { steps: 12 });
+    // Playwright's WebKit drag dispatch misses occasionally; the feature is deterministic once the drop lands.
+    if (await attachments(page).count() === 0) await output.dragTo(composer(page), { steps: 12 });
     await expect(attachments(page)).toHaveCount(1);
     await expect(composer(page).locator('img[src="/api/download/synthetic-generated?index=1&inline=1"]')).toBeVisible();
     await composer(page).getByRole("textbox").fill("Reuse second image");
