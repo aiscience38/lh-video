@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import useSWR from "swr";
 import { useTranslations } from "next-intl";
 import { AlertCircle, FileJson, Loader2, Plus } from "lucide-react";
@@ -39,7 +39,7 @@ function statusKey(template: WorkflowTemplate): "enabled" | "disabled" | "unveri
 }
 
 export default function ToolsPage() {
-    return <Suspense fallback={null}><ToolsLibrary /></Suspense>;
+    return <ToolsLibrary />;
 }
 
 function ToolsLibrary() {
